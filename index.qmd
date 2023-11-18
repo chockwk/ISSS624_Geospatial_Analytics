@@ -1,0 +1,15 @@
+---
+title: "ISSS624_Geospatial_Analytics"
+---
+
+Welcome to ISSS624 AY2023!
+
+This page documents my learning journey of geospatial analytics.
+
+Mac
+
+1.  install.packages("httr2")
+
+2.  Set up git by typing usethis::use_git() in console. When prompted "*Is it ok to commit them?* ", selection "*Not now*". You will observe an icon GI+ appeared in toolbar menu.
+
+3.  
