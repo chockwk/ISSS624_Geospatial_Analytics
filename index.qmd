@@ -6,10 +6,32 @@ Welcome to ISSS624 AY2023!
 
 This page documents my learning journey of geospatial analytics.
 
-Mac
+Mac User Journey
 
 1.  install.packages("httr2")
 
 2.  Set up git by typing usethis::use_git() in console. When prompted "*Is it ok to commit them?* ", selection "*Not now*". You will observe an icon GI+ appeared in toolbar menu.
 
-3.  
+3.  Create a github token.
+
+    a\) install.packages(c("gh", "gitcreds"))
+
+    b\) usethis::create_github_token()
+
+    c\) gitcreds::gitcreds_set() and enter your token
+
+    d\) gh::gh_whoami()
+
+4.  Set up new github repository for the project by typing usethis::use_github() in console.
+
+5.  Publish webpage through Netlify: https://www.netlify.com.
+
+    a\) Sign up through Github account.
+
+    b\) Add a new site and indicate \_site in *Publish directory*.
+
+    c\) Deploy site.
+
+6.  
+
+7.  

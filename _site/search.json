@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "ISSS624_Geospatial_Analytics",
     "section": "",
-    "text": "Welcome to ISSS624 AY2023!\nThis page documents my learning journey of geospatial analytics."
+    "text": "Welcome to ISSS624 AY2023!\nThis page documents my learning journey of geospatial analytics.\nMac User Journey\n\ninstall.packages(“httr2”)\nSet up git by typing usethis::use_git() in console. When prompted “Is it ok to commit them?”, selection “Not now”. You will observe an icon GI+ appeared in toolbar menu.\nCreate a github token.\na) install.packages(c(“gh”, “gitcreds”))\nb) usethis::create_github_token()\nc) gitcreds::gitcreds_set() and enter your token\nd) gh::gh_whoami()\nSet up new github repository for the project by typing usethis::use_github() in console.\nPublish webpage through Netlify: https://www.netlify.com.\na) Sign up through Github account.\nb) Add a new site and indicate _site in Publish directory.\nc) Deploy site."
   },
   {
     "objectID": "about.html",
@@ -12,5 +12,12 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "Handson_Ex/Handson_Ex01/Handson_Ex01.html",
+    "href": "Handson_Ex/Handson_Ex01/Handson_Ex01.html",
+    "title": "Handson_Ex01",
+    "section": "",
+    "text": "Overview\nThis is the first hands-on exercise.\nGetting started"
   }
 ]
