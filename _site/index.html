@@ -97,7 +97,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-hands-on-ex">    
         <li>
-    <a class="dropdown-item" href="./Handson_Ex/Handson_Ex01/Handson_Ex01.html" rel="" target="">
+    <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html" rel="" target="">
  <span class="dropdown-text">Hands-on Ex01</span></a>
   </li>  
         <li class="dropdown-header">Hands-on Ex02</li>
@@ -156,9 +156,15 @@ ul.task-list li input[type="checkbox"] {
 <p>This page documents my learning journey of geospatial analytics.</p>
 <p>Mac User Journey</p>
 <ol type="1">
-<li><p>install.packages(“httr2”)</p></li>
+<li><p>Install R studio</p></li>
+<li><p>Install git</p></li>
+<li><p>Several packages requires <em>Rtools</em> and works under Windows. To resolve, type the following codes in console:</p>
+<p>a) install.packages(“remotes”)</p>
+<p>b) remotes::install_github(“rmacoslib/macrtools”)</p>
+<p>c) install.packages(“httr2”)</p>
+<p>Note: httr2 is a package that provides tools for creating and modifying HTTP requests, then performing them and processing the results. ‘httr2’ is a modern re-imagining of ‘httr’ that uses a pipe-based interface and solves more of the problems that API wrapping packages face.</p></li>
 <li><p>Set up git by typing usethis::use_git() in console. When prompted “<em>Is it ok to commit them?</em>”, selection “<em>Not now</em>”. You will observe an icon GI+ appeared in toolbar menu.</p></li>
-<li><p>Create a github token.</p>
+<li><p>Create a github token through the following codes in console:</p>
 <p>a) install.packages(c(“gh”, “gitcreds”))</p>
 <p>b) usethis::create_github_token()</p>
 <p>c) gitcreds::gitcreds_set() and enter your token</p>
@@ -168,8 +174,6 @@ ul.task-list li input[type="checkbox"] {
 <p>a) Sign up through Github account.</p>
 <p>b) Add a new site and indicate _site in <em>Publish directory</em>.</p>
 <p>c) Deploy site.</p></li>
-<li></li>
-<li></li>
 </ol>
 
 

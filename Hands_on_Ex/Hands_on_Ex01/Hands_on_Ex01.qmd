@@ -1,0 +1,71 @@
+---
+title: "1 Geospatial Data Wrangling with R"
+author: "Wan Kee"
+date: "15 November 2023"
+date modified: "18 November 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+## 1.1 Overview
+
+In this Hands_on_Ex01, we will handle geospatial data in R using two packages, namely tidyverse and sf.
+
+**Learning Objectives:**
+
+1.  xx
+2.  xx
+
+## 1.2 Load packages
+
+*Tidyverse* contains and installs a number of packages commonly used in data analysis, such as *ggplot2* to create declarative graphics, *dplyr* to manipulate data, *tidyr* to organize data in a consistent form, *readr* to parse rectangular data, and other packages. More information can be found [here](https://www.tidyverse.org/packages/).
+
+*sf* provides a set of tools and a standardized way to encode geospatial vectors in the form of points, lines, polygons, etc. It binds to *GDAL* to read and write data, *GEOS* for geometrical operations, and *PROJ* for projection conversions and datum transformations. More information can be found [here](https://r-spatial.github.io/sf/).
+
+```{r}
+pacman::p_load(sf, tidyverse)
+```
+
+## 1.3 Import geospatial data
+
+We will be working on three geospatial datasets:
+
+1.  Master Plan 2014 Subzone Boundary (mpsz)
+
+    The Master Plan is a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.
+
+    Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
+
+    ![](images/Screenshot%202023-11-19%20at%2012.43.30%E2%80%AFAM.png){width="463"}
+
+2.  Pre-schools Location (preschool)
+
+    The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.
+
+    Source: ECDA (Download [here](https://beta.data.gov.sg/collections/2064/view))
+
+    ![](images/Screenshot%202023-11-19%20at%2012.42.16%E2%80%AFAM.png){width="463"}
+
+3.  Cycling Path
+
+    The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.
+
+    Source: LTA (Download [here](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html))
+
+    ![](images/Screenshot%202023-11-19%20at%2012.54.09%E2%80%AFAM.png){width="463"}
+
+Note on data format:
+
+-   Keyhole Markup Language (KML) is an XML-based format mainly used by Google Earth.
+
+-   Shapefile (SHP) are the industry-standard format used by Geographic Information System (GIS) software like ESRI ArcGIS and QGIS.
+
+-   GeoJSON is a format for encoding a variety of geographic data structures.
+
+```{r}
+mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
+```
