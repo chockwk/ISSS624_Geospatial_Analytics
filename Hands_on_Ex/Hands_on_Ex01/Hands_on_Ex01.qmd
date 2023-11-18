@@ -32,40 +32,54 @@ pacman::p_load(sf, tidyverse)
 
 ## 1.3 Import geospatial data
 
-We will be working on three geospatial datasets:
+Before we begin, let's understand the geospatial file formats. KML, SHP, and GeoJSON are file formats commonly used in Geographic Information System (GIS) and mapping applications to represent and store geospatial data. Each format serves a specific purpose and has its own characteristics.
 
-1.  Master Plan 2014 Subzone Boundary (mpsz)
+-   KML (Keyhole Markup Language) is an XML-based file format developed for use with Google Earth. It is widely supported by various GIS and mapping software. KML files can contain a variety of geospatial data, including points, lines, polygons, images, and text annotations.
 
-    The Master Plan is a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.
+-   SHP (Shapefile) is a widely used industry-standard geospatial vector data format used by GIS softwares, such as ESRI ArcGIS and QGIS. Shapefiles consist of multiple files with different extensions (.shp, .shx, .dbf, etc.) that together represent vector features, including points, lines, and polygons. Shapefiles are versatile and support for attribute data, making them suitable for a wide range of GIS applications.
 
-    Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
+-   GeoJSON (Geographic JavaScript Object Notation) is an open and lightweight format for encoding geospatial data in a JSON (JavaScript Object Notation) format. It is easy for both humans and machines to read and write. GeoJSON supports various types of geospatial features, including points, lines, polygons, and multi-geometry collections. It is commonly used in web mapping applications and can be easily integrated with JavaScript and other programming languages. GeoJSON is a format for encoding a variety of geographic data structures.
 
-    ![](images/Screenshot%202023-11-19%20at%2012.43.30%E2%80%AFAM.png){width="463"}
+Next, we have three geospatial datasets in various data file formats.
 
-2.  Pre-schools Location (preschool)
+**Dataset 1: Master Plan 2014 Subzone Boundary (mpsz)**
 
-    The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.
+The Master Plan is a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.
 
-    Source: ECDA (Download [here](https://beta.data.gov.sg/collections/2064/view))
+Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
 
-    ![](images/Screenshot%202023-11-19%20at%2012.42.16%E2%80%AFAM.png){width="463"}
-
-3.  Cycling Path
-
-    The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.
-
-    Source: LTA (Download [here](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html))
-
-    ![](images/Screenshot%202023-11-19%20at%2012.54.09%E2%80%AFAM.png){width="463"}
-
-Note on data format:
-
--   Keyhole Markup Language (KML) is an XML-based format mainly used by Google Earth.
-
--   Shapefile (SHP) are the industry-standard format used by Geographic Information System (GIS) software like ESRI ArcGIS and QGIS.
-
--   GeoJSON is a format for encoding a variety of geographic data structures.
+![](images/Screenshot%202023-11-19%20at%2012.43.30%E2%80%AFAM.png){width="463"}
 
 ```{r}
 mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
 ```
+
+The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in svy21 projected coordinates system with XY dimension.
+
+**Dataset 2: Pre-schools Location (preschool)**
+
+The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.
+
+Source: ECDA (Download [here](https://beta.data.gov.sg/collections/2064/view))
+
+![](images/Screenshot%202023-11-19%20at%2012.42.16%E2%80%AFAM.png){width="463"}
+
+```{r}
+preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
+```
+
+The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in wgs84 projected coordinates system with XYZ dimension.
+
+**Dataset 3: Cycling Path (cyclingpath)**
+
+The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.
+
+Source: LTA (Download [here](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html))
+
+![](images/Screenshot%202023-11-19%20at%2012.54.09%E2%80%AFAM.png){width="463"}
+
+```{r}
+cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
+```
+
+The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.

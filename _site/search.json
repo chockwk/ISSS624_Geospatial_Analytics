@@ -40,5 +40,33 @@
     "title": "1 Geospatial Data Wrangling with R",
     "section": "1.3 Import geospatial data",
     "text": "1.3 Import geospatial data\n\nmpsz = st_read(dsn=\"data/geospatial\", layer=\"MP14_SUBZONE_WEB_PL\")\n\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `/Users/chockwankee/Documents/chockwk/ISSS624_Geospatial_Analytics/Handson_Ex/Handson_Ex01/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html",
+    "href": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html",
+    "title": "1 Geospatial Data Wrangling with R",
+    "section": "",
+    "text": "In this Hands_on_Ex01, we will handle geospatial data in R using two packages, namely tidyverse and sf.\nLearning Objectives:\n\nxx\nxx"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html#overview",
+    "href": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html#overview",
+    "title": "1 Geospatial Data Wrangling with R",
+    "section": "",
+    "text": "In this Hands_on_Ex01, we will handle geospatial data in R using two packages, namely tidyverse and sf.\nLearning Objectives:\n\nxx\nxx"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html#load-packages",
+    "href": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html#load-packages",
+    "title": "1 Geospatial Data Wrangling with R",
+    "section": "1.2 Load packages",
+    "text": "1.2 Load packages\nTidyverse contains and installs a number of packages commonly used in data analysis, such as ggplot2 to create declarative graphics, dplyr to manipulate data, tidyr to organize data in a consistent form, readr to parse rectangular data, and other packages. More information can be found here.\nsf provides a set of tools and a standardized way to encode geospatial vectors in the form of points, lines, polygons, etc. It binds to GDAL to read and write data, GEOS for geometrical operations, and PROJ for projection conversions and datum transformations. More information can be found here.\n\npacman::p_load(sf, tidyverse)"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html#import-geospatial-data",
+    "href": "Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html#import-geospatial-data",
+    "title": "1 Geospatial Data Wrangling with R",
+    "section": "1.3 Import geospatial data",
+    "text": "1.3 Import geospatial data\nWe will be working on three geospatial datasets:\n\nMaster Plan 2014 Subzone Boundary (mpsz)\nThe Master Plan is a forward looking guiding plan for Singapore’s development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.\nSource: URA (Download here)\n\nPre-schools Location (preschool)\nThe data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.\nSource: ECDA (Download here)\n\nCycling Path\nThe data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.\nSource: LTA (Download here)\n\n\nNote on data format:\n\nKeyhole Markup Language (KML) is an XML-based format mainly used by Google Earth.\nShapefile (SHP) are the industry-standard format used by Geographic Information System (GIS) software like ESRI ArcGIS and QGIS.\nGeoJSON is a format for encoding a variety of geographic data structures.\n\n\nmpsz = st_read(dsn=\"data/geospatial\", layer=\"MP14_SUBZONE_WEB_PL\")\n\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `/Users/chockwankee/Documents/chockwk/ISSS624_Geospatial_Analytics/Hands_on_Ex/Hands_on_Ex01/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21"
   }
 ]
