@@ -1,0 +1,8 @@
+﻿Word,Description
+POINT,Zero-dimensional geometry containing a single point
+LINESTRING,"Sequence of points connected by straight, non-self intersecting line pieces; one-dimensional geometry"
+POLYGON,"Geometry with a positive area (two-dimensional); sequence of points form a closed, non-self intersecting ring; the first ring denotes the exterior ring, zero or more subsequent rings denote holes in this exterior ring"
+MULTIPOINT,Set of points; a MULTIPOINT is simple if no two Points in the MULTIPOINT are equal
+MULTILINESTRING,Set of linestrings
+MULTIPOLYGON,Set of polygons
+GEOMETRYCOLLECTION,Set of geometries of any type except GEOMETRYCOLLECTION

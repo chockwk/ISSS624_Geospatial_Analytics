@@ -173,6 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1.1 Overview</a></li>
   <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages">1.2 Load packages</a></li>
   <li><a href="#import-geospatial-data" id="toc-import-geospatial-data" class="nav-link" data-scroll-target="#import-geospatial-data">1.3 Import geospatial data</a></li>
+  <li><a href="#explore-data" id="toc-explore-data" class="nav-link" data-scroll-target="#explore-data">1.4 Explore data</a></li>
   </ul>
 </nav>
     </div>
@@ -227,27 +228,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="import-geospatial-data" class="level2">
 <h2 class="anchored" data-anchor-id="import-geospatial-data">1.3 Import geospatial data</h2>
-<p>We will be working on three geospatial datasets:</p>
-<ol type="1">
-<li><p>Master Plan 2014 Subzone Boundary (mpsz)</p>
+<p>Before we begin, let’s understand the geospatial file formats. KML, SHP, and GeoJSON are file formats commonly used in Geographic Information System (GIS) and mapping applications to represent and store geospatial data. Each format serves a specific purpose and has its own characteristics.</p>
+<ul>
+<li><p>KML (Keyhole Markup Language) is an XML-based file format developed for use with Google Earth. It is widely supported by various GIS and mapping software. KML files can contain a variety of geospatial data, including points, lines, polygons, images, and text annotations.</p></li>
+<li><p>SHP (Shapefile) is a widely used industry-standard geospatial vector data format used by GIS softwares, such as ESRI ArcGIS and QGIS. Shapefiles consist of multiple files with different extensions (.shp, .shx, .dbf, etc.) that together represent vector features, including points, lines, and polygons. Shapefiles are versatile and support for attribute data, making them suitable for a wide range of GIS applications.</p></li>
+<li><p>GeoJSON (Geographic JavaScript Object Notation) is an open and lightweight format for encoding geospatial data in a JSON (JavaScript Object Notation) format. It is easy for both humans and machines to read and write. GeoJSON supports various types of geospatial features, including points, lines, polygons, and multi-geometry collections. It is commonly used in web mapping applications and can be easily integrated with JavaScript and other programming languages. GeoJSON is a format for encoding a variety of geographic data structures.</p></li>
+</ul>
+<p>Next, we have three geospatial datasets in various data file formats.</p>
+<p><strong>Dataset 1: Master Plan 2014 Subzone Boundary (mpsz)</strong></p>
 <p>The Master Plan is a forward looking guiding plan for Singapore’s development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.</p>
 <p>Source: URA (Download <a href="https://beta.data.gov.sg/collections/1708/view">here</a>)</p>
-<p><img src="images/Screenshot 2023-11-19 at 12.43.30 AM.png" class="img-fluid" width="463"></p></li>
-<li><p>Pre-schools Location (preschool)</p>
-<p>The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.</p>
-<p>Source: ECDA (Download <a href="https://beta.data.gov.sg/collections/2064/view">here</a>)</p>
-<p><img src="images/Screenshot 2023-11-19 at 12.42.16 AM.png" class="img-fluid" width="463"></p></li>
-<li><p>Cycling Path</p>
-<p>The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.</p>
-<p>Source: LTA (Download <a href="https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html">here</a>)</p>
-<p><img src="images/Screenshot 2023-11-19 at 12.54.09 AM.png" class="img-fluid" width="463"></p></li>
-</ol>
-<p>Note on data format:</p>
-<ul>
-<li><p>Keyhole Markup Language (KML) is an XML-based format mainly used by Google Earth.</p></li>
-<li><p>Shapefile (SHP) are the industry-standard format used by Geographic Information System (GIS) software like ESRI ArcGIS and QGIS.</p></li>
-<li><p>GeoJSON is a format for encoding a variety of geographic data structures.</p></li>
-</ul>
+<p><img src="images/Screenshot 2023-11-19 at 12.43.30 AM.png" class="img-fluid" width="550"></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"MP14_SUBZONE_WEB_PL"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -261,6 +252,47 @@ Bounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33
 Projected CRS: SVY21</code></pre>
 </div>
 </div>
+<p>The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in svy21 projected coordinates system with XY dimension.</p>
+<p><strong>Dataset 2: Pre-schools Location (preschool)</strong></p>
+<p>The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.</p>
+<p>Source: ECDA (Download <a href="https://beta.data.gov.sg/collections/2064/view">here</a>)</p>
+<p><img src="images/Screenshot 2023-11-19 at 12.42.16 AM.png" class="img-fluid" width="550"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>preschool <span class="ot">=</span> <span class="fu">st_read</span>(<span class="st">"data/geospatial/PreSchoolsLocation.kml"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `PRESCHOOLS_LOCATION' from data source 
+  `/Users/chockwankee/Documents/chockwk/ISSS624_Geospatial_Analytics/Hands_on_Ex/Hands_on_Ex01/data/geospatial/PreSchoolsLocation.kml' 
+  using driver `KML'
+Simple feature collection with 2290 features and 2 fields
+Geometry type: POINT
+Dimension:     XYZ
+Bounding box:  xmin: 103.6878 ymin: 1.247759 xmax: 103.9897 ymax: 1.462134
+z_range:       zmin: 0 zmax: 0
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in wgs84 projected coordinates system with XYZ dimension.</p>
+<p><strong>Dataset 3: Cycling Path (cyclingpath)</strong></p>
+<p>The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.</p>
+<p>Source: LTA (Download <a href="https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html">here</a>)</p>
+<p><img src="images/Screenshot 2023-11-19 at 12.54.09 AM.png" class="img-fluid" width="550"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cyclingpath <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"CyclingPathGazette"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `CyclingPathGazette' from data source 
+  `/Users/chockwankee/Documents/chockwk/ISSS624_Geospatial_Analytics/Hands_on_Ex/Hands_on_Ex01/data/geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 2558 features and 2 fields
+Geometry type: MULTILINESTRING
+Dimension:     XY
+Bounding box:  xmin: 11854.32 ymin: 28347.98 xmax: 42626.09 ymax: 48948.15
+Projected CRS: SVY21</code></pre>
+</div>
+</div>
+<p>The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.</p>
+</section>
+<section id="explore-data" class="level2">
+<h2 class="anchored" data-anchor-id="explore-data">1.4 Explore data</h2>
 
 
 </section>

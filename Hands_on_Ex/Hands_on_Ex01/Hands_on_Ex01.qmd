@@ -48,7 +48,7 @@ The Master Plan is a forward looking guiding plan for Singapore's development in
 
 Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
 
-![](images/Screenshot%202023-11-19%20at%2012.43.30%E2%80%AFAM.png){width="463"}
+![](images/Screenshot%202023-11-19%20at%2012.43.30%E2%80%AFAM.png){width="550"}
 
 ```{r}
 mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
@@ -62,7 +62,7 @@ The data contains the location of pre-schools, including childcare centres and k
 
 Source: ECDA (Download [here](https://beta.data.gov.sg/collections/2064/view))
 
-![](images/Screenshot%202023-11-19%20at%2012.42.16%E2%80%AFAM.png){width="463"}
+![](images/Screenshot%202023-11-19%20at%2012.42.16%E2%80%AFAM.png){width="550"}
 
 ```{r}
 preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
@@ -76,10 +76,12 @@ The data contains an intra-town path designated for cyclists represented by line
 
 Source: LTA (Download [here](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html))
 
-![](images/Screenshot%202023-11-19%20at%2012.54.09%E2%80%AFAM.png){width="463"}
+![](images/Screenshot%202023-11-19%20at%2012.54.09%E2%80%AFAM.png){width="550"}
 
 ```{r}
 cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
 ```
 
 The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.
+
+## 1.4 Explore data
