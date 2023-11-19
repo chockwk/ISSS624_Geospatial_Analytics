@@ -1,0 +1,28 @@
+---
+title: "Spatial Manipulation with sf"
+author: "Wan Kee"
+---
+
+## Geometric confirmation
+
+st_contains(x, y, \...) Identifies if y is within x (i.e. point within polygon)
+
+st_covered_by(x, y, \...) Identifies if x is completely within y (i.e. polygon completely within polygon)
+
+st_covers(x, y, \...) Identifies if any point from x is outside of y (i.e. polygon outside polygon)
+
+st_crosses(x, y, \...) Identifies if any geometry of x have commonalities with y
+
+st_disjoint(x, y, \...) Identifies when geometries from x do not share space with y
+
+st_equals(x, y, \...) Identifies if x and y share the same geometry
+
+st_intersects(x, y, \...) Identifies if x and y geometry share any space
+
+st_overlaps(x, y, \...) Identifies if geometries of x and y share space, are of the same dimension, but are not completely contained by each other
+
+st_touches(x, y, \...) Identifies if geometries of x and y share a common point but their interiors do not intersect
+
+st_within(x, y, \...) Identifies if x is in a specified distance to y
+
+## Geometric operations

@@ -42,7 +42,7 @@ Before we begin, let's understand the geospatial file formats. KML, SHP, and Geo
 
 Next, we have three geospatial datasets in various data file formats.
 
-**Dataset 1: Master Plan 2014 Subzone Boundary (mpsz)**
+**Dataset 1: Master Plan 2014 Subzone Boundary (`mpsz`)**
 
 The Master Plan is a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.
 
@@ -56,7 +56,7 @@ mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
 
 The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in svy21 projected coordinates system with XY dimension.
 
-**Dataset 2: Pre-schools Location (preschool)**
+**Dataset 2: Pre-schools Location (`preschool`)**
 
 The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.
 
@@ -70,7 +70,7 @@ preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
 
 The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in wgs84 projected coordinates system with XYZ dimension.
 
-**Dataset 3: Cycling Path (cyclingpath)**
+**Dataset 3: Cycling Path (`cyclingpath`)**
 
 The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.
 
@@ -85,3 +85,94 @@ cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
 The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.
 
 ## 1.4 Explore data
+
+### 1.4.1 st_geometry()
+
+`st_geometry()` `st_set_geometry()` `st_drop_geometry()` can get, set, replace or rename geometry from an sf object. For this exercise, we will use `st_geometry()` to display basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data.
+
+`mpsz` contains a column `geometry` where it indicates the object is a multipolygon in XY dimension.
+
+```{r}
+st_geometry(mpsz)
+```
+
+A multipolygon represent areas (polygons), typically complex ones with areas/holes inside, or consisting of multiple disjoint parts. Here is an example of a multipolygon and an object within the column `geometry` where its relations are represented as ((X~1~,Y~1~), (X~2~,Y~2~),..).
+
+![](images/Screenshot%202023-11-19%20at%2011.54.56%E2%80%AFAM.png){width="300"}
+
+```{r}
+mpsz[[16]][[1]]
+```
+
+`preschool` contains a column `geometry` where it indicates the object is a point z in XYZ dimension. The statistics reveal zmin and zmax as zero and the observation is confirmed by a visual check of the data.
+
+```{r}
+st_geometry(preschool)
+```
+
+`cyclingpath` contains a column `geometry` where it indicates the object is a multilinestring in XY dimension.
+
+```{r}
+st_geometry(cyclingpath)
+```
+
+A multilinestring represent one ground feature made of one or multiple line strings. Here is an example of multilinestring and two objects where they consist of 2 and 5 lines and are represented as ((X~1~ Y~1~, X~2~ Y~2~, ...)) within the column `geometry` .
+
+![](images/Screenshot%202023-11-19%20at%2012.15.39%E2%80%AFPM.png){width="300"}
+
+```{r}
+cyclingpath[[3]][[1]]
+cyclingpath[[3]][[46]]
+```
+
+## 
+
+### 1.4.2 glimpse()
+
+```{r}
+glimpse(mpsz)
+```
+
+```{r}
+glimpse(preschool)
+```
+
+```{r}
+glimpse(cyclingpath)
+```
+
+### 1.4.3 head()
+
+```{r}
+head(mpsz, n=5)
+```
+
+```{r}
+head(preschool, n=5)
+```
+
+```{r}
+head(cyclingpath, n=5)
+```
+
+## 1.5 Plot geospatial data
+
+### 1.5.1 plot()
+
+```{r}
+plot(mpsz)
+```
+
+```{r}
+plot(st_geometry(mpsz))
+```
+
+```{r}
+plot(mpsz["PLN_AREA_N"])
+```
+
+## 1.6 Map coordinate reference systems (CRS)
+
+```{r}
+st_crs(mpsz)
+```
