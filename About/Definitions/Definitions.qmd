@@ -1,0 +1,74 @@
+---
+title: "Definitions"
+author: "Wan Kee"
+date: "15 November 2023"
+---
+
+## Find the word!
+
+Libraries
+
+1.  [Observable stdlib](https://github.com/observablehq/stdlib) --- Core primitives for DOM manipulation, file handling, importing code, and much more.
+
+2.  [Observable Inputs](https://github.com/observablehq/inputs) --- Standard inputs controls including sliders, drop-downs, tables, check-boxes, etc.
+
+3.  [Observable Plot](https://github.com/observablehq/plot) --- High level plotting library for exploratory data visualization.
+
+```{ojs}
+definitions=FileAttachment("Definitions.csv").csv({ typed: true })
+```
+
+Geospatial Dictionary
+
+| Word | Description |
+|------|------|
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
