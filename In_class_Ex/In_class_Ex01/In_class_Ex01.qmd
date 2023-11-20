@@ -47,7 +47,7 @@ odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
 ## busstop
 
 ```{r}
-busstop <- st_read(dsn = "data/geospatial",
+busstop <- st_read(dsn = "data",
                    layer = "BusStop") %>%
   st_transform(crs = 3414)
 ```
@@ -56,7 +56,7 @@ busstop <- st_read(dsn = "data/geospatial",
 ## mpsz
 
 ```{r}
-mpsz = st_read(dsn="data/geospatial", layer="MPSZ-2019") %>% 
+mpsz = st_read(dsn="data", layer="MPSZ-2019") %>% 
   st_transform(crs=3414)
 ```
 
@@ -152,7 +152,7 @@ mpsz_origtrip <- left_join(mpsz,
 ```
 
 
-#1.7 Choropleth Visualisation
+# 1.7 Choropleth Visualisation
 
 ```{r}
 tm_shape(mpsz_origtrip)+

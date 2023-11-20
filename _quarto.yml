@@ -23,6 +23,7 @@ website:
       - text: In-class Ex
         menu: 
           - text: In-class Ex01
+            href: In_class_Ex/In_class_Ex01/In_class_Ex01.html
           - text: In-class Ex02
           - text: In-class Ex03
           - text: In-class Ex04
