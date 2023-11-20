@@ -35,31 +35,31 @@ pacman::p_load(sf, tidyverse)
 
 Before we begin, let's understand the geospatial file formats. KML, SHP, and GeoJSON are file formats commonly used in Geographic Information System (GIS) and mapping applications to represent and store geospatial data. Each format serves a specific purpose and has its own characteristics.
 
-::: panel-tabset
-
-## **KML**  
+::: {.panel-tabset}
+## KML
 
 Keyhole Markup Language is an XML-based file format developed for use with Google Earth. It is widely supported by various GIS and mapping software. KML files can contain a variety of geospatial data, including points, lines, polygons, images, and text annotations.
 
-## **SHP**
+## SHP
 
 Shapefile is a widely used industry-standard geospatial vector data format used by GIS softwares, such as ESRI ArcGIS and QGIS. Shapefiles consist of multiple files with different extensions (.shp, .shx, .dbf, etc.) that together represent vector features, including points, lines, and polygons. Shapefiles are versatile and support for attribute data, making them suitable for a wide range of GIS applications.
 
-## **GeoJSON**  
+## GeoJSON
 
 Geographic JavaScript Object Notation is an open and lightweight format for encoding geospatial data in a JSON (JavaScript Object Notation) format. It is easy for both humans and machines to read and write. GeoJSON supports various types of geospatial features, including points, lines, polygons, and multi-geometry collections. It is commonly used in web mapping applications and can be easily integrated with JavaScript and other programming languages. GeoJSON is a format for encoding a variety of geographic data structures.
-
 :::
 
-Next, we have three geospatial datasets in various data file formats.
+Next, we have three geospatial and one aspatial datasets in various data file formats.
 
-**Geospatial Dataset 1: Master Plan 2014 Subzone Boundary (`mpsz`)**
+::: {.panel-tabset}
+
+## mpsz
+
+**Master Plan 2014 Subzone Boundary (`mpsz`)**
 
 The Master Plan is a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.
 
 Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
-
-![](images/Screenshot%202023-11-19%20at%2012.43.30%E2%80%AFAM.png){width="550"}
 
 ```{r}
 mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
@@ -67,13 +67,14 @@ mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
 
 The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in svy21 projected coordinates system with XY dimension.
 
-**Dataset 2: Pre-schools Location (`preschool`)**
+
+## preschool
+
+**Pre-schools Location (`preschool`)**
 
 The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.
 
 Source: ECDA (Download [here](https://beta.data.gov.sg/collections/2064/view))
-
-![](images/Screenshot%202023-11-19%20at%2012.42.16%E2%80%AFAM.png){width="550"}
 
 ```{r}
 preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
@@ -81,13 +82,13 @@ preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
 
 The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in wgs84 projected coordinates system with XYZ dimension.
 
-**Dataset 3: Cycling Path (`cyclingpath`)**
+## cyclingpath
+
+**Cycling Path (`cyclingpath`)**
 
 The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.
 
 Source: LTA (Download [here](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html))
-
-![](images/Screenshot%202023-11-19%20at%2012.54.09%E2%80%AFAM.png){width="550"}
 
 ```{r}
 cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
@@ -95,9 +96,9 @@ cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
 
 The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-**Dataset 4: Inside Airbnb Singapore (`listings`) - Aspatial dataset**
+## airbnb
+
+**Inside Airbnb Singapore (`airbnb`)**
 
 Inside Airbnb is a mission driven project that provides data and advocacy about Airbnb's impact on residential communities. The data utilizes public information compiled from the Airbnb web-site including the availabiity calendar for 365 days in the future, and the reviews for each listing. Data is verified, cleansed, analyzed and aggregated. Note the data is not associated with or endorsed by Airbnb.
 
@@ -106,17 +107,22 @@ Inside Airbnb uses an occupancy model, the San Francisco Model, in honor of the 
 Source: Inside Airbnb (Download [here](http://insideairbnb.com/get-the-data))
 
 ```{r}
-listings = read_csv("data/aspatial/listings.csv")
-list(listings)
+airbnb = read_csv("data/aspatial/listings.csv")
+list(airbnb)
 ```
 
-The output indicates 3483 features and
+The output indicates 3483 features and 18 fields. 
+:::
 
-## 1.4 Explore data
+# 1.4 Explore data
 
-### 1.4.1 st_geometry()
+## 1.4.1 st_geometry()
 
 `st_geometry()` `st_set_geometry()` `st_drop_geometry()` can get, set, replace or rename geometry from an sf object. For this exercise, we will use `st_geometry()` to display basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data.
+
+::: {.panel-tabset}
+
+## mpsz
 
 `mpsz` contains a column `geometry` where it indicates the object is a multipolygon in XY dimension.
 
@@ -126,17 +132,21 @@ st_geometry(mpsz)
 
 A multipolygon represent areas (polygons), typically complex ones with areas/holes inside, or consisting of multiple disjoint parts. Here is an example of a multipolygon and an object within the column `geometry` where its relations are represented as ((X~1~,Y~1~), (X~2~,Y~2~),..).
 
-![](images/Screenshot%202023-11-19%20at%2011.54.56%E2%80%AFAM.png){width="300"}
-
 ```{r}
 mpsz[[16]][[1]]
 ```
+
+
+## preschool
 
 `preschool` contains a column `geometry` where it indicates the object is a point z in XYZ dimension. The statistics reveal zmin and zmax as zero and the observation is confirmed by a visual check of the data.
 
 ```{r}
 st_geometry(preschool)
 ```
+
+
+## cyclingpath
 
 `cyclingpath` contains a column `geometry` where it indicates the object is a multilinestring in XY dimension.
 
@@ -146,55 +156,71 @@ st_geometry(cyclingpath)
 
 A multilinestring represent one ground feature made of one or multiple line strings. Here is an example of multilinestring and two objects where they consist of 2 and 5 lines and are represented as ((X~1~ Y~1~, X~2~ Y~2~, ...)) within the column `geometry` .
 
-![](images/Screenshot%202023-11-19%20at%2012.15.39%E2%80%AFPM.png){width="300"}
-
 ```{r}
 cyclingpath[[3]][[1]]
 cyclingpath[[3]][[46]]
 ```
+:::
 
-### 1.4.2 glimpse()
+
+## 1.4.2 glimpse()
 
 `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values in every column in a data frame.
+
+::: {.panel-tabset}
+
+## mpsz
 
 ```{r}
 glimpse(mpsz)
 ```
 
+## preschool
+
 ```{r}
 glimpse(preschool)
 ```
 
+## cyclingpath
+
 ```{r}
 glimpse(cyclingpath)
 ```
+:::
 
-### 1.4.3 head()
+## 1.4.3 head()
 
 `head()` returns the first defined n rows of a vector, matrix, table, data frame or function.
 
 `tail()` is the reversed function.
 
+::: {.panel-tabset}
+
+## mpsz
 ```{r}
 head(mpsz, n=5)
 ```
 
+## preschool
 ```{r}
 head(preschool, n=5)
 ```
 
+## cyclingpath
 ```{r}
 head(cyclingpath, n=5)
 ```
+:::
 
-## 1.5 Plot geospatial data
+# 1.5 Plot geospatial data
 
-### 1.5.1 plot()
+## 1.5.1 plot()
 
 `plot()` takes parameters for specifying points in the diagram. At its simplest, it can plot two numbers against each other. With datasets, it can generate maps and plot the specified columns/attributes, with default up to nine plots or maximum all plots.
 
-First, `mpsz` contains 15 attributes and we will generate a map for each of the attributes as shown below.
-
+::: {.panel-tabset}
+## mpsz
+`mpsz` contains 15 attributes and we will generate a map for each of the attributes as shown below.
 Note: The column `geometry` is not considered as an attribute for `mpsz`, similar for the subsequent datasets.
 
 ```{r}
@@ -213,7 +239,9 @@ We can select a specific attribute of `mpsz` and generate its map accordingly.
 plot(mpsz["PLN_AREA_N"])
 ```
 
-Second, `preschool` has two attributes and `plot()` generates two maps with points based on object name and center details.
+
+## preschool
+`preschool` has two attributes and `plot()` generates two maps with points based on object name and center details.
 
 ```{r}
 plot(preschool)
@@ -225,7 +253,9 @@ Based on visual observation, the geometry map is the same as the description map
 plot(st_geometry(preschool))
 ```
 
-Third, `cyclingpath` has two attributes. However, `PLANNING_A` does not generate any map due to missing values. The planning area and geometry maps plot the cycling paths as lines.
+## cyclingpath
+
+`cyclingpath` has two attributes. However, `PLANNING_A` does not generate any map due to missing values. The planning area and geometry maps plot the cycling paths as lines.
 
 ```{r}
 plot(cyclingpath["PLANNING_1"])
@@ -234,24 +264,35 @@ plot(cyclingpath["PLANNING_1"])
 ```{r}
 plot(st_geometry(cyclingpath))
 ```
+:::
 
 Overall, the three geospatial datasets are spatial information of different purposes sharing the same Singapore map. However, the geospatial datasets uses two CRS; svy21 and wgs84.
 
-## 1.6 Map coordinate reference systems (CRS)
+# 1.6 Map coordinate reference systems (CRS)
 
 A spatial reference system (SRS) or coordinate reference system (CRS) is a framework used to precisely measure locations on the surface of Earth as coordinates. There are thousands of spatial reference systems used today and they are based on general strategies defined in the EPSG, ISO, and OGC standards. For this exercise, the datasets use SVY21 and WGS84; two different CRS commonly used in geospatial applications, especially in the context of Singapore.
 
+::: {.panel-tabset}
+## SVY21
 **SVY21** (Singapore Coordinate System 1980) is a coordinate reference system used specifically in Singapore. It was established in 1980 and is based on the Transverse Mercator projection. SVY21 uses meters as its unit of measurement and the origin (0, 0) is located at a specific point in Singapore, and coordinates are measured in meters eastward (E) and northward (N) from this origin point.
 
+## WGS84
 **WGS84** (World Geodetic System 1984) is a global geodetic reference system widely used for GPS (Global Positioning System) and geospatial applications worldwide. It is maintained by the U.S. National Geospatial-Intelligence Agency (NGA). It uses latitude and longitude to specify locations on the Earth's surface, and it is based on an ellipsoidal model of the Earth. Coordinates in WGS84 are typically expressed in degrees of latitude (N or S) and longitude (E or W), although they can also be represented in other units such as decimal degrees or degrees, minutes, and seconds.
+:::
 
-### 1.6.1 Assign EPSG code
+## 1.6.1 Assign EPSG code
 
 One of the common issues for geospatial data is the missing coordinate system of the source data or wrongly assigned during the importing process. Although `mpsz` data frame is projected in SVY21, the CRS indicates that the EPSG is 9001. This is a wrong EPSG code because the correct EPSG code for SVY21 should be 3414. More information [here](https://epsg.io/3414).
+
+::: {.panel-tabset}
+
+## Before
 
 ```{r}
 st_crs(mpsz)
 ```
+
+## After
 
 We will assign the correct EPSG to `mpsz` using `st_set_crs()`.
 
@@ -259,6 +300,7 @@ We will assign the correct EPSG to `mpsz` using `st_set_crs()`.
 mpsz3414 <- st_set_crs(mpsz,3414)
 st_crs(mpsz3414)
 ```
+:::
 
 ## 1.6.2 Transform WGS84 to SVY21
 
@@ -271,10 +313,145 @@ preschool3414 <- st_transform(preschool, crs=3414)
 st_crs(preschool3414)
 ```
 
-## 1.6.3 Create a simple feature dataframe
+## 1.6.3 Create a simple feature object
 
-Dataset 4: Inside Airbnb (`listings`)
+`st_as_sf()` create an sf object by taking arguments such as longitude and latitude as the coordinates. Let’s assume that the coordinate system used to reference the latitude and longitude coordinates is WGS84 with crs 4236, then transform it to SVY21 with crs 3414.
+
+::: {.panel-tabset}
+
+## Transform
+
+`st_as_sf()` drops the columns used to create `geometry` by default. The `remove = F` specification ensures the longitude and latitude columns are retained, which may be used plots subsequently. 
 
 ```{r}
-
+airbnb_sf <- st_as_sf(airbnb,
+                      coords = c("longitude","latitude"),
+                      crs = 4326,
+                      remove = F) %>% 
+  st_transform(crs = 3414)
 ```
+
+## View
+
+New column `geometry` is created and the geometry type is point.
+
+```{r}
+glimpse(airbnb_sf)
+```
+:::
+
+# 1.7 Geoprocessing
+
+Geoprocessing provides a framework for performing analysis and management of geographic data and a large suite of tools for performing GIS tasks that range from simple buffers and polygon overlays to complex regression analysis and image classification.
+
+::: {.panel-tabset}
+
+## Buffering
+
+::: {.solvebox .solve data-latex="solve"}
+### Question:
+Determine the total area of land required to upgrade a cycling path with 5 metres of reserved land on the both sides of the current cycling path.
+:::
+
+`st_buffer()` encircles a geometry object at a specified `dist` and returns a geometry object that is the buffer that surrounds the source object.
+
+`st_area()` returns the area of a geometry.
+
+Step 1: Compute the 5-meter buffers around cycling paths.
+```{r}
+cyclingpath_buffer <- st_buffer(cyclingpath,
+                                dist = 5,
+                                nQuadSegs = 30)
+```
+
+Step 2: Calculate the area of the buffers.
+```{r}
+cyclingpath_buffer$AREA = st_area(cyclingpath_buffer)
+```
+
+Step 3: Calculate the total area of land involved.
+```{r}
+sum(cyclingpath_buffer$AREA)
+```
+
+## Point-in-polygon Count
+
+::: {.solvebox .solve data-latex="solve"}
+### Question:
+Find the number and density of pre-schools in each Planning Subzone.
+:::
+
+Step 1: Identify and calculate the pre-schools located inside each Planning Subzone by using `st_intersects()` and `length()`.
+
+```{r}
+mpsz3414$`PreSch Count`<- lengths(st_intersects(mpsz3414, preschool3414))
+```
+
+Step 2: Determine the area of each planning subzone.
+
+```{r}
+mpsz3414$Area <- mpsz3414 %>% 
+  st_area()
+```
+
+Step 3: Compute the density.
+
+```{r}
+mpsz3414 <- mpsz3414 %>%
+  mutate(`PreSch Density` = `PreSch Count`/Area * 1000000)
+```
+
+
+## Join
+
+`st_join()` is a left join that returns all records of the x object with y fields for non-matched records filled with NA values. Where the crs system differs, it throws an error message "st_crs(x) == st_crs(y) is not TRUE".
+
+```{r}
+mpsz3414_preschool3414 <- st_join(mpsz3414, preschool3414,
+                              join = st_within)
+plot(mpsz3414_preschool3414)
+```
+:::
+
+# 1.8 Exploratory Data Analysis
+
+
+::: {.panel-tabset}
+
+## Histogram
+
+```{r}
+hist(mpsz3414$`PreSch Density`)
+```
+
+## Histogram
+
+```{r}
+ggplot(data=mpsz3414, 
+       aes(x= as.numeric(`PreSch Density`)))+
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue") +
+  labs(title = "Are pre-school even distributed in Singapore?",
+       subtitle= "There are many planning sub-zones with a single pre-school, on the other hand, \nthere are two planning sub-zones with at least 20 pre-schools",
+      x = "Pre-school density (per km sq)",
+      y = "Frequency")
+```
+
+
+## Scatterplot
+
+```{r}
+ggplot(data=mpsz3414, 
+       aes(y = `PreSch Count`, 
+           x= as.numeric(`PreSch Density`)))+
+  geom_point(color="black", 
+             fill="light blue") +
+  xlim(0, 40) +
+  ylim(0, 40) +
+  labs(title = "",
+      x = "Pre-school density (per km sq)",
+      y = "Pre-school count")
+```
+
+:::

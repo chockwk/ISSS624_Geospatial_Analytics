@@ -172,10 +172,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1.1 Overview</a></li>
   <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages">1.2 Load packages</a></li>
-  <li><a href="#import-geospatial-data" id="toc-import-geospatial-data" class="nav-link" data-scroll-target="#import-geospatial-data">1.3 Import geospatial data</a>
-  <ul class="collapse">
-  <li><a href="#shp" id="toc-shp" class="nav-link" data-scroll-target="#shp"><strong>SHP</strong></a></li>
-  <li><a href="#geojson" id="toc-geojson" class="nav-link" data-scroll-target="#geojson"><strong>GeoJSON</strong></a></li>
+  <li><a href="#import-geospatial-data" id="toc-import-geospatial-data" class="nav-link" data-scroll-target="#import-geospatial-data">1.3 Import geospatial data</a></li>
   <li><a href="#explore-data" id="toc-explore-data" class="nav-link" data-scroll-target="#explore-data">1.4 Explore data</a>
   <ul class="collapse">
   <li><a href="#st_geometry" id="toc-st_geometry" class="nav-link" data-scroll-target="#st_geometry">1.4.1 st_geometry()</a></li>
@@ -189,10 +186,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#map-coordinate-reference-systems-crs" id="toc-map-coordinate-reference-systems-crs" class="nav-link" data-scroll-target="#map-coordinate-reference-systems-crs">1.6 Map coordinate reference systems (CRS)</a>
   <ul class="collapse">
   <li><a href="#assign-epsg-code" id="toc-assign-epsg-code" class="nav-link" data-scroll-target="#assign-epsg-code">1.6.1 Assign EPSG code</a></li>
-  </ul></li>
   <li><a href="#transform-wgs84-to-svy21" id="toc-transform-wgs84-to-svy21" class="nav-link" data-scroll-target="#transform-wgs84-to-svy21">1.6.2 Transform WGS84 to SVY21</a></li>
-  <li><a href="#create-a-simple-feature-dataframe" id="toc-create-a-simple-feature-dataframe" class="nav-link" data-scroll-target="#create-a-simple-feature-dataframe">1.6.3 Create a simple feature dataframe</a></li>
+  <li><a href="#create-a-simple-feature-object" id="toc-create-a-simple-feature-object" class="nav-link" data-scroll-target="#create-a-simple-feature-object">1.6.3 Create a simple feature object</a></li>
+  <li><a href="#transform" id="toc-transform" class="nav-link" data-scroll-target="#transform">Transform</a></li>
+  <li><a href="#view" id="toc-view" class="nav-link" data-scroll-target="#view">View</a></li>
   </ul></li>
+  <li><a href="#geoprocessing" id="toc-geoprocessing" class="nav-link" data-scroll-target="#geoprocessing">1.7 Geoprocessing</a></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">1.8 Exploratory Data Analysis</a></li>
   </ul>
 </nav>
     </div>
@@ -250,27 +250,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>1.3 Import geospatial data</h1>
 <p>Before we begin, let’s understand the geospatial file formats. KML, SHP, and GeoJSON are file formats commonly used in Geographic Information System (GIS) and mapping applications to represent and store geospatial data. Each format serves a specific purpose and has its own characteristics.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true"><strong>KML</strong></a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">KML</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">SHP</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">GeoJSON</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>Keyhole Markup Language is an XML-based file format developed for use with Google Earth. It is widely supported by various GIS and mapping software. KML files can contain a variety of geospatial data, including points, lines, polygons, images, and text annotations.</p>
 </div>
-</div>
-</div>
-<section id="shp" class="level2">
-<h2 class="anchored" data-anchor-id="shp"><strong>SHP</strong></h2>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>Shapefile is a widely used industry-standard geospatial vector data format used by GIS softwares, such as ESRI ArcGIS and QGIS. Shapefiles consist of multiple files with different extensions (.shp, .shx, .dbf, etc.) that together represent vector features, including points, lines, and polygons. Shapefiles are versatile and support for attribute data, making them suitable for a wide range of GIS applications.</p>
-<p>:::</p>
-</section>
-<section id="geojson" class="level2">
-<h2 class="anchored" data-anchor-id="geojson"><strong>GeoJSON</strong></h2>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <p>Geographic JavaScript Object Notation is an open and lightweight format for encoding geospatial data in a JSON (JavaScript Object Notation) format. It is easy for both humans and machines to read and write. GeoJSON supports various types of geospatial features, including points, lines, polygons, and multi-geometry collections. It is commonly used in web mapping applications and can be easily integrated with JavaScript and other programming languages. GeoJSON is a format for encoding a variety of geographic data structures.</p>
-<p>:::</p>
-<p>Next, we have three geospatial datasets in various data file formats.</p>
-<p><strong>Geospatial Dataset 1: Master Plan 2014 Subzone Boundary (<code>mpsz</code>)</strong></p>
+</div>
+</div>
+</div>
+<p>Next, we have three geospatial and one aspatial datasets in various data file formats.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">cyclingpath</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">airbnb</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p><strong>Master Plan 2014 Subzone Boundary (<code>mpsz</code>)</strong></p>
 <p>The Master Plan is a forward looking guiding plan for Singapore’s development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.</p>
 <p>Source: URA (Download <a href="https://beta.data.gov.sg/collections/1708/view">here</a>)</p>
-<p><img src="images/Screenshot 2023-11-19 at 12.43.30 AM.png" class="img-fluid" width="550"></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"MP14_SUBZONE_WEB_PL"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -285,10 +285,11 @@ Projected CRS: SVY21</code></pre>
 </div>
 </div>
 <p>The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in svy21 projected coordinates system with XY dimension.</p>
-<p><strong>Dataset 2: Pre-schools Location (<code>preschool</code>)</strong></p>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p><strong>Pre-schools Location (<code>preschool</code>)</strong></p>
 <p>The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.</p>
 <p>Source: ECDA (Download <a href="https://beta.data.gov.sg/collections/2064/view">here</a>)</p>
-<p><img src="images/Screenshot 2023-11-19 at 12.42.16 AM.png" class="img-fluid" width="550"></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>preschool <span class="ot">=</span> <span class="fu">st_read</span>(<span class="st">"data/geospatial/PreSchoolsLocation.kml"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -304,10 +305,11 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 <p>The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in wgs84 projected coordinates system with XYZ dimension.</p>
-<p><strong>Dataset 3: Cycling Path (<code>cyclingpath</code>)</strong></p>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<p><strong>Cycling Path (<code>cyclingpath</code>)</strong></p>
 <p>The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.</p>
 <p>Source: LTA (Download <a href="https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html">here</a>)</p>
-<p><img src="images/Screenshot 2023-11-19 at 12.54.09 AM.png" class="img-fluid" width="550"></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cyclingpath <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"CyclingPathGazette"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -322,13 +324,15 @@ Projected CRS: SVY21</code></pre>
 </div>
 </div>
 <p>The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.</p>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD <strong>Dataset 4: Inside Airbnb Singapore (<code>listings</code>) - Aspatial dataset</strong></p>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<p><strong>Inside Airbnb Singapore (<code>airbnb</code>)</strong></p>
 <p>Inside Airbnb is a mission driven project that provides data and advocacy about Airbnb’s impact on residential communities. The data utilizes public information compiled from the Airbnb web-site including the availabiity calendar for 365 days in the future, and the reviews for each listing. Data is verified, cleansed, analyzed and aggregated. Note the data is not associated with or endorsed by Airbnb.</p>
 <p>Inside Airbnb uses an occupancy model, the San Francisco Model, in honor of the public policy and urban planners working for that fair city who created occupancy models to quantify the impact of Airbnb on housing.</p>
 <p>Source: Inside Airbnb (Download <a href="http://insideairbnb.com/get-the-data">here</a>)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>listings <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/listings.csv"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(listings)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>airbnb <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/listings.csv"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(airbnb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 # A tibble: 3,483 × 18
@@ -352,13 +356,20 @@ Projected CRS: SVY21</code></pre>
 #   ⁶​room_type</code></pre>
 </div>
 </div>
-<p>The output indicates 3483 features and</p>
+<p>The output indicates 3483 features and 18 fields.</p>
+</div>
+</div>
+</div>
 </section>
-<section id="explore-data" class="level2">
-<h2 class="anchored" data-anchor-id="explore-data">1.4 Explore data</h2>
-<section id="st_geometry" class="level3">
-<h3 class="anchored" data-anchor-id="st_geometry">1.4.1 st_geometry()</h3>
+<section id="explore-data" class="level1">
+<h1>1.4 Explore data</h1>
+<section id="st_geometry" class="level2">
+<h2 class="anchored" data-anchor-id="st_geometry">1.4.1 st_geometry()</h2>
 <p><code>st_geometry()</code> <code>st_set_geometry()</code> <code>st_drop_geometry()</code> can get, set, replace or rename geometry from an sf object. For this exercise, we will use <code>st_geometry()</code> to display basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">cyclingpath</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <p><code>mpsz</code> contains a column <code>geometry</code> where it indicates the object is a multipolygon in XY dimension.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_geometry</span>(mpsz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -372,10 +383,11 @@ First 5 geometries:</code></pre>
 </div>
 </div>
 <p>A multipolygon represent areas (polygons), typically complex ones with areas/holes inside, or consisting of multiple disjoint parts. Here is an example of a multipolygon and an object within the column <code>geometry</code> where its relations are represented as ((X<sub>1</sub>,Y<sub>1</sub>), (X<sub>2</sub>,Y<sub>2</sub>),..).</p>
-<p><img src="images/Screenshot 2023-11-19 at 11.54.56 AM.png" class="img-fluid" width="300"></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mpsz[[<span class="dv">16</span>]][[<span class="dv">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <p><code>preschool</code> contains a column <code>geometry</code> where it indicates the object is a point z in XYZ dimension. The statistics reveal zmin and zmax as zero and the observation is confirmed by a visual check of the data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_geometry</span>(preschool)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -389,6 +401,8 @@ Geodetic CRS:  WGS 84
 First 5 geometries:</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <p><code>cyclingpath</code> contains a column <code>geometry</code> where it indicates the object is a multilinestring in XY dimension.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_geometry</span>(cyclingpath)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -402,15 +416,21 @@ First 5 geometries:</code></pre>
 </div>
 </div>
 <p>A multilinestring represent one ground feature made of one or multiple line strings. Here is an example of multilinestring and two objects where they consist of 2 and 5 lines and are represented as ((X<sub>1</sub> Y<sub>1</sub>, X<sub>2</sub> Y<sub>2</sub>, …)) within the column <code>geometry</code> .</p>
-<p><img src="images/Screenshot 2023-11-19 at 12.15.39 PM.png" class="img-fluid" width="300"></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cyclingpath[[<span class="dv">3</span>]][[<span class="dv">1</span>]]</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>cyclingpath[[<span class="dv">3</span>]][[<span class="dv">46</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</div>
+</div>
+</div>
 </section>
-<section id="glimpse" class="level3">
-<h3 class="anchored" data-anchor-id="glimpse">1.4.2 glimpse()</h3>
+<section id="glimpse" class="level2">
+<h2 class="anchored" data-anchor-id="glimpse">1.4.2 glimpse()</h2>
 <p><code>glimpse()</code> transposes the columns in a dataset and makes it possible to see the column name, data type and values in every column in a data frame.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">cyclingpath</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(mpsz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -434,6 +454,8 @@ $ SHAPE_Area &lt;dbl&gt; 1630379.27, 559816.25, 160807.50, 595428.89, 387429.44,
 $ geometry   &lt;MULTIPOLYGON [m]&gt; MULTIPOLYGON (((31495.56 30..., MULTIPOLYGON (…</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(preschool)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -444,6 +466,8 @@ $ Description &lt;chr&gt; "&lt;center&gt;&lt;table&gt;&lt;tr&gt;&lt;th colspan='
 $ geometry    &lt;POINT [°]&gt; POINT Z (103.8072 1.299333 0), POINT Z (103.826 1.31…</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(cyclingpath)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -454,11 +478,18 @@ $ PLANNING_1 &lt;chr&gt; "BEDOK", "BEDOK", "BEDOK", "TAMPINES", "TAMPINES", "TAM
 $ geometry   &lt;MULTILINESTRING [m]&gt; MULTILINESTRING ((39782.85 ..., MULTILINEST…</code></pre>
 </div>
 </div>
+</div>
+</div>
+</div>
 </section>
-<section id="head" class="level3">
-<h3 class="anchored" data-anchor-id="head">1.4.3 head()</h3>
+<section id="head" class="level2">
+<h2 class="anchored" data-anchor-id="head">1.4.3 head()</h2>
 <p><code>head()</code> returns the first defined n rows of a vector, matrix, table, data frame or function.</p>
 <p><code>tail()</code> is the reversed function.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false">cyclingpath</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mpsz, <span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -487,6 +518,8 @@ Projected CRS: SVY21
 5 30005.70   2825.594   387429.4 MULTIPOLYGON (((26451.03 30...</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(preschool, <span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -516,6 +549,8 @@ Geodetic CRS:  WGS 84
 5   POINT Z (103.839 1.33315 0)</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-5-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-3-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cyclingpath, <span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -532,15 +567,21 @@ Projected CRS: SVY21
 5       &lt;NA&gt;   TAMPINES MULTILINESTRING ((39652.87 ...</code></pre>
 </div>
 </div>
+</div>
+</div>
+</div>
 </section>
 </section>
-<section id="plot-geospatial-data" class="level2">
-<h2 class="anchored" data-anchor-id="plot-geospatial-data">1.5 Plot geospatial data</h2>
-<section id="plot" class="level3">
-<h3 class="anchored" data-anchor-id="plot">1.5.1 plot()</h3>
+<section id="plot-geospatial-data" class="level1">
+<h1>1.5 Plot geospatial data</h1>
+<section id="plot" class="level2">
+<h2 class="anchored" data-anchor-id="plot">1.5.1 plot()</h2>
 <p><code>plot()</code> takes parameters for specifying points in the diagram. At its simplest, it can plot two numbers against each other. With datasets, it can generate maps and plot the specified columns/attributes, with default up to nine plots or maximum all plots.</p>
-<p>First, <code>mpsz</code> contains 15 attributes and we will generate a map for each of the attributes as shown below.</p>
-<p>Note: The column <code>geometry</code> is not considered as an attribute for <code>mpsz</code>, similar for the subsequent datasets.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-3" role="tab" aria-controls="tabset-6-3" aria-selected="false">cyclingpath</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<p><code>mpsz</code> contains 15 attributes and we will generate a map for each of the attributes as shown below. Note: The column <code>geometry</code> is not considered as an attribute for <code>mpsz</code>, similar for the subsequent datasets.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mpsz, <span class="at">max.plot =</span> <span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -561,7 +602,9 @@ Projected CRS: SVY21
 <p><img src="Hands_on_Ex01_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Second, <code>preschool</code> has two attributes and <code>plot()</code> generates two maps with points based on object name and center details.</p>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<p><code>preschool</code> has two attributes and <code>plot()</code> generates two maps with points based on object name and center details.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(preschool)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -575,7 +618,9 @@ Projected CRS: SVY21
 <p><img src="Hands_on_Ex01_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Third, <code>cyclingpath</code> has two attributes. However, <code>PLANNING_A</code> does not generate any map due to missing values. The planning area and geometry maps plot the cycling paths as lines.</p>
+</div>
+<div id="tabset-6-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-3-tab">
+<p><code>cyclingpath</code> has two attributes. However, <code>PLANNING_A</code> does not generate any map due to missing values. The planning area and geometry maps plot the cycling paths as lines.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cyclingpath[<span class="st">"PLANNING_1"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -588,17 +633,33 @@ Projected CRS: SVY21
 <p><img src="Hands_on_Ex01_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</div>
+</div>
+</div>
 <p>Overall, the three geospatial datasets are spatial information of different purposes sharing the same Singapore map. However, the geospatial datasets uses two CRS; svy21 and wgs84.</p>
 </section>
 </section>
-<section id="map-coordinate-reference-systems-crs" class="level2">
-<h2 class="anchored" data-anchor-id="map-coordinate-reference-systems-crs">1.6 Map coordinate reference systems (CRS)</h2>
+<section id="map-coordinate-reference-systems-crs" class="level1">
+<h1>1.6 Map coordinate reference systems (CRS)</h1>
 <p>A spatial reference system (SRS) or coordinate reference system (CRS) is a framework used to precisely measure locations on the surface of Earth as coordinates. There are thousands of spatial reference systems used today and they are based on general strategies defined in the EPSG, ISO, and OGC standards. For this exercise, the datasets use SVY21 and WGS84; two different CRS commonly used in geospatial applications, especially in the context of Singapore.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">SVY21</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false">WGS84</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
 <p><strong>SVY21</strong> (Singapore Coordinate System 1980) is a coordinate reference system used specifically in Singapore. It was established in 1980 and is based on the Transverse Mercator projection. SVY21 uses meters as its unit of measurement and the origin (0, 0) is located at a specific point in Singapore, and coordinates are measured in meters eastward (E) and northward (N) from this origin point.</p>
+</div>
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
 <p><strong>WGS84</strong> (World Geodetic System 1984) is a global geodetic reference system widely used for GPS (Global Positioning System) and geospatial applications worldwide. It is maintained by the U.S. National Geospatial-Intelligence Agency (NGA). It uses latitude and longitude to specify locations on the Earth’s surface, and it is based on an ellipsoidal model of the Earth. Coordinates in WGS84 are typically expressed in degrees of latitude (N or S) and longitude (E or W), although they can also be represented in other units such as decimal degrees or degrees, minutes, and seconds.</p>
-<section id="assign-epsg-code" class="level3">
-<h3 class="anchored" data-anchor-id="assign-epsg-code">1.6.1 Assign EPSG code</h3>
+</div>
+</div>
+</div>
+<section id="assign-epsg-code" class="level2">
+<h2 class="anchored" data-anchor-id="assign-epsg-code">1.6.1 Assign EPSG code</h2>
 <p>One of the common issues for geospatial data is the missing coordinate system of the source data or wrongly assigned during the importing process. Although&nbsp;<code>mpsz</code>&nbsp;data frame is projected in SVY21, the CRS indicates that the EPSG is 9001. This is a wrong EPSG code because the correct EPSG code for SVY21 should be 3414. More information <a href="https://epsg.io/3414">here</a>.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Before</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">After</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(mpsz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -642,6 +703,8 @@ PROJCRS["SVY21",
                 ID["EPSG",9001]]]]</code></pre>
 </div>
 </div>
+</div>
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
 <p>We will assign the correct EPSG to <code>mpsz</code> using <code>st_set_crs()</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>mpsz3414 <span class="ot">&lt;-</span> <span class="fu">st_set_crs</span>(mpsz,<span class="dv">3414</span>)</span>
@@ -690,7 +753,9 @@ PROJCRS["SVY21 / Singapore TM",
     ID["EPSG",3414]]</code></pre>
 </div>
 </div>
-</section>
+</div>
+</div>
+</div>
 </section>
 <section id="transform-wgs84-to-svy21" class="level2">
 <h2 class="anchored" data-anchor-id="transform-wgs84-to-svy21">1.6.2 Transform WGS84 to SVY21</h2>
@@ -744,12 +809,168 @@ PROJCRS["SVY21 / Singapore TM",
 </div>
 </div>
 </section>
-<section id="create-a-simple-feature-dataframe" class="level2">
-<h2 class="anchored" data-anchor-id="create-a-simple-feature-dataframe">1.6.3 Create a simple feature dataframe</h2>
-<p>Dataset 4: Inside Airbnb (<code>listings</code>)</p>
-
-
+<section id="create-a-simple-feature-object" class="level2">
+<h2 class="anchored" data-anchor-id="create-a-simple-feature-object">1.6.3 Create a simple feature object</h2>
+<p><code>st_as_sf()</code> create an sf object by taking arguments such as longitude and latitude as the coordinates. Let’s assume that the coordinate system used to reference the latitude and longitude coordinates is WGS84 with crs 4236, then transform it to SVY21 with crs 3414.</p>
+<p>::: {.panel-tabset}</p>
 </section>
+<section id="transform" class="level2">
+<h2 class="anchored" data-anchor-id="transform">Transform</h2>
+<p><code>st_as_sf()</code> drops the columns used to create <code>geometry</code> by default. The <code>remove = F</code> specification ensures the longitude and latitude columns are retained, which may be used plots subsequently.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>airbnb_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(airbnb,</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>,<span class="st">"latitude"</span>),</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">crs =</span> <span class="dv">4326</span>,</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">remove =</span> F) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="view" class="level2">
+<h2 class="anchored" data-anchor-id="view">View</h2>
+<p>New column <code>geometry</code> is created and the geometry type is point.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(airbnb_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 3,483
+Columns: 19
+$ id                             &lt;dbl&gt; 71609, 71896, 71903, 275343, 275344, 28…
+$ name                           &lt;chr&gt; "Villa in Singapore · ★4.44 · 2 bedroom…
+$ host_id                        &lt;dbl&gt; 367042, 367042, 367042, 1439258, 143925…
+$ host_name                      &lt;chr&gt; "Belinda", "Belinda", "Belinda", "Kay",…
+$ neighbourhood_group            &lt;chr&gt; "East Region", "East Region", "East Reg…
+$ neighbourhood                  &lt;chr&gt; "Tampines", "Tampines", "Tampines", "Bu…
+$ latitude                       &lt;dbl&gt; 1.34537, 1.34754, 1.34531, 1.29015, 1.2…
+$ longitude                      &lt;dbl&gt; 103.9589, 103.9596, 103.9610, 103.8081,…
+$ room_type                      &lt;chr&gt; "Private room", "Private room", "Privat…
+$ price                          &lt;dbl&gt; 150, 80, 80, 55, 69, 220, 85, 75, 45, 7…
+$ minimum_nights                 &lt;dbl&gt; 92, 92, 92, 60, 60, 92, 92, 60, 60, 92,…
+$ number_of_reviews              &lt;dbl&gt; 20, 24, 47, 22, 17, 12, 133, 18, 6, 81,…
+$ last_review                    &lt;date&gt; 2020-01-17, 2019-10-13, 2020-01-09, 20…
+$ reviews_per_month              &lt;dbl&gt; 0.14, 0.16, 0.31, 0.17, 0.12, 0.09, 0.9…
+$ calculated_host_listings_count &lt;dbl&gt; 5, 5, 5, 52, 52, 5, 7, 52, 52, 7, 7, 1,…
+$ availability_365               &lt;dbl&gt; 89, 89, 89, 275, 274, 89, 365, 365, 365…
+$ number_of_reviews_ltm          &lt;dbl&gt; 0, 0, 0, 0, 3, 0, 0, 1, 3, 0, 0, 0, 0, …
+$ license                        &lt;chr&gt; NA, NA, NA, "S0399", "S0399", NA, NA, "…
+$ geometry                       &lt;POINT [m]&gt; POINT (41972.5 36390.05), POINT (…</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="geoprocessing" class="level1">
+<h1>1.7 Geoprocessing</h1>
+<p>Geoprocessing provides a framework for performing analysis and management of geographic data and a large suite of tools for performing GIS tasks that range from simple buffers and polygon overlays to complex regression analysis and image classification.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">Buffering</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">Point-in-polygon Count</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-3" role="tab" aria-controls="tabset-9-3" aria-selected="false">Join</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
+<section id="question" class="level3 solvebox solve">
+<h3 class="anchored" data-anchor-id="question">Question:</h3>
+<p>Determine the total area of land required to upgrade a cycling path with 5 metres of reserved land on the both sides of the current cycling path.</p>
+</section>
+<p><code>st_buffer()</code> encircles a geometry object at a specified <code>dist</code> and returns a geometry object that is the buffer that surrounds the source object.</p>
+<p><code>st_area()</code> returns the area of a geometry.</p>
+<p>Step 1: Compute the 5-meter buffers around cycling paths.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>cyclingpath_buffer <span class="ot">&lt;-</span> <span class="fu">st_buffer</span>(cyclingpath,</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">dist =</span> <span class="dv">5</span>,</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">nQuadSegs =</span> <span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 2: Calculate the area of the buffers.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>cyclingpath_buffer<span class="sc">$</span>AREA <span class="ot">=</span> <span class="fu">st_area</span>(cyclingpath_buffer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 3: Calculate the total area of land involved.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(cyclingpath_buffer<span class="sc">$</span>AREA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1774367 [m^2]</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
+<section id="question-1" class="level3 solvebox solve">
+<h3 class="anchored" data-anchor-id="question-1">Question:</h3>
+<p>Find the number and density of pre-schools in each Planning Subzone.</p>
+</section>
+<p>Step 1: Identify and calculate the pre-schools located inside each Planning Subzone by using <code>st_intersects()</code> and <code>length()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>mpsz3414<span class="sc">$</span><span class="st">`</span><span class="at">PreSch Count</span><span class="st">`</span><span class="ot">&lt;-</span> <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(mpsz3414, preschool3414))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 2: Determine the area of each planning subzone.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>mpsz3414<span class="sc">$</span>Area <span class="ot">&lt;-</span> mpsz3414 <span class="sc">%&gt;%</span> </span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_area</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 3: Compute the density.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>mpsz3414 <span class="ot">&lt;-</span> mpsz3414 <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">PreSch Density</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">PreSch Count</span><span class="st">`</span><span class="sc">/</span>Area <span class="sc">*</span> <span class="dv">1000000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-9-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-3-tab">
+<p><code>st_join()</code> is a left join that returns all records of the x object with y fields for non-matched records filled with NA values. Where the crs system differs, it throws an error message “st_crs(x) == st_crs(y) is not TRUE”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>mpsz3414_preschool3414 <span class="ot">&lt;-</span> <span class="fu">st_join</span>(mpsz3414, preschool3414,</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">join =</span> st_within)</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mpsz3414_preschool3414)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Hands_on_Ex01_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="exploratory-data-analysis" class="level1">
+<h1>1.8 Exploratory Data Analysis</h1>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-10-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-1" role="tab" aria-controls="tabset-10-1" aria-selected="true">Histogram</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-2" role="tab" aria-controls="tabset-10-2" aria-selected="false">Histogram</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-10-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-10-3" role="tab" aria-controls="tabset-10-3" aria-selected="false">Scatterplot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-10-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(mpsz3414<span class="sc">$</span><span class="st">`</span><span class="at">PreSch Density</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Hands_on_Ex01_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-10-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>mpsz3414, </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x=</span> <span class="fu">as.numeric</span>(<span class="st">`</span><span class="at">PreSch Density</span><span class="st">`</span>)))<span class="sc">+</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins=</span><span class="dv">20</span>, </span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color=</span><span class="st">"black"</span>, </span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill=</span><span class="st">"light blue"</span>) <span class="sc">+</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Are pre-school even distributed in Singapore?"</span>,</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle=</span> <span class="st">"There are many planning sub-zones with a single pre-school, on the other hand, </span><span class="sc">\n</span><span class="st">there are two planning sub-zones with at least 20 pre-schools"</span>,</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Pre-school density (per km sq)"</span>,</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Frequency"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Hands_on_Ex01_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+<div id="tabset-10-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-10-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>mpsz3414, </span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">y =</span> <span class="st">`</span><span class="at">PreSch Count</span><span class="st">`</span>, </span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">x=</span> <span class="fu">as.numeric</span>(<span class="st">`</span><span class="at">PreSch Density</span><span class="st">`</span>)))<span class="sc">+</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color=</span><span class="st">"black"</span>, </span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill=</span><span class="st">"light blue"</span>) <span class="sc">+</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>, <span class="dv">40</span>) <span class="sc">+</span></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">40</span>) <span class="sc">+</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">""</span>,</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Pre-school density (per km sq)"</span>,</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Pre-school count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Hands_on_Ex01_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
