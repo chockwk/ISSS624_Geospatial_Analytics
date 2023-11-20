@@ -100,6 +100,7 @@ cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
 The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 **Dataset 4: Inside Airbnb Singapore (`listings`) - Aspatial dataset**
 
 Inside Airbnb is a mission driven project that provides data and advocacy about Airbnb's impact on residential communities. The data utilizes public information compiled from the Airbnb web-site including the availabiity calendar for 365 days in the future, and the reviews for each listing. Data is verified, cleansed, analyzed and aggregated. Note the data is not associated with or endorsed by Airbnb.
@@ -281,6 +282,3 @@ Dataset 4: Inside Airbnb (`listings`)
 ```{r}
 
 ```
-=======
-## 1.4 Explore data
->>>>>>> c1d382e0ead019599a95c27c6cde4fd72510082a
