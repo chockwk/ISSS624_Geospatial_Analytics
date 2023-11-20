@@ -11,9 +11,13 @@ website:
         href: about.qmd
         menu: 
           - text: Definitions
+<<<<<<< HEAD
             href: About/definitions.html
           - text: Spatial Manipulation with sf
             href: About/sf.html
+=======
+            href: About/Definitions/Definitions.html
+>>>>>>> c1d382e0ead019599a95c27c6cde4fd72510082a
     right: 
       - text: Hands-on Ex
         menu: 
