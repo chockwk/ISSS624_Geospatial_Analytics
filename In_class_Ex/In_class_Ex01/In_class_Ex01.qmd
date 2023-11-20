@@ -1,0 +1,176 @@
+---
+title: "1 Choropleth Map"
+author: "Wan Kee"
+date: "18 November 2023"
+date modified: "20 November 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# 1.1 Overview
+
+A choropleth map is a thematic map composed of coloured polygons and is used to represent statistical data using the color mapping symbology technique.
+
+Learning Objectives 1. xx 2. xx
+
+# 1.2 Load packages
+
+`knitr` provides a general-purpose tool for dynamic report generation in R using Literate Programming techniques.
+
+`tmap` is a package for interactive maps.
+
+```{r}
+pacman::p_load(knitr, tmap, tidyverse, sf)
+```
+
+# 1.3 Import data
+
+::: panel-tabset
+
+## odbus
+
+```{r}
+odbus = read_csv("data/origin_destination_bus_202308.csv")
+```
+
+Rows: 5709512 Columns: 7
+
+```{r}
+odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
+odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
+```
+
+## busstop
+
+```{r}
+busstop <- st_read(dsn = "data/geospatial",
+                   layer = "BusStop") %>%
+  st_transform(crs = 3414)
+```
+
+
+## mpsz
+
+```{r}
+mpsz = st_read(dsn="data/geospatial", layer="MPSZ-2019") %>% 
+  st_transform(crs=3414)
+```
+
+:::
+
+# 1.4 Explore data
+
+::: panel-tabset
+
+## odbus
+
+```{r}
+glimpse(odbus)
+```
+
+## busstop
+
+```{r}
+glimpse(busstop)
+```
+
+## mpsz
+
+```{r}
+glimpse(mpsz)
+```
+
+:::
+
+# 1.5 Extract data
+
+```{r}
+origin7_9 <- odbus %>%
+  filter(DAY_TYPE == "WEEKDAY") %>%
+  filter(TIME_PER_HOUR >= 7 &
+           TIME_PER_HOUR <= 9) %>%
+  group_by(ORIGIN_PT_CODE) %>%
+  summarise(TRIPS = sum(TOTAL_TRIPS))
+```
+
+```{r}
+kable(head(origin7_9))
+```
+
+```{r}
+write_rds(origin7_9, "data/rds/origin7_9.rds")
+```
+
+```{r}
+origin7_9 <- read_rds("data/rds/origin7_9.rds")
+```
+
+# 1.6 Combine data
+
+
+```{r}
+busstop_mpsz <- st_intersection(busstop, mpsz) %>%
+  select(BUS_STOP_N, SUBZONE_C) %>%
+  st_drop_geometry()
+```
+
+
+```{r}
+write_rds(busstop_mpsz, "data/rds/busstop_mpsz.csv")
+```
+
+
+```{r}
+origin_data <- left_join(origin7_9 , busstop_mpsz,
+            by = c("ORIGIN_PT_CODE" = "BUS_STOP_N")) %>%
+  rename(ORIGIN_BS = ORIGIN_PT_CODE,
+         ORIGIN_SZ = SUBZONE_C)
+```
+
+
+```{r}
+duplicate <- origin_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+```
+
+
+```{r}
+origin_data <- unique(origin_data)
+```
+
+
+```{r}
+mpsz_origtrip <- left_join(mpsz, 
+                           origin_data,
+                           by = c("SUBZONE_C" = "ORIGIN_SZ"))
+```
+
+
+#1.7 Choropleth Visualisation
+
+```{r}
+tm_shape(mpsz_origtrip)+
+  tm_fill("TRIPS", 
+          style = "quantile", 
+          palette = "Blues",
+          title = "Passenger trips") +
+  tm_layout(main.title = "Passenger trips generated at planning sub-zone level",
+            main.title.position = "center",
+            main.title.size = 1.2,
+            legend.height = 0.45, 
+            legend.width = 0.35,
+            frame = TRUE) +
+  tm_borders(alpha = 0.5) +
+  tm_compass(type="8star", size = 2) +
+  tm_scale_bar() +
+  tm_grid(alpha =0.2) +
+  tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics DOS", 
+             position = c("left", "bottom"))
+```
+

@@ -33,7 +33,7 @@ In this Hands_on_Ex01, we will handle geospatial data in R using two packages, n
 pacman::p_load(sf, tidyverse)
 ```
 
-# 1.3 Import geospatial data
+# 1.3 Import data
 
 Before we begin, let's understand the geospatial file formats. KML, SHP, and GeoJSON are file formats commonly used in Geographic Information System (GIS) and mapping applications to represent and store geospatial data. Each format serves a specific purpose and has its own characteristics.
 
