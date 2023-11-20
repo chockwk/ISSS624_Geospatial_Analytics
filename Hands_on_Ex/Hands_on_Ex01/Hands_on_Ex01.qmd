@@ -41,13 +41,19 @@ Before we begin, let's understand the geospatial file formats. KML, SHP, and Geo
 
 Keyhole Markup Language is an XML-based file format developed for use with Google Earth. It is widely supported by various GIS and mapping software. KML files can contain a variety of geospatial data, including points, lines, polygons, images, and text annotations.
 
+:::
+
 ## **SHP**
 
 Shapefile is a widely used industry-standard geospatial vector data format used by GIS softwares, such as ESRI ArcGIS and QGIS. Shapefiles consist of multiple files with different extensions (.shp, .shx, .dbf, etc.) that together represent vector features, including points, lines, and polygons. Shapefiles are versatile and support for attribute data, making them suitable for a wide range of GIS applications.
 
+:::
+
 ## **GeoJSON**  
 
 Geographic JavaScript Object Notation is an open and lightweight format for encoding geospatial data in a JSON (JavaScript Object Notation) format. It is easy for both humans and machines to read and write. GeoJSON supports various types of geospatial features, including points, lines, polygons, and multi-geometry collections. It is commonly used in web mapping applications and can be easily integrated with JavaScript and other programming languages. GeoJSON is a format for encoding a variety of geographic data structures.
+
+:::
 
 Next, we have three geospatial datasets in various data file formats.
 
