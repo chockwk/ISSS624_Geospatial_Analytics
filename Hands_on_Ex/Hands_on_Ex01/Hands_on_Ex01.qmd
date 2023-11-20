@@ -19,7 +19,9 @@ In this Hands_on_Ex01, we will handle geospatial data in R using two packages, n
 
 1.  Introduction to R packages and functions that support geospatial data.
 2.  Understand geospatial file formats and coordinate reference systems.
-3.  Create a simple feature dataframe from an aspatial dataframe.
+3.  Create a simple feature (sf) dataframe.
+4.  Perform geoprocessing tasks.
+5.  Perform exploratory data analysis.
 
 # 1.2 Load packages
 
@@ -35,7 +37,7 @@ pacman::p_load(sf, tidyverse)
 
 Before we begin, let's understand the geospatial file formats. KML, SHP, and GeoJSON are file formats commonly used in Geographic Information System (GIS) and mapping applications to represent and store geospatial data. Each format serves a specific purpose and has its own characteristics.
 
-::: {.panel-tabset}
+::: panel-tabset
 ## KML
 
 Keyhole Markup Language is an XML-based file format developed for use with Google Earth. It is widely supported by various GIS and mapping software. KML files can contain a variety of geospatial data, including points, lines, polygons, images, and text annotations.
@@ -51,8 +53,7 @@ Geographic JavaScript Object Notation is an open and lightweight format for enco
 
 Next, we have three geospatial and one aspatial datasets in various data file formats.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## mpsz
 
 **Master Plan 2014 Subzone Boundary (`mpsz`)**
@@ -61,12 +62,13 @@ The Master Plan is a forward looking guiding plan for Singapore's development in
 
 Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
 
+![](images/Screenshot%202023-11-19%20at%2012.43.30%E2%80%AFAM.png){fig-align="center" width="400"}
+
 ```{r}
 mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
 ```
 
 The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in svy21 projected coordinates system with XY dimension.
-
 
 ## preschool
 
@@ -75,6 +77,8 @@ The output indicates that the geospatial objects are multipolygon features. Ther
 The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.
 
 Source: ECDA (Download [here](https://beta.data.gov.sg/collections/2064/view))
+
+![](images/Screenshot%202023-11-19%20at%2012.42.16%E2%80%AFAM.png){fig-align="center" width="400"}
 
 ```{r}
 preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
@@ -89,6 +93,8 @@ The output indicates that the geospatial objects are point features. There are 2
 The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.
 
 Source: LTA (Download [here](https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html))
+
+![](images/Screenshot%202023-11-19%20at%2012.54.09%E2%80%AFAM.png){fig-align="center" width="400"}
 
 ```{r}
 cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
@@ -106,12 +112,14 @@ Inside Airbnb uses an occupancy model, the San Francisco Model, in honor of the 
 
 Source: Inside Airbnb (Download [here](http://insideairbnb.com/get-the-data))
 
+![](images/Screenshot%202023-11-20%20at%2011.58.05%E2%80%AFPM.png){fig-align="center" width="400"}
+
 ```{r}
 airbnb = read_csv("data/aspatial/listings.csv")
 list(airbnb)
 ```
 
-The output indicates 3483 features and 18 fields. 
+The output indicates 3483 features and 18 fields.
 :::
 
 # 1.4 Explore data
@@ -120,8 +128,7 @@ The output indicates 3483 features and 18 fields.
 
 `st_geometry()` `st_set_geometry()` `st_drop_geometry()` can get, set, replace or rename geometry from an sf object. For this exercise, we will use `st_geometry()` to display basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## mpsz
 
 `mpsz` contains a column `geometry` where it indicates the object is a multipolygon in XY dimension.
@@ -132,10 +139,11 @@ st_geometry(mpsz)
 
 A multipolygon represent areas (polygons), typically complex ones with areas/holes inside, or consisting of multiple disjoint parts. Here is an example of a multipolygon and an object within the column `geometry` where its relations are represented as ((X~1~,Y~1~), (X~2~,Y~2~),..).
 
+![](images/Screenshot%202023-11-19%20at%2011.54.56%E2%80%AFAM.png){fig-align="center" width="300"}
+
 ```{r}
 mpsz[[16]][[1]]
 ```
-
 
 ## preschool
 
@@ -145,7 +153,6 @@ mpsz[[16]][[1]]
 st_geometry(preschool)
 ```
 
-
 ## cyclingpath
 
 `cyclingpath` contains a column `geometry` where it indicates the object is a multilinestring in XY dimension.
@@ -154,7 +161,9 @@ st_geometry(preschool)
 st_geometry(cyclingpath)
 ```
 
-A multilinestring represent one ground feature made of one or multiple line strings. Here is an example of multilinestring and two objects where they consist of 2 and 5 lines and are represented as ((X~1~ Y~1~, X~2~ Y~2~, ...)) within the column `geometry` .
+A multilinestring represent one ground feature made of one or multiple line strings. Here is an example of multilinestring and two objects where they consist of 2 and 5 lines and are represented as ((X~1~ Y~1~, X~2~ Y~2~, ...)) within the column `geometry`.
+
+![](images/Screenshot%202023-11-19%20at%2012.15.39%E2%80%AFPM.png){fig-align="center" width="300"}
 
 ```{r}
 cyclingpath[[3]][[1]]
@@ -162,13 +171,11 @@ cyclingpath[[3]][[46]]
 ```
 :::
 
-
 ## 1.4.2 glimpse()
 
 `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values in every column in a data frame.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## mpsz
 
 ```{r}
@@ -194,19 +201,21 @@ glimpse(cyclingpath)
 
 `tail()` is the reversed function.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## mpsz
+
 ```{r}
 head(mpsz, n=5)
 ```
 
 ## preschool
+
 ```{r}
 head(preschool, n=5)
 ```
 
 ## cyclingpath
+
 ```{r}
 head(cyclingpath, n=5)
 ```
@@ -218,10 +227,10 @@ head(cyclingpath, n=5)
 
 `plot()` takes parameters for specifying points in the diagram. At its simplest, it can plot two numbers against each other. With datasets, it can generate maps and plot the specified columns/attributes, with default up to nine plots or maximum all plots.
 
-::: {.panel-tabset}
+::: panel-tabset
 ## mpsz
-`mpsz` contains 15 attributes and we will generate a map for each of the attributes as shown below.
-Note: The column `geometry` is not considered as an attribute for `mpsz`, similar for the subsequent datasets.
+
+`mpsz` contains 15 attributes and we will generate a map for each of the attributes as shown below. Note: The column `geometry` is not considered as an attribute for `mpsz`, similar for the subsequent datasets.
 
 ```{r}
 plot(mpsz, max.plot = 15)
@@ -239,8 +248,8 @@ We can select a specific attribute of `mpsz` and generate its map accordingly.
 plot(mpsz["PLN_AREA_N"])
 ```
 
-
 ## preschool
+
 `preschool` has two attributes and `plot()` generates two maps with points based on object name and center details.
 
 ```{r}
@@ -272,11 +281,13 @@ Overall, the three geospatial datasets are spatial information of different purp
 
 A spatial reference system (SRS) or coordinate reference system (CRS) is a framework used to precisely measure locations on the surface of Earth as coordinates. There are thousands of spatial reference systems used today and they are based on general strategies defined in the EPSG, ISO, and OGC standards. For this exercise, the datasets use SVY21 and WGS84; two different CRS commonly used in geospatial applications, especially in the context of Singapore.
 
-::: {.panel-tabset}
+::: panel-tabset
 ## SVY21
+
 **SVY21** (Singapore Coordinate System 1980) is a coordinate reference system used specifically in Singapore. It was established in 1980 and is based on the Transverse Mercator projection. SVY21 uses meters as its unit of measurement and the origin (0, 0) is located at a specific point in Singapore, and coordinates are measured in meters eastward (E) and northward (N) from this origin point.
 
 ## WGS84
+
 **WGS84** (World Geodetic System 1984) is a global geodetic reference system widely used for GPS (Global Positioning System) and geospatial applications worldwide. It is maintained by the U.S. National Geospatial-Intelligence Agency (NGA). It uses latitude and longitude to specify locations on the Earth's surface, and it is based on an ellipsoidal model of the Earth. Coordinates in WGS84 are typically expressed in degrees of latitude (N or S) and longitude (E or W), although they can also be represented in other units such as decimal degrees or degrees, minutes, and seconds.
 :::
 
@@ -284,8 +295,7 @@ A spatial reference system (SRS) or coordinate reference system (CRS) is a frame
 
 One of the common issues for geospatial data is the missing coordinate system of the source data or wrongly assigned during the importing process. Although `mpsz` data frame is projected in SVY21, the CRS indicates that the EPSG is 9001. This is a wrong EPSG code because the correct EPSG code for SVY21 should be 3414. More information [here](https://epsg.io/3414).
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## Before
 
 ```{r}
@@ -315,13 +325,12 @@ st_crs(preschool3414)
 
 ## 1.6.3 Create a simple feature object
 
-`st_as_sf()` create an sf object by taking arguments such as longitude and latitude as the coordinates. Let’s assume that the coordinate system used to reference the latitude and longitude coordinates is WGS84 with crs 4236, then transform it to SVY21 with crs 3414.
+`st_as_sf()` create an sf object by taking arguments such as longitude and latitude as the coordinates. Let's assume that the coordinate system used to reference the latitude and longitude coordinates is WGS84 with crs 4236, then transform it to SVY21 with crs 3414.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## Transform
 
-`st_as_sf()` drops the columns used to create `geometry` by default. The `remove = F` specification ensures the longitude and latitude columns are retained, which may be used plots subsequently. 
+`st_as_sf()` drops the columns used to create `geometry` by default. The `remove = F` specification ensures the longitude and latitude columns are retained, which may be used plots subsequently.
 
 ```{r}
 airbnb_sf <- st_as_sf(airbnb,
@@ -344,12 +353,12 @@ glimpse(airbnb_sf)
 
 Geoprocessing provides a framework for performing analysis and management of geographic data and a large suite of tools for performing GIS tasks that range from simple buffers and polygon overlays to complex regression analysis and image classification.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## Buffering
 
 ::: {.solvebox .solve data-latex="solve"}
 ### Question:
+
 Determine the total area of land required to upgrade a cycling path with 5 metres of reserved land on the both sides of the current cycling path.
 :::
 
@@ -357,7 +366,10 @@ Determine the total area of land required to upgrade a cycling path with 5 metre
 
 `st_area()` returns the area of a geometry.
 
+![](images/Screenshot%202023-11-20%20at%209.42.08%E2%80%AFPM.png){fig-align="center" width="300"}
+
 Step 1: Compute the 5-meter buffers around cycling paths.
+
 ```{r}
 cyclingpath_buffer <- st_buffer(cyclingpath,
                                 dist = 5,
@@ -365,11 +377,13 @@ cyclingpath_buffer <- st_buffer(cyclingpath,
 ```
 
 Step 2: Calculate the area of the buffers.
+
 ```{r}
 cyclingpath_buffer$AREA = st_area(cyclingpath_buffer)
 ```
 
 Step 3: Calculate the total area of land involved.
+
 ```{r}
 sum(cyclingpath_buffer$AREA)
 ```
@@ -378,6 +392,7 @@ sum(cyclingpath_buffer$AREA)
 
 ::: {.solvebox .solve data-latex="solve"}
 ### Question:
+
 Find the number and density of pre-schools in each Planning Subzone.
 :::
 
@@ -401,10 +416,9 @@ mpsz3414 <- mpsz3414 %>%
   mutate(`PreSch Density` = `PreSch Count`/Area * 1000000)
 ```
 
-
 ## Join
 
-`st_join()` is a left join that returns all records of the x object with y fields for non-matched records filled with NA values. Where the crs system differs, it throws an error message "st_crs(x) == st_crs(y) is not TRUE".
+`st_join()` is a left join that returns all records of the x object with y fields for non-matched records filled with NA values. It is useful for the utilization of two datasets together. Where the crs system differs, it throws an error message "st_crs(x) == st_crs(y) is not TRUE".
 
 ```{r}
 mpsz3414_preschool3414 <- st_join(mpsz3414, preschool3414,
@@ -415,9 +429,7 @@ plot(mpsz3414_preschool3414)
 
 # 1.8 Exploratory Data Analysis
 
-
-::: {.panel-tabset}
-
+::: panel-tabset
 ## Histogram
 
 ```{r}
@@ -438,7 +450,6 @@ ggplot(data=mpsz3414,
       y = "Frequency")
 ```
 
-
 ## Scatterplot
 
 ```{r}
@@ -453,5 +464,4 @@ ggplot(data=mpsz3414,
       x = "Pre-school density (per km sq)",
       y = "Pre-school count")
 ```
-
 :::
