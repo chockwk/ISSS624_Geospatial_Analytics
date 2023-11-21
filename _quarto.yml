@@ -2,8 +2,9 @@ project:
   type: website
 
 website:
-  title: "ISSS624_Geospatial_Analytics"
+  title: "Geospatial Analytics"
   navbar:
+  
     left:
       - href: index.qmd
         text: Home
@@ -11,6 +12,7 @@ website:
         href: about.qmd
         menu: 
           - text: Definitions
+    
     right: 
       - text: Hands-on Ex
         menu: 
@@ -32,6 +34,29 @@ website:
             href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
           - text: In-class Ex04
           - text: In-class Ex05
+    
+  page-navigation: true
+
+  back-to-top-navigation: false
+  
+  page-footer:
+    background: "#ABEBC6"
+    center:
+      - href: https://cosmic-kitten.netlify.app
+        icon: house-fill
+        aria-label: Home
+      - href: wkchock.2022@mitb.smu.edu.sg
+        icon: envelope-fill
+        aria-label: Email
+      - href: https://github.com/chockwk/ISSS624_Geospatial_Analytics/tree/main
+        icon: github
+        aria-label: GitHub
+      - href: https://www.linkedin.com/in/wan-kee/
+        icon: linkedin
+        aria-label: LinkedIn
+
+        
+
 format:
   html:
     theme: minty

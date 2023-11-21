@@ -31,11 +31,17 @@ Distance-based weights assign weights based on the Euclidean or other distance m
 ![](/_site/Hands_on_Ex/Hands_on_Ex02/images/Screenshot%202023-11-21%20at%208.58.23%E2%80%AFPM.png){fig-align="center" width="500"}
 :::
 
-Learning Objectives: 
-1. xx 
-2. xx
+Learning Objectives: 1. xx 2. xx
 
 # 1.2 Load packages
+
+<div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
+  <div class="card-header">New package</div>
+  <div class="card-body">
+    <h4 class="card-title">`spdep`</h4>
+    <p class="card-text">A comprehensive package for spatial econometrics and spatial statistics. It provides functions and tools for handling spatial data, creating spatial weights matrices, and conducting spatial data analysis.</p>
+  </div>
+</div>
 
 `spdep` is a comprehensive package for spatial econometrics and spatial statistics. It provides functions and tools for handling spatial data, creating spatial weights matrices, and conducting spatial data analysis.
 
@@ -69,14 +75,11 @@ Learning Objectives:
 
 `hunan` output indicates that the geospatial objects are polygon features. There are 88 features and 7 fields. It is in WGS84 projected coordinates system with XY dimension.
 
-
 ```{r}
 hunan = st_read(dsn="data/geospatial", layer="Hunan")
 ```
+
 ## hunan2012
-
-
-
 
 # 1.4 Explore data
 

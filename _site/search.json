@@ -263,7 +263,7 @@
     "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html",
     "title": "Hands_on_Ex03",
     "section": "",
-    "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
+    "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\nHeader\n\n\n&lt;h4 class=\"card-title\"&gt;Primary card title&lt;/h4&gt;\n&lt;p class=\"card-text\"&gt;Some quick example text to build on the card title and make up the bulk of the card's content.&lt;/p&gt;\n\n\n\n\nHeader\n\n\n&lt;h4 class=\"card-title\"&gt;Secondary card title&lt;/h4&gt;\n&lt;p class=\"card-text\"&gt;Some quick example text to build on the card title and make up the bulk of the card's content.&lt;/p&gt;\n\n\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
   },
   {
     "objectID": "In_class_Ex/In_class_Ex02/In_class_Ex02.html",
