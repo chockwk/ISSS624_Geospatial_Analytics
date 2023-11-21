@@ -17,7 +17,9 @@ website:
           - text: Hands-on Ex01
             href: Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
           - text: Hands-on Ex02
+            href: Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html
           - text: Hands-on Ex03
+            href: Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html
           - text: Hands-on Ex04
           - text: Hands-on Ex05
       - text: In-class Ex
@@ -30,7 +32,7 @@ website:
           - text: In-class Ex05
 format:
   html:
-    theme: cosmo
+    theme: sketchy
     css: styles.css
     toc: true
 
