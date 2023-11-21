@@ -254,16 +254,16 @@
   {
     "objectID": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html",
     "href": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html",
-    "title": "2 Spatial Weights and Application",
+    "title": "2a Spatial Weights and Application",
     "section": "",
-    "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
+    "text": "Spatial weights are a fundamental concept in spatial analysis and spatial statistics. They are used to quantify the spatial relationships between geographic locations in a dataset. Spatial weights capture the relation of one location is to another based on their spatial proximity.\nThere are two types of spatial weights:\n\nContiguity WeightsDistance-Band Weights\n\n\nContiguity-based weights define relationships based on common geographic boundary.\n\n\n\n\n\n\n\nDistance-based weights assign weights based on the Euclidean or other distance measures between locations. Locations closer to each other receive higher weights.\n\n\n\n\n\n\n\n\nLearning Objectives:\n\nxx\nxx"
   },
   {
     "objectID": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html",
     "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html",
     "title": "Hands_on_Ex03",
     "section": "",
-    "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\nHeader\n\n\n&lt;h4 class=\"card-title\"&gt;Primary card title&lt;/h4&gt;\n&lt;p class=\"card-text\"&gt;Some quick example text to build on the card title and make up the bulk of the card's content.&lt;/p&gt;\n\n\n\n\nHeader\n\n\n&lt;h4 class=\"card-title\"&gt;Secondary card title&lt;/h4&gt;\n&lt;p class=\"card-text\"&gt;Some quick example text to build on the card title and make up the bulk of the card's content.&lt;/p&gt;\n\n\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
+    "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
   },
   {
     "objectID": "In_class_Ex/In_class_Ex02/In_class_Ex02.html",
@@ -276,6 +276,34 @@
     "objectID": "In_class_Ex/In_class_Ex03/In_class_Ex03.html",
     "href": "In_class_Ex/In_class_Ex03/In_class_Ex03.html",
     "title": "In_class_Ex03",
+    "section": "",
+    "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html#hunan",
+    "href": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html#hunan",
+    "title": "2a Spatial Weights and Application",
+    "section": "hunan",
+    "text": "hunan\nhunan output indicates that the geospatial objects are polygon features. There are 88 features and 7 fields. It is in WGS84 projected coordinates system with XY dimension.\n\nhunan = st_read(dsn=\"data/geospatial\", layer=\"Hunan\")\n\nReading layer `Hunan' from data source \n  `/Users/chockwankee/Documents/chockwk/ISSS624_Geospatial_Analytics/Hands_on_Ex/Hands_on_Ex02/data/geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html#hunan2012",
+    "href": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html#hunan2012",
+    "title": "2a Spatial Weights and Application",
+    "section": "hunan2012",
+    "text": "hunan2012"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html",
+    "href": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html",
+    "title": "Global Measures of Spatial Autocorrelation",
+    "section": "",
+    "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02c.html",
+    "href": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02c.html",
+    "title": "Local Measures of Spatial Autocorrelation",
     "section": "",
     "text": "1.1 Overview\n\n\n1.2 Load packages\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
   }

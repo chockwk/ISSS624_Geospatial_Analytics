@@ -16,10 +16,14 @@ website:
     right: 
       - text: Hands-on Ex
         menu: 
-          - text: Hands-on Ex01
+          - text: Geospatial Data Wrangling
             href: Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
-          - text: Hands-on Ex02
+          - text: Spatial Weights and Application
             href: Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html
+          - text: Global Measures of Spatial Autocorrelation
+            href: Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html
+          - text: Local Measures of Spatial Autocorrelation
+            href: Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02c.html
           - text: Hands-on Ex03
             href: Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html
           - text: Hands-on Ex04
