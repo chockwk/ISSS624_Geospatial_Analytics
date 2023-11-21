@@ -179,6 +179,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#explore-data" id="toc-explore-data" class="nav-link" data-scroll-target="#explore-data">1.4 Explore data</a></li>
   <li><a href="#extract-data" id="toc-extract-data" class="nav-link" data-scroll-target="#extract-data">1.5 Extract data</a></li>
   <li><a href="#combine-data" id="toc-combine-data" class="nav-link" data-scroll-target="#combine-data">1.6 Combine data</a></li>
+  <li><a href="#choropleth-visualisation" id="toc-choropleth-visualisation" class="nav-link" data-scroll-target="#choropleth-visualisation">1.7 Choropleth Visualisation</a></li>
   </ul>
 </nav>
     </div>
@@ -417,7 +418,9 @@ $ geometry   &lt;MULTIPOLYGON [m]&gt; MULTIPOLYGON (((33222.98 29..., MULTIPOLYG
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                           origin_data,</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"SUBZONE_C"</span> <span class="ot">=</span> <span class="st">"ORIGIN_SZ"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>#1.7 Choropleth Visualisation</p>
+</section>
+<section id="choropleth-visualisation" class="level1">
+<h1>1.7 Choropleth Visualisation</h1>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz_origtrip)<span class="sc">+</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"TRIPS"</span>, </span>
