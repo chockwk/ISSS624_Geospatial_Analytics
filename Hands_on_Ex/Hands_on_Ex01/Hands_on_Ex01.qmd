@@ -68,7 +68,7 @@ Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
 mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
 ```
 
-The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in svy21 projected coordinates system with XY dimension.
+The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in SVY21 projected coordinates system with XY dimension.
 
 ## preschool
 
@@ -84,7 +84,7 @@ Source: ECDA (Download [here](https://beta.data.gov.sg/collections/2064/view))
 preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
 ```
 
-The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in wgs84 projected coordinates system with XYZ dimension.
+The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in WGS84 projected coordinates system with XYZ dimension.
 
 ## cyclingpath
 

@@ -27,12 +27,14 @@ website:
           - text: In-class Ex01
             href: In_class_Ex/In_class_Ex01/In_class_Ex01.html
           - text: In-class Ex02
+            href: In_class_Ex/In_class_Ex02/In_class_Ex02.html
           - text: In-class Ex03
+            href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
           - text: In-class Ex04
           - text: In-class Ex05
 format:
   html:
-    theme: sketchy
+    theme: minty
     css: styles.css
     toc: true
 

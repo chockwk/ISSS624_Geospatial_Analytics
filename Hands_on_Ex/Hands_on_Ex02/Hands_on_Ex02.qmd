@@ -13,14 +13,71 @@ editor: visual
 
 # 1.1 Overview
 
+Spatial weights are a fundamental concept in spatial analysis and spatial statistics. They are used to quantify the spatial relationships between geographic locations in a dataset. Spatial weights capture the relation of one location is to another based on their spatial proximity.
+
+There are two types of spatial weights:
+
+::: panel-tabset
+## Contiguity Weights
+
+Contiguity-based weights define relationships based on common geographic boundary.
+
+![](/_site/Hands_on_Ex/Hands_on_Ex02/images/Screenshot%202023-11-21%20at%208.52.53%E2%80%AFPM.png){fig-align="center" width="300"}
+
+## Distance-Band Weights
+
+Distance-based weights assign weights based on the Euclidean or other distance measures between locations. Locations closer to each other receive higher weights.
+
+![](/_site/Hands_on_Ex/Hands_on_Ex02/images/Screenshot%202023-11-21%20at%208.58.23%E2%80%AFPM.png){fig-align="center" width="500"}
+:::
+
+Learning Objectives: 
+1. xx 
+2. xx
 
 # 1.2 Load packages
 
+`spdep` is a comprehensive package for spatial econometrics and spatial statistics. It provides functions and tools for handling spatial data, creating spatial weights matrices, and conducting spatial data analysis.
+
+::: panel-tabset
+## Spatial Weights Matrices
+
+`spdep` offers various methods to create spatial weights matrices based on contiguity, distance, and other spatial relationships. Binary or weighted spatial weights matrices are created using functions such as `poly2nb` (polygon-based contiguity), `dnearneigh` (distance-based neighbors), and others.
+
+## Spatial Autocorrelation
+
+`spdep` provides functions to calculate measures of spatial autocorrelation, including global Moran's I, Geary's C, and Getis/Ord G statistics.
+
+## Spatial Regression Models
+
+`spdep` supports various types of spatial regression models, including spatial autoregressive (SAR) models, spatial error models, spatial lag models, and generalized spatial two-stage least squares (GMM-SAR) models.
+
+## Spatial Filtering
+
+`spdep` has functions for spatial filtering, such as Moran eigenvector spatial filtering (MESF) and generalized Moran eigenvector spatial filtering (GMESF), which can be used for spatial smoothing and noise reduction.
+
+## Regional Aggregation
+
+`sdpep` allows for regional aggregation using minimum spanning tree-based methods.
+:::
 
 # 1.3 Import data
 
+::: panel-tabset
+
+## hunan
+
+`hunan` output indicates that the geospatial objects are polygon features. There are 88 features and 7 fields. It is in WGS84 projected coordinates system with XY dimension.
+
+
+```{r}
+hunan = st_read(dsn="data/geospatial", layer="Hunan")
+```
+## hunan2012
+
+
+
 
 # 1.4 Explore data
-
 
 # 1.5 Plot data
