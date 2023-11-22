@@ -140,8 +140,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html" rel="" target="">
  <span class="dropdown-text">Spatial Weights and Application</span></a>
   </li>  
-        <li class="dropdown-header">Global Measures of Spatial Autocorrelation</li>
-        <li class="dropdown-header">Local Measures of Spatial Autocorrelation</li>
+        <li>
+    <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html" rel="" target="">
+ <span class="dropdown-text">Global Measures of Spatial Autocorrelation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02c.html" rel="" target="">
+ <span class="dropdown-text">Local Measures of Spatial Autocorrelation</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html" rel="" target="">
  <span class="dropdown-text">Hands-on Ex03</span></a>
@@ -189,13 +195,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1.1 Overview</a></li>
   <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages">1.2 Load packages</a></li>
-  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">1.3 Import data</a>
-  <ul class="collapse">
-  <li><a href="#hunan" id="toc-hunan" class="nav-link" data-scroll-target="#hunan">hunan</a></li>
-  <li><a href="#hunan2012" id="toc-hunan2012" class="nav-link" data-scroll-target="#hunan2012">hunan2012</a></li>
-  </ul></li>
+  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">1.3 Import data</a></li>
   <li><a href="#explore-data" id="toc-explore-data" class="nav-link" data-scroll-target="#explore-data">1.4 Explore data</a></li>
   <li><a href="#plot-data" id="toc-plot-data" class="nav-link" data-scroll-target="#plot-data">1.5 Plot data</a></li>
+  <li><a href="#compute-contiguity-spatial-weights" id="toc-compute-contiguity-spatial-weights" class="nav-link" data-scroll-target="#compute-contiguity-spatial-weights">1.6 Compute Contiguity Spatial Weights</a></li>
+  <li><a href="#compute-distance-band-neighbours" id="toc-compute-distance-band-neighbours" class="nav-link" data-scroll-target="#compute-distance-band-neighbours">1.7 Compute Distance-band neighbours</a></li>
   </ul>
 </nav>
     </div>
@@ -266,7 +270,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>1.2 Load packages</h1>
 <div class="card text-white bg-secondary mb-3" style="max-width: 40rem;">
 <div class="card-body">
-<pre><code>`spdep` is comprehensive package for spatial econometrics and spatial 
+<pre><code>**New package**
+`spdep` is comprehensive package for spatial econometrics and spatial 
 statistics. It provides the functions and tools for handling spatial 
 data, creating spatial weights matrices, and conducting spatial data 
 analysis.</code></pre>
@@ -298,9 +303,10 @@ analysis.</code></pre>
 </section>
 <section id="import-data" class="level1">
 <h1>1.3 Import data</h1>
-<p>::: panel-tabset</p>
-<section id="hunan" class="level2">
-<h2 class="anchored" data-anchor-id="hunan">hunan</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">hunan</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">hunan2012</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">hunan_hunan2012</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <p><code>hunan</code> output indicates that the geospatial objects are polygon features. There are 88 features and 7 fields. It is in WGS84 projected coordinates system with XY dimension.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"Hunan"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -315,16 +321,82 @@ Bounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-</section>
-<section id="hunan2012" class="level2">
-<h2 class="anchored" data-anchor-id="hunan2012">hunan2012</h2>
-</section>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p><code>hunan2012</code> output indicates 88 features, and 29 fields.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hunan2012 <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/Hunan_2012.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<p><code>left_join()</code> will merge the selected columns of <code>hunan</code> and <code>hunan2012</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>hunan_hunan2012 <span class="ot">=</span> <span class="fu">left_join</span>(hunan, hunan2012) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">15</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hunan_hunan2012, <span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 5 features and 6 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 111.2145 ymin: 28.61762 xmax: 112.3013 ymax: 29.95847
+Geodetic CRS:  WGS 84
+   NAME_2  ID_3  NAME_3   ENGTYPE_3  County GDPPC
+1 Changde 21098 Anxiang      County Anxiang 23667
+2 Changde 21100 Hanshou      County Hanshou 20981
+3 Changde 21101  Jinshi County City  Jinshi 34592
+4 Changde 21102      Li      County      Li 24473
+5 Changde 21103   Linli      County   Linli 25554
+                        geometry
+1 POLYGON ((112.0625 29.75523...
+2 POLYGON ((112.2288 29.11684...
+3 POLYGON ((111.8927 29.6013,...
+4 POLYGON ((111.3731 29.94649...
+5 POLYGON ((111.6324 29.76288...</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="explore-data" class="level1">
 <h1>1.4 Explore data</h1>
 </section>
 <section id="plot-data" class="level1">
 <h1>1.5 Plot data</h1>
+<p><code>GDPPC</code> is the gross domestic product per capita shows a country’s GDP divided by its total population. We will visualise the regional development indicator by plotting a basemap nad a choropleth map with the distribution of GDPPC using <code>qtm()</code>.</p>
+<p><code>qtm()</code> draws a quick thematic map without arguments or with a search term.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>basemap <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(hunan_hunan2012) <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_text</span>(<span class="st">"NAME_3"</span>, <span class="at">size=</span><span class="fl">0.5</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>gdppc <span class="ot">&lt;-</span> <span class="fu">qtm</span>(hunan_hunan2012, <span class="st">"GDPPC"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(basemap, gdppc, <span class="at">asp=</span><span class="dv">1</span>, <span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Hands_on_Ex02_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="compute-contiguity-spatial-weights" class="level1">
+<h1>1.6 Compute Contiguity Spatial Weights</h1>
+<p><code>poly2nb()</code> builds a neighbours list based on regions with contiguous boundaries, that is sharing one or more boundary point.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">QUEEN</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">ROOK</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">Visualisation</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
+
+</div>
+</div>
+</div>
+</section>
+<section id="compute-distance-band-neighbours" class="level1">
+<h1>1.7 Compute Distance-band neighbours</h1>
 
 
 </section>
