@@ -9,7 +9,7 @@
 <meta name="author" content="Wan Kee">
 <meta name="dcterms.date" content="2023-11-20">
 
-<title>Geospatial Analytics - Global Measures of Spatial Autocorrelation</title>
+<title>Geospatial Analytics - Global and Local Measures of Spatial Autocorrelation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -205,12 +205,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#step-1-compute-contiguity-spatial-weights" id="toc-step-1-compute-contiguity-spatial-weights" class="nav-link" data-scroll-target="#step-1-compute-contiguity-spatial-weights">Step 1: Compute Contiguity Spatial Weights</a></li>
   <li><a href="#step-2-construct-row-standardised-weights-matrix" id="toc-step-2-construct-row-standardised-weights-matrix" class="nav-link" data-scroll-target="#step-2-construct-row-standardised-weights-matrix">Step 2: Construct Row-standardised Weights Matrix</a></li>
   <li><a href="#step-3-perform-statistical-testing." id="toc-step-3-perform-statistical-testing." class="nav-link" data-scroll-target="#step-3-perform-statistical-testing.">Step 3: Perform statistical testing.</a></li>
-  <li><a href="#step-4-visualisation" id="toc-step-4-visualisation" class="nav-link" data-scroll-target="#step-4-visualisation">Step 4: Visualisation</a>
-  <ul class="collapse">
-  <li><a href="#monte-carlo-morans-i-1" id="toc-monte-carlo-morans-i-1" class="nav-link" data-scroll-target="#monte-carlo-morans-i-1"><strong>Monte Carlo Moran’s I</strong></a></li>
-  <li><a href="#monte-carlo-gearys-i" id="toc-monte-carlo-gearys-i" class="nav-link" data-scroll-target="#monte-carlo-gearys-i"><strong>Monte Carlo Geary’s I</strong></a></li>
+  <li><a href="#step-4-visualisation" id="toc-step-4-visualisation" class="nav-link" data-scroll-target="#step-4-visualisation">Step 4: Visualisation</a></li>
   </ul></li>
-  </ul></li>
+  <li><a href="#local-indicators-of-spatial-association" id="toc-local-indicators-of-spatial-association" class="nav-link" data-scroll-target="#local-indicators-of-spatial-association">Local Indicators of Spatial Association</a></li>
   </ul>
 </nav>
     </div>
@@ -219,7 +216,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Global Measures of Spatial Autocorrelation</h1>
+<h1 class="title">Global and Local Measures of Spatial Autocorrelation</h1>
 </div>
 
 
@@ -495,13 +492,11 @@ alternative hypothesis: greater</code></pre>
 </section>
 <section id="step-4-visualisation" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-visualisation">Step 4: Visualisation</h2>
-<section id="monte-carlo-morans-i-1" class="level3">
-<h3 class="anchored" data-anchor-id="monte-carlo-morans-i-1"><strong>Monte Carlo Moran’s I</strong></h3>
-<p>The histogram is approximately symmetric with a slight negative skew. The red line at v=0 may represent the observed Moran’s I value against which the simulated values are being compared.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">ggplot</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Monte Carlo Moran’s I</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Monte Carlo Geary’s C</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Moran’s I</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false">Geary’s C</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<p>The histogram is approximately symmetric with a slight negative skew. The red line at v=0 may represent the observed Moran’s I value against which the simulated values are being compared.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(bperm_moran<span class="sc">$</span>res, <span class="at">freq=</span><span class="cn">TRUE</span>, <span class="at">breaks=</span><span class="dv">20</span>, <span class="at">xlab=</span><span class="st">"Simulated Moran's I"</span>)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="dv">0</span>, <span class="at">col=</span><span class="st">"red"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -509,8 +504,6 @@ alternative hypothesis: greater</code></pre>
 <p><img src="Hands_on_Ex02b_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</div>
-<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -531,9 +524,6 @@ alternative hypothesis: greater</code></pre>
 <span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gg_mcmI)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Hands_on_Ex02b_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</div>
 </div>
 </div>
 <div class="cell">
@@ -557,9 +547,8 @@ alternative hypothesis: greater</code></pre>
 <pre><code>[1] 0.004371574</code></pre>
 </div>
 </div>
-</section>
-<section id="monte-carlo-gearys-i" class="level3">
-<h3 class="anchored" data-anchor-id="monte-carlo-gearys-i"><strong>Monte Carlo Geary’s I</strong></h3>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(bperm_geary<span class="sc">$</span>res, <span class="at">freq=</span><span class="cn">TRUE</span>, <span class="at">breaks=</span><span class="dv">20</span>, <span class="at">xlab=</span><span class="st">"Simulated Geary c"</span>)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="dv">1</span>, <span class="at">col=</span><span class="st">"red"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -588,10 +577,67 @@ alternative hypothesis: greater</code></pre>
 <pre><code>[1] 0.007436493</code></pre>
 </div>
 </div>
-
-
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>MI_corr <span class="ot">&lt;-</span> <span class="fu">sp.correlogram</span>(wm_q, hunan<span class="sc">$</span>GDPPC, <span class="at">order=</span><span class="dv">6</span>, <span class="at">method=</span><span class="st">"I"</span>, <span class="at">style=</span><span class="st">"W"</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(MI_corr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Hands_on_Ex02b_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(MI_corr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Spatial correlogram for hunan$GDPPC 
+method: Moran's I
+         estimate expectation   variance standard deviate Pr(I) two sided    
+1 (88)  0.3007500  -0.0114943  0.0043484           4.7351       2.189e-06 ***
+2 (88)  0.2060084  -0.0114943  0.0020962           4.7505       2.029e-06 ***
+3 (88)  0.0668273  -0.0114943  0.0014602           2.0496        0.040400 *  
+4 (88)  0.0299470  -0.0114943  0.0011717           1.2107        0.226015    
+5 (88) -0.1530471  -0.0114943  0.0012440          -4.0134       5.984e-05 ***
+6 (88) -0.1187070  -0.0114943  0.0016791          -2.6164        0.008886 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>GC_corr <span class="ot">&lt;-</span> <span class="fu">sp.correlogram</span>(wm_q, hunan<span class="sc">$</span>GDPPC, <span class="at">order=</span><span class="dv">6</span>, <span class="at">method=</span><span class="st">"C"</span>, <span class="at">style=</span><span class="st">"W"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(GC_corr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Hands_on_Ex02b_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(GC_corr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Spatial correlogram for hunan$GDPPC 
+method: Geary's C
+        estimate expectation  variance standard deviate Pr(I) two sided    
+1 (88) 0.6907223   1.0000000 0.0073364          -3.6108       0.0003052 ***
+2 (88) 0.7630197   1.0000000 0.0049126          -3.3811       0.0007220 ***
+3 (88) 0.9397299   1.0000000 0.0049005          -0.8610       0.3892612    
+4 (88) 1.0098462   1.0000000 0.0039631           0.1564       0.8757128    
+5 (88) 1.2008204   1.0000000 0.0035568           3.3673       0.0007592 ***
+6 (88) 1.0773386   1.0000000 0.0058042           1.0151       0.3100407    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
 </section>
+<section id="local-indicators-of-spatial-association" class="level1">
+<h1>Local Indicators of Spatial Association</h1>
+<p>Local Indicators of Spatial Association (LISA) are statistics that evaluate the existence of clusters in the spatial arrangement of a given variable at a local level. Compared to global spatial autocorrelation, LISA breaks down the global map into smaller local maps to detect areas of significant spatial clustering.</p>
+<p>LISA statistics are used to identify local clusters of high values (hot spots), low values (cold spots), and spatial outliers where a high value is surrounded by low values or vice versa.</p>
+
+
 </section>
 
 </main> <!-- /main -->
