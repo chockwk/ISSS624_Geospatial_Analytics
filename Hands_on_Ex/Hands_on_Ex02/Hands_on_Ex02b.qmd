@@ -1,8 +1,8 @@
 ---
 title: "Global Measures of Spatial Autocorrelation"
 author: "Wan Kee"
-date: "XX November 2023"
-date modified: "XX November 2023"
+date: "20 November 2023"
+date modified: "24 November 2023"
 format: html
 execute: 
   echo: true
@@ -13,10 +13,247 @@ editor: visual
 
 # 1.1 Overview
 
+**Learning Objectives:**
+
+1. Compute Global Spatial Autocorrelation (GSA) statistics using `spdep` by
+    a) Moran scatterplot,
+    b) Compute and plot spatial correlogram using `spdep`
+2. Compute Local Indicator of Spatial Association (LISA) statistics to detect clusters and outliers using `spdep`
+3. Compute Getis-Ord’s Gi-statistics to detect hot spot or/and cold spot area using `spdep` 
+4. Visualize the analysis output by using tmap package
+
+**Geospatial Analytic Flowchart:**
+
+```{mermaid}
+flowchart LR
+  A[Evaluate spatial policy] --> B(Apply spatial statistical methods)
+  B --> C{Geographical Distribution}
+  C --> D[Even Distribution]
+  D --> F[Where are the clusters?]
+  C --> E[Uneven Distribution]
+  E --> G[Any observable clusters?]
+```
+
 # 1.2 Load packages
+
+`sf` imports and handles geospatial data in R.
+`tidyverse` wrangles attribute data in R.
+`spdep` compute spatial weights, global and local spatial autocorrelation statistics.
+`tmap` prepare cartographic quality choropleth map.
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse)
+```
 
 # 1.3 Import data
 
+::: panel-tabset
+
+## hunan_geo
+
+`hunan_geo` is a geospatial data set of the Hunan province administrative boundary layer at county level in ESRI shapefile format.
+
+```{r}
+hunan_geo <- st_read(dsn = "data/geospatial", layer = "Hunan")
+```
+## hunan_ind
+
+`hunan_ind` contains selected Hunan’s local development indicators in 2012, such as `avg_wage`, `GDP`, `GDPPC` (GDP per county), etc.
+
+```{r}
+hunan_ind <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+## hunan
+
+We will perform relational join of the attribute table of `hunan_geo` spatial polygons dataFrame with the attribute fields of `hunan_ind` dataframe to create a fused dataset `hunan`. 
+
+```{r}
+hunan <- left_join(hunan_geo,hunan_ind) %>% 
+  select(1:4, 7, 15)
+```
+:::
+
 # 1.4 Explore data
 
-# 1.5 Plot data
+The choropleth maps show the distribution of Hunan's GDPPC in 2012 by using `qtm()` of `tmap`. The quantile classification map displays the relative difference in GDP by each county in more contrast manner.
+
+```{r}
+equal <- tm_shape(hunan) + 
+  tm_fill("GDPPC", n = 5, style = "equal") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal interval classification")
+
+quantile <- tm_shape(hunan) + 
+  tm_fill("GDPPC", n = 5, style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal quantile classification")
+
+tmap_arrange(equal, quantile, asp=1, ncol=2)
+```
+
+# 1.5 Global Spatial Autocorrelation
+
+## Step 1: Compute Contiguity Spatial Weights
+
+We will construct the spatial weights of the study area to define the neighbourhood relationships between the geographical units or county in the study area. The Queen contiguity weight matrix will be used to capture all common boundary of each county in Hunan.
+
+```{r}
+wm_q <- poly2nb(hunan, queen=TRUE)
+summary(wm_q)
+```
+
+## Step 2: Construct Row-standardised Weights Matrix
+
+We assign equal weights (style=“W”) to each neighboring polygon. The weights are obtained by the fraction 1/(#ofneighbors) to each neighboring county then summing the weighted income values. 
+
+```{r}
+rswm_q <- nb2listw(wm_q, style="W", zero.policy = TRUE)
+rswm_q
+```
+
+## Step 3: Perform statistical testing.
+
+H0: There is no spatial autocorrelation between the Hunan counties. 
+
+H1: There is spatial autocorrelation between the Hunan counties.
+
+::: panel-tabset
+
+## Moran's I
+
+**Moran's I** is a test for spatial autocorrelation, which assesses whether there is spatial dependence or clustering of values among neighboring geographic units, such as regions, points, or polygons, in a spatial dataset. It determines if nearby locations tend to have similar values or spatial randomness. Where Pearson's correlation coefficient measures the linear association between two continuous variable, Moran's I is specifically designed for spatial data analysis.
+
+Moran's I values range from -1 to 1, where **-1** indicates perfect dispersion (values at one location are dissimilar to values at neighboring locations), **0** indicates spatial randomness (no spatial autocorrelation), **1** indicates perfect clustering (values at one location are identical to values at neighboring locations).
+
+Moran's I relies on spatial weights or neighborhood matrices that define how locations are connected. It is sensitive to how the weights are defined (e.g., contiguity-based weights or distance-based weights).
+
+`moran.test()` is the Moran's test for spatial autocorrelation using a spatial weights matrix in weights list form. The assumptions underlying the test are sensitive to the form of the graph of neighbour relationships and other factors, and results may be checked against those of moran.mc permutations.
+
+```{r}
+moran.test(hunan$GDPPC, listw=rswm_q, zero.policy = TRUE, na.action=na.omit)
+```
+H0: There is no spatial autocorrelation between the Hunan counties.
+
+H1: There is spatial autocorrelation between the Hunan counties.
+
+The p-value associated with the Moran I statistic (p-value = 1.095e-06) is less than 0.05, indicates there is a significant spatial pattern in the GDPPC values in Hunan. Similarly, the Moran I statistic of 0.300749970 indicates a positive spatial autocorrelation where the regions in Hunan with similar GDPPC values tend to be spatially clustered together.
+
+## Monte Carlo Moran's I
+
+**Monte Carlo Moran's I** is a statistical technique used to assess the significance of the Moran's I statistic in spatial autocorrelation analysis. It is an extension of Moran's I test and determine whether the observed spatial autocorrelation is statistically significant or occurred by random chance through simulation. It generates a large number of random spatial permutations of the data and calculate Moran's I for each permutation. Monte Carlo Moran's I is useful when sample sizes are small or when the assumption of normality is not met.
+
+`moran.mc()` is a permutation test for Moran's I statistic calculated by using nsim random permutations of x for the given spatial weighting scheme, to establish the rank of the observed statistic in relation to the nsim simulated values.
+
+We will perform permutation test for Moran’s I statistic by using `moran.mc()` through 1000 simulation.
+
+```{r}
+set.seed(1234)
+bperm_moran = moran.mc(hunan$GDPPC, listw=rswm_q, nsim=999, zero.policy = TRUE, na.action=na.omit)
+bperm_moran
+```
+The Monte Carlo simulation was performed with 1000 simulations. The observed Moran's I statistic is 0.30075 and indicates positive spatial autocorrelation where the regions with similar GDPPC values tend to be spatially clustered together in Hunan. The p-value of 0.001 suggests a significant spatial pattern in the GDPPC values in Hunan and we reject null hypothesis.
+
+## Geary's C
+
+**Geary's C** statistics is a measure used to assess spatial autocorrelation in a dataset, similar to Moran's I statistics. Geary's C is sensitive to spread and detects dispersion (negative spatial autocorrelation) and clustering while Moran's I is primarily focused on the clustering aspect of spatial autocorrelation.
+
+Geary's C values range from 0 to 2 where **1** suggests spatial randomness, **<1** indicate positive spatial autocorrelation (clustering) and **>1** indicate negative spatial autocorrelation (dispersion).
+
+`geary.test()` is a function for Geary's test for spatial autocorrelation using a spatial weights matrix in weights list form. The assumptions underlying the test are sensitive to the form of the graph of neighbour relationships and other factors, and results may be checked against those of geary.mc permutations.
+
+```{r}
+geary.test(hunan$GDPPC, listw=rswm_q)
+```
+The p-value associated with the Geary C statistic (0.0001526) is less than 0.05, indicating there is a significant spatial pattern in the GDPPC values in Hunan. Similarly, the Geary C statistic (0.6907223) is less than 1, it indicates negative spatial autocorrelation where the neighboring areas are less similar than expected if the variable were randomly distributed across space.
+
+## Monte Carlo Geary’s C
+
+`geary.mc()` is a permutation test for Geary's C statistic calculated by using nsim random permutations of x for the given spatial weighting scheme, to establish the rank of the observed statistic in relation to the nsim simulated values.
+
+```{r}
+set.seed(1234)
+bperm_geary = geary.mc(hunan$GDPPC, listw=rswm_q, nsim=999)
+bperm_geary
+```
+The Monte Carlo simulation was performed with 1000 simulations. The observed Geary C statistic is 0.69072 and indicates negative spatial autocorrelation where the regions with similar GDPPC values tend to be spatially clustered together in Hunan. The p-value of 0.001 suggests a significant spatial pattern in the GDPPC values in Hunan and we reject null hypothesis.
+:::
+
+## Step 4: Visualisation
+
+### **Monte Carlo Moran's I**
+
+The histogram is approximately symmetric with a slight negative skew. The red line at v=0 may represent the observed Moran's I value against which the simulated values are being compared.
+
+::: panel-tabset
+
+### Plot
+
+```{r}
+hist(bperm_moran$res, freq=TRUE, breaks=20, xlab="Simulated Moran's I")
+abline(v=0, col="red") 
+```
+
+### ggplot
+
+```{r}
+library(ggplot2)
+
+res_df <- data.frame(bperm_moran.res = bperm_moran$res)
+
+gg_mcmI <- ggplot(res_df, aes(x=bperm_moran.res)) +
+  geom_histogram(binwidth = 0.02, fill="grey", color="black") +
+  geom_vline(aes(xintercept=mean(bperm_moran$res)), color="red", linetype="dashed", linewidth=1) +
+  labs(title="Histogram of Simulated Moran's I",
+       x="Simulated Moran's I",
+       y="Frequency") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank()
+  )
+print(gg_mcmI)
+```
+:::
+
+```{r}
+summary(bperm_moran$res[1:999])
+```
+
+The mean of -0.015 suggests that the average of these simulations is slightly negative.
+
+```{r}
+mean(bperm_moran$res[1:999])
+```
+
+The variance of 0.0043 indicate a low degree of spread in the simulated Moran's I values around the mean.
+
+```{r}
+var(bperm_moran$res[1:999])
+```
+
+### **Monte Carlo Geary's I**
+
+```{r}
+hist(bperm_geary$res, freq=TRUE, breaks=20, xlab="Simulated Geary c")
+abline(v=1, col="red") 
+```
+```{r}
+summary(bperm_geary$res[1:999])
+```
+
+The mean of 1.004402 suggests that the average of these simulations is slightly negative.
+
+```{r}
+mean(bperm_geary$res[1:999])
+```
+
+The variance of 0.007436493 indicate a low degree of spread in the simulated Moran's I values around the mean.
+
+```{r}
+var(bperm_geary$res[1:999])
+```
+
+
+
+
