@@ -1,0 +1,82 @@
+---
+title: "Geospatial Analytics for Public Good"
+author: "Wan Kee"
+date: "25 November 2023"
+date modified: "25 November 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: visual
+---
+
+# 1.1 Overview
+
+# 1.2 Load packages
+
+```{r}
+pacman::p_load(knitr, spdep, tmap, tidyverse, sf)
+```
+
+# 1.3 Import data
+
+::: panel-tabset
+
+The datasets are the passenger volume by origin destination bus stops.
+
+## Aug 2023
+
+```{r}
+odbus08 = read_csv("data/origin_destination_bus_202308.csv")
+
+odbus08$ORIGIN_PT_CODE <- as.factor(odbus08$ORIGIN_PT_CODE)
+odbus08$DESTINATION_PT_CODE <- as.factor(odbus08$DESTINATION_PT_CODE)
+glimpse(odbus08)
+```
+
+## Sept 2023
+
+```{r}
+odbus09 = read_csv("data/origin_destination_bus_202309.csv")
+
+odbus09$ORIGIN_PT_CODE <- as.factor(odbus09$ORIGIN_PT_CODE)
+odbus09$DESTINATION_PT_CODE <- as.factor(odbus09$DESTINATION_PT_CODE)
+glimpse(odbus09)
+```
+
+## Oct 2023
+
+```{r}
+odbus10 = read_csv("data/origin_destination_bus_202310.csv")
+
+odbus10$ORIGIN_PT_CODE <- as.factor(odbus10$ORIGIN_PT_CODE)
+odbus10$DESTINATION_PT_CODE <- as.factor(odbus10$DESTINATION_PT_CODE)
+glimpse(odbus10)
+```
+
+## hexagon
+
+`hexagon` is a hexagon layer of 250m (this distance is the perpendicular distance between the centre of the hexagon and its edges.) should be used to replace the relative coarse and irregular Master Plan 2019 Planning Sub-zone GIS data set of URA.
+
+`st_make_grid()`
+
+```{r}
+# hexagon08 = st_make_grid(odbus08, c(150, 150), what = "polygons", square = FALSE)
+```
+
+:::
+
+# 1.4 Explore data
+
+
+# 1.5 Geovisualisation and Analysis
+
+
+# 1.6 Local Indicators of Spatial Association (LISA) Analysis
+
+
+# 1.7 Emerging Hot Spot Analysis (EHSA)
+
+
+# 1.8 Plot data

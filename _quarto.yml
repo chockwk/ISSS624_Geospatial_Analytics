@@ -38,6 +38,10 @@ website:
             href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
           - text: In-class Ex04
           - text: In-class Ex05
+      - text: Take-home Ex
+        menu:
+          - text: Geospatial Analytics for Public Good
+          - text: Regionalisation of Multivariate Water Point Attributes with Clustering Methods
     
   page-navigation: true
 
