@@ -57,12 +57,42 @@ glimpse(odbus10)
 
 ## hexagon
 
+Master Plan 2014 Subzone Boundary
+
+The Master Plan is a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.
+
 `hexagon` is a hexagon layer of 250m (this distance is the perpendicular distance between the centre of the hexagon and its edges.) should be used to replace the relative coarse and irregular Master Plan 2019 Planning Sub-zone GIS data set of URA.
 
-`st_make_grid()`
+Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 
 ```{r}
-# hexagon08 = st_make_grid(odbus08, c(150, 150), what = "polygons", square = FALSE)
+install.packages("rgdal")
+install.packages("sf")
+```
+
+
+```{r}
+# Load the GeoJSON or KML file
+data <- st_read("path_to_your_file.geojson")  # or "path_to_your_file.kml"
+st_write(data, "path_to_new_shapefile.shp")
+```
+
+Step 2: Create a hexagon grid over the extent of your data with 250m radius
+
+```{r}
+hex_grid <- st_make_grid(odbus08_sf, cellsize = c(250, 250 * sqrt(3)), what = "hexagons")
+```
+
+Step 3: Coerce hex_grid to an sf object and calculate the centroids if needed
+
+```{r}
+hexagon <- st_sf(geometry = hex_grid)
+```
+
+Step 4: Assign a CRS (Coordinate Reference System) to the hexagon grid if needed
+
+```{r}
+st_crs(hexagon) <- st_crs(odbus08_sf)
 ```
 
 :::
@@ -80,3 +110,6 @@ glimpse(odbus10)
 
 
 # 1.8 Plot data
+
+
+# weekday evening peak passenger trips by origin; hexagons dont not have shared boundary; isolated with no neighbours but a hotspot. hexagon is a compact shape, grid is a regular geographic unit, rarely real world reflection to overcome odd shape geographical units.

@@ -1,6 +1,9 @@
 ---
 title: "Geospatial Analytics"
+
 ---
+
+![](froggie.mp4)
 
 Welcome to ISSS624 AY2023!
 
@@ -22,7 +25,7 @@ Mac User Journey
 
     Note: httr2 is a package that provides tools for creating and modifying HTTP requests, then performing them and processing the results. 'httr2' is a modern re-imagining of 'httr' that uses a pipe-based interface and solves more of the problems that API wrapping packages face.
 
-4.  Set up git by typing usethis::use_git() in console. When prompted "*Is it ok to commit them?* ", selection "*Not now*". You will observe an icon GI+ appeared in toolbar menu.
+4.  Set up git by typing usethis::use_git() in console. When prompted "*Is it ok to commit them?*", selection "*Not now*". You will observe an icon GI+ appeared in toolbar menu.
 
 5.  Create a github token through the following codes in console:
 

@@ -1,8 +1,8 @@
 ---
-title: "In_class_Ex02"
+title: "Spatial Weights using sfdep"
 author: "Wan Kee"
-date: "21 November 2023"
-date modified: "21 November 2023"
+date: "25 November 2023"
+date modified: "26 November 2023"
 format: html
 execute: 
   echo: true
@@ -13,10 +13,119 @@ editor: visual
 
 # 1.1 Overview
 
+Learning Objective: 1. Derive contiguity weights using Queen's method using `st_weights()` 2. Compute local Moran's I of GDPPC using `local_moran()` 3.
+
 # 1.2 Load packages
+
+The following R packages are loaded:
+
+`knitr` is for general-purpose tool for dynamic reporting. `sf` performs Spatial vector data encoding. `spdep` performs geospatial analysis. `sfdep` integrates `sf` objects and `tidyverse`. `tmap` plots geographic maps. `tidyverse` for general data-wrangling. `plotly` for general data visualisation.
+
+```{r}
+pacman::p_load(knitr, sf, sfdep, tmap, tidyverse, sf, plotly)
+```
 
 # 1.3 Import data
 
+::: panel-tabset
+## hunan_geo
+
+`hunan_geo` is a geospatial data set of the Hunan province administrative boundary layer at county level in ESRI shapefile format.
+
+```{r}
+hunan_geo <- st_read(dsn = "data/geospatial", layer = "Hunan")
+```
+
+## hunan_ind
+
+`hunan_ind` contains selected Hunan's local development indicators in 2012, such as `avg_wage`, `GDP`, `GDPPC` (GDP per county), etc.
+
+```{r}
+hunan_ind <- read_csv("data/aspatial/Hunan_2012.csv")
+head(hunan_ind, n=5)
+```
+
+## hunan
+
+We will perform relational join of the attribute table of `hunan_geo` spatial polygons dataFrame with the attribute fields of `hunan_ind` dataframe to create a fused dataset `hunan`.
+
+::: callout-note
+in order to retain the geospatial properties, the left data frame must be sf data frame.
+:::
+
+```{r}
+hunan <- left_join(hunan_geo,hunan_ind) %>% 
+  select(1:4, 7, 15)
+```
+## GDPPC
+```{r}
+GDPPC = st_read("data/aspatial/Hunan_GDPPC.csv")
+GDPPC$Year <- as.numeric(as.character(GDPPC$Year))
+glimpse(GDPPC)
+```
+
+:::
+
 # 1.4 Explore data
+
+Step 1: Derive contiguity weights using Queen's method using `st_weights()` There are three variables: nb is the neighbour list object style is W wt is the weight matrix
+
+`st_weights()`
+
+```{r}
+wm_q = hunan %>% 
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb, style = "W"), .before = 1)
+glimpse(wm_q)
+```
+
+Step 2: Compute local Moran's I of GDPPC using `local_moran()`
+
+```{r}
+lisa = wm_q %>% 
+  mutate(local_moran = local_moran(GDPPC, nb, wt, nsim = 99), .before = 1) %>% 
+  unnest(local_moran)
+glimpse(lisa)
+```
+
+The output of `local_moran()` is a sf data.frame containing the following columns: 
+ii: local moran statistic 
+eii: expectation of local moran statistic 
+var_ii: variance of local moran statistic 
+z_ii: standard deviate of local moran statistic 
+p_ii: probability of local moran statistic 
+p_ii_sim 
+p_folded_sim
+
+Step 3: Create a time series cube using `spacetime()`
+
+```{r}
+GDPPC_st = spacetime(GDPPC, hunan, .loc_col = "County", .time_col = "Year")
+glimpse(GDPPC_st)
+```
+
+```{r}
+is_spacetime_cube("GDPPC_st")
+```
+
+```{r}
+GDPPC_nb = GDPPC_st %>% 
+  activate("geometry") %>% 
+  mutate(nb = include_self(st_contiguity(geometry)),
+         wt = st_inverse_distance(nb, geometry, scale = 1, alpha = 1), .before = 1) %>% 
+  set_nbs("nb") %>% 
+  set_wts("wt")
+```
+
+
+Step 5: Compute Gi*
+
+```{r}
+gi_stars = GDPPC_nb %>% 
+  group_by(Year) %>% 
+  mutate(gi_star = local_gstar_perm(GDPPC, nb, wt)) %>%
+  tidyr::unnest(gi_stars)
+```
+
 
 # 1.5 Plot data
