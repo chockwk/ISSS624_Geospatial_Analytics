@@ -57,13 +57,14 @@ in order to retain the geospatial properties, the left data frame must be sf dat
 hunan <- left_join(hunan_geo,hunan_ind) %>% 
   select(1:4, 7, 15)
 ```
+
 ## GDPPC
+
 ```{r}
 GDPPC = st_read("data/aspatial/Hunan_GDPPC.csv")
 GDPPC$Year <- as.numeric(as.character(GDPPC$Year))
 glimpse(GDPPC)
 ```
-
 :::
 
 # 1.4 Explore data
@@ -88,14 +89,7 @@ lisa = wm_q %>%
 glimpse(lisa)
 ```
 
-The output of `local_moran()` is a sf data.frame containing the following columns: 
-ii: local moran statistic 
-eii: expectation of local moran statistic 
-var_ii: variance of local moran statistic 
-z_ii: standard deviate of local moran statistic 
-p_ii: probability of local moran statistic 
-p_ii_sim 
-p_folded_sim
+The output of `local_moran()` is a sf data.frame containing the following columns: ii: local moran statistic eii: expectation of local moran statistic var_ii: variance of local moran statistic z_ii: standard deviate of local moran statistic p_ii: probability of local moran statistic p_ii_sim p_folded_sim
 
 Step 3: Create a time series cube using `spacetime()`
 
@@ -117,15 +111,19 @@ GDPPC_nb = GDPPC_st %>%
   set_wts("wt")
 ```
 
-
-Step 5: Compute Gi*
+Step 5: Compute Gi\*
 
 ```{r}
-gi_stars = GDPPC_nb %>% 
-  group_by(Year) %>% 
-  mutate(gi_star = local_gstar_perm(GDPPC, nb, wt)) %>%
-  tidyr::unnest(gi_stars)
+#gi_stars = GDPPC_nb %>% 
+#  group_by(Year) %>% 
+#  mutate(gi_star = local_gstar_perm(GDPPC, nb, wt)) %>%
+#  tidyr::unnest(gi_stars)
 ```
 
+Step 6: Performing Emerging Hotspot Analysis
+
+```{r}
+#ehsa = emerging_hotspot_analysis(x = GDPPC_st, .var = "GDPPC", k = 1, nsim = 99)
+```
 
 # 1.5 Plot data

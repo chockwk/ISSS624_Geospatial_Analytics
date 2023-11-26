@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Wan Kee">
 
-<title>Geospatial Analytics</title>
+<title>Geospatial Analytics - Mac User Tips</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -82,7 +83,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="./index.html" rel="" target="">
  <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
@@ -90,12 +91,8 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./mac_user_tips.html" rel="" target="">
+    <a class="nav-link active" href="./mac_user_tips.html" rel="" target="" aria-current="page">
  <span class="menu-text">Mac User Tips</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./useful_links.html" rel="" target="">
- <span class="menu-text">Useful Links</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -106,15 +103,19 @@ ul.task-list li input[type="checkbox"] {
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-hands-on-ex">    
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html" rel="" target="">
- <span class="dropdown-text">Data Wrangling</span></a>
+ <span class="dropdown-text">Geospatial Data Wrangling</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html" rel="" target="">
- <span class="dropdown-text">Spatial Weights</span></a>
+ <span class="dropdown-text">Spatial Weights and Application</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html" rel="" target="">
- <span class="dropdown-text">Spatial Autocorrelation</span></a>
+ <span class="dropdown-text">Global Measures of Spatial Autocorrelation</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02c.html" rel="" target="">
+ <span class="dropdown-text">Local Measures of Spatial Autocorrelation</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html" rel="" target="">
@@ -173,13 +174,19 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Geospatial Analytics</h1>
+<h1 class="title">Mac User Tips</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Wan Kee </p>
+          </div>
+  </div>
     
   
     
@@ -188,12 +195,31 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>Welcome to ISSS624 Applied Geospatial Analytics, Winter 2024 class!</p>
-<div class="tenor-gif-embed" data-postid="13844757" data-share-method="host" data-aspect-ratio="1" data-width="100%">
-<p><a href="https://tenor.com/view/map-explore-trail-compass-colorful-gif-13844757">Map Explore Sticker</a>from <a href="https://tenor.com/search/map-stickers">Map Stickers</a></p>
-</div>
-<script type="text/javascript" async="" src="https://tenor.com/embed.js"></script>
-<p>This page documents my learning journey of geospatial analytics taught by Prof Kam Tin Seong.</p>
+<p>Mac User Journey</p>
+<ol type="1">
+<li><p>Install R studio</p></li>
+<li><p>Install git</p></li>
+<li><p>Several packages requires *Rtools* and works under Windows. To resolve, type the following codes in console:</p></li>
+</ol>
+<p>a\) install.packages(“remotes”)</p>
+<p>b\) remotes::install_github(“rmacoslib/macrtools”)</p>
+<p>c\) install.packages(“httr2”)</p>
+<p>Note: httr2 is a package that provides tools for creating and modifying HTTP requests, then performing them and processing the results. ‘httr2’ is a modern re-imagining of ‘httr’ that uses a pipe-based interface and solves more of the problems that API wrapping packages face.</p>
+<ol start="4" type="1">
+<li><p>Set up git by typing usethis::use_git() in console. When prompted “*Is it ok to commit them?*”, selection “*Not now*”. You will observe an icon GI+ appeared in toolbar menu.</p></li>
+<li><p>Create a github token through the following codes in console:</p></li>
+</ol>
+<p>a\) install.packages(c(“gh”, “gitcreds”))</p>
+<p>b\) usethis::create_github_token()</p>
+<p>c\) gitcreds::gitcreds_set() and enter your token</p>
+<p>d\) gh::gh_whoami()</p>
+<ol start="6" type="1">
+<li><p>Set up new github repository for the project by typing usethis::use_github() in console.</p></li>
+<li><p>Publish webpage through Netlify: https://www.netlify.com.</p></li>
+</ol>
+<p>a\) Sign up through Github account.</p>
+<p>b\) Add a new site and indicate \_site in *Publish directory*.</p>
+<p>c\) Deploy site.</p>
 
 
 

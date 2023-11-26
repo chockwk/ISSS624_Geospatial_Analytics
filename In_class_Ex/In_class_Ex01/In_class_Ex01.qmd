@@ -30,11 +30,11 @@ pacman::p_load(knitr, tmap, tidyverse, sf)
 # 1.3 Import data
 
 ::: panel-tabset
-
 ## odbus
 
 ```{r}
 odbus = read_csv("data/origin_destination_bus_202308.csv")
+head(odbus, n=5)
 ```
 
 Rows: 5709512 Columns: 7
@@ -52,20 +52,17 @@ busstop <- st_read(dsn = "data",
   st_transform(crs = 3414)
 ```
 
-
 ## mpsz
 
 ```{r}
 mpsz = st_read(dsn="data", layer="MPSZ-2019") %>% 
   st_transform(crs=3414)
 ```
-
 :::
 
 # 1.4 Explore data
 
 ::: panel-tabset
-
 ## odbus
 
 ```{r}
@@ -83,7 +80,6 @@ glimpse(busstop)
 ```{r}
 glimpse(mpsz)
 ```
-
 :::
 
 # 1.5 Extract data
@@ -111,18 +107,15 @@ origin7_9 <- read_rds("data/rds/origin7_9.rds")
 
 # 1.6 Combine data
 
-
 ```{r}
 busstop_mpsz <- st_intersection(busstop, mpsz) %>%
   select(BUS_STOP_N, SUBZONE_C) %>%
   st_drop_geometry()
 ```
 
-
 ```{r}
 write_rds(busstop_mpsz, "data/rds/busstop_mpsz.csv")
 ```
-
 
 ```{r}
 origin_data <- left_join(origin7_9 , busstop_mpsz,
@@ -131,7 +124,6 @@ origin_data <- left_join(origin7_9 , busstop_mpsz,
          ORIGIN_SZ = SUBZONE_C)
 ```
 
-
 ```{r}
 duplicate <- origin_data %>%
   group_by_all() %>%
@@ -139,18 +131,15 @@ duplicate <- origin_data %>%
   ungroup()
 ```
 
-
 ```{r}
 origin_data <- unique(origin_data)
 ```
-
 
 ```{r}
 mpsz_origtrip <- left_join(mpsz, 
                            origin_data,
                            by = c("SUBZONE_C" = "ORIGIN_SZ"))
 ```
-
 
 # 1.7 Choropleth Visualisation
 
@@ -173,4 +162,3 @@ tm_shape(mpsz_origtrip)+
   tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics DOS", 
              position = c("left", "bottom"))
 ```
-

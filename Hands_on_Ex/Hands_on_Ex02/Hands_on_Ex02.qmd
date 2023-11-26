@@ -162,12 +162,11 @@ The output shows that there are 88 regions in Hunan where the most connected reg
 
 A connectivity map represents the relationships between geographic units or locations based on spatial proximity or adjacency. It provides a visual representation of how different regions or areas are connected to one another.
 
-`map_dbl()` outputs double vectors, which have numbers that can have decimals. The mapping function applies a given function to each element of a vector and returns a vector of the same length. 
+`map_dbl()` outputs double vectors, which have numbers that can have decimals. The mapping function applies a given function to each element of a vector and returns a vector of the same length.
 
-`st_centroid()` is used to extract the centroid coordinates of each polygon feature and returns a point geometry. Note that the centroid is not always inside of the polygon that it is the center of, for example, a “C-shaped” island or a doughnut. `st_point_on_surface()` provides an alternative in which a point within the polygon will be returned.
+`st_centroid()` is used to extract the centroid coordinates of each polygon feature and returns a point geometry. Note that the centroid is not always inside of the polygon that it is the center of, for example, a "C-shaped" island or a doughnut. `st_point_on_surface()` provides an alternative in which a point within the polygon will be returned.
 
-Step 1: Map the `geometry` column to obtain the `longitude` and `latitude` columns.
-Note longitude is the first value in each centroid and latitude is the second value.
+Step 1: Map the `geometry` column to obtain the `longitude` and `latitude` columns. Note longitude is the first value in each centroid and latitude is the second value.
 
 ```{r}
 longitude = map_dbl(hunan2$geometry, ~st_centroid(.x)[[1]])
@@ -176,12 +175,13 @@ latitude = map_dbl(hunan2$geometry, ~st_centroid(.x)[[2]])
 
 Step 2: Bind `longitude` and `latitude` into the same object to create `coords`.
 
-`cbind()` merge two data frames, given that the number of rows in both the data frames are equal. `cbind()` can append vectors, matrices, or any data frame by columns. 
+`cbind()` merge two data frames, given that the number of rows in both the data frames are equal. `cbind()` can append vectors, matrices, or any data frame by columns.
 
 ```{r}
 coords <- cbind(longitude, latitude)
 head(coords)
 ```
+
 ## Connectivity Plot
 
 Plot Queen and Rook contiguity based on neighbours map.
@@ -210,6 +210,7 @@ k1 <- knn2nb(knearneigh(coords))
 k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
 summary(k1dists)
 ```
+
 The output shows that the largest first nearest neighbour distance is 61.79 km, this value as the upper threshold ensures that all objects will have at least one neighbour.
 
 **Step 2:** Compute fixed distance weight matrix
@@ -218,12 +219,12 @@ The output shows that the largest first nearest neighbour distance is 61.79 km, 
 wm_d62 <- dnearneigh(coords, 0, 62, longlat = TRUE)
 wm_d62
 ```
+
 The output indicates there are 88 coords and the average number of neighbours is 3.68.
 
 **Step 3:** Plot fixed distance weight matrix
 
 ::: panel-tabset
-
 ## Combined plot
 
 'k1' indicated in orange lines show the links of 1st nearest neighbours and 'wm_d62' in blue lines show the links of neighbours within the cut-off distance of 62km.
@@ -250,12 +251,13 @@ plot(wm_d62, coords, add=TRUE, col="cornflowerblue", pch = 19, cex = 0.6)
 One of the characteristics of fixed distance weight matrix is that more densely populated areas tend to have more neighbours than the less dense areas. We can use k-nearest neighbours to restrict the number of neighbours.
 
 ::: panel-tabset
+## Create
 
-## Create 
 ```{r}
 knn8 <- knn2nb(knearneigh(coords, k=8))
 knn8
 ```
+
 The output indicates there are 88 coords and the average number of neighbours is 8.
 
 ## Plot
@@ -277,20 +279,20 @@ dist <- nbdists(wm_q, coords, longlat = TRUE)
 ids <- lapply(dist, function(x) 1/(x))
 ```
 
-**Step 2:** Assign weights to each neighbouring polygon 
+**Step 2:** Assign weights to each neighbouring polygon
 
-Each neighboring polygon will be assigned equal weight (style=“W”). The zero.policy=TRUE option allows for lists of non-neighbors. 
+Each neighboring polygon will be assigned equal weight (style="W"). The zero.policy=TRUE option allows for lists of non-neighbors.
 
-`nb2listw()` function supplements a neighbours list with spatial weights for the chosen coding scheme. 
+`nb2listw()` function supplements a neighbours list with spatial weights for the chosen coding scheme.
 
 ::: panel-tabset
-
 ## Method 1
 
 ```{r}
 rswm_q <- nb2listw(wm_q, style="W", zero.policy = TRUE)
 rswm_q
 ```
+
 The output shows that n=88 and nn=7744. The weights are assigned equally based on the number of neighbours.
 
 To view the weight of a specific polygon:
@@ -298,6 +300,7 @@ To view the weight of a specific polygon:
 ```{r}
 rswm_q$weights[1]
 ```
+
 The output shows that object 1 has 5 neighbours with weight 0.2 assigned to each neighbour.
 
 ## Method 2
@@ -316,12 +319,11 @@ rswm_ids$weights[1]
 
 Geospatial data often displays spatial autocorrelation where a set of spatial features and their associated data values tend to be clustered together or dispersed in space. Such autocorrelation can drive spurious correlations or upward-biased treatment effect estimates. A common test to determine whether there is spatial dependence that needs to be modeled is the Moran Test.
 
-One way to account for this spatial dependence is to model the autocorrelation using the spatial lag model, in which a dependent variable is predicted using the value of the dependent variable of an observation’s neighbors. We will be using `ML_Lag` from `speg`.
+One way to account for this spatial dependence is to model the autocorrelation using the spatial lag model, in which a dependent variable is predicted using the value of the dependent variable of an observation's neighbors. We will be using `ML_Lag` from `speg`.
 
 There are four types of spatial lagged variables:
 
 ::: panel-tabset
-
 ## Spatial lag (Row-standardized weights)
 
 **Step 1:** Compute the average neighbor GDPPC value for each polygon, also known as spatially lagged values.
@@ -332,6 +334,7 @@ Note: hunan_hunan2012 has to be a vector or matrix.
 GDPPC.lag <- lag.listw(rswm_q, hunan2$GDPPC)
 GDPPC.lag
 ```
+
 **Step 2:** Append the spatially lag GDPPC values onto hunan_hunan2012 sf data frame
 
 ```{r}
@@ -341,6 +344,7 @@ colnames(lag.res) <- c("NAME_3", "lag GDPPC")
 hunan3 <- left_join(hunan2,lag.res)
 head(hunan3)
 ```
+
 The output shows the geospatial objects in new hunan_hunan2012 are polygon features. There are 6 features and 7 fields. It is in WGS84 projected coordinates system with XY dimension. The average neighboring income values for each county stored as `lag GDPPC`.
 
 **Step 3:** Plot both the GDPPC and spatial lag GDPPC for comparison
@@ -367,7 +371,7 @@ b_weights2
 
 **Step 2:** Compute a lag variable from the weight and GDPPC.
 
-`lag.listw()` computes the spatial lag using a `listw()` sparse representation of a spatial weights matrix. 
+`lag.listw()` computes the spatial lag using a `listw()` sparse representation of a spatial weights matrix.
 
 ```{r}
 lag_sum = list(hunan3$NAME_3, lag.listw(b_weights2, hunan3$GDPPC))
@@ -391,7 +395,7 @@ tmap_arrange(gdppc, lag_sum_gdppc, asp=1, ncol=2)
 
 ## Spatial window average
 
-The spatial window average uses row-standardized weights and includes the diagonal element. 
+The spatial window average uses row-standardized weights and includes the diagonal element.
 
 **Step 1:** Add the diagonal element to the neighbour list.
 
@@ -401,6 +405,7 @@ The spatial window average uses row-standardized weights and includes the diagon
 wm_qs <- include.self(wm_q)
 wm_qs
 ```
+
 The number of nonzero links, percentage nonzero weights and average number of links are higher that that of wm_q.
 
 List the neighbours of the specified polygon in the object:
@@ -408,6 +413,7 @@ List the neighbours of the specified polygon in the object:
 ```{r}
 wm_qs[[85]]
 ```
+
 Object 85 has an additional neightbour; 12 neighbours.
 
 **Step 2:** Obtain weights with nb2listw() and assign weight values.
@@ -423,6 +429,7 @@ wm_qs
 lag_w_avg_gpdpc <- lag.listw(wm_qs, hunan4$GDPPC)
 lag_w_avg_gpdpc
 ```
+
 **Step 4:** Convert the lag variable listw object into a data.frame by using as.data.frame().Append lag_window_avg_gpdpc values onto hunan4 sf data frame.
 
 ```{r}
@@ -443,7 +450,6 @@ hunan5 %>%
 ```
 
 **Step 4:** Plot the lag_gdppc and w_ave_gdppc maps for comparison.
-
 
 ```{r}
 w_avg_gdppc <- qtm(hunan5, "lag_window_avg GDPPC")
@@ -490,8 +496,6 @@ colnames(w_sum_gdppc.res) <- c("NAME_3", "w_sum GDPPC")
 hunan6 <- left_join(hunan5, w_sum_gdppc.res)
 ```
 
-
-
 **Step 5:** Prepare a table to compare the values of lag GDPPC and spatial window average.
 
 ```{r}
@@ -506,5 +510,4 @@ hunan6 %>%
 w_sum_gdppc <- qtm(hunan6, "w_sum GDPPC")
 tmap_arrange(lag_sum_gdppc, w_sum_gdppc, asp=1, ncol=2)
 ```
-
 :::

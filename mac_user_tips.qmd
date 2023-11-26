@@ -1,0 +1,42 @@
+---
+title: "Mac User Tips"
+author: "Wan Kee"
+---
+
+Mac User Journey
+
+1. Install R studio
+
+2. Install git
+
+3. Several packages requires \*Rtools\* and works under Windows. To resolve, type the following codes in console:
+
+ a\\) install.packages("remotes")
+
+ b\\) remotes::install_github("rmacoslib/macrtools")
+
+ c\\) install.packages("httr2")
+
+ Note: httr2 is a package that provides tools for creating and modifying HTTP requests, then performing them and processing the results. 'httr2' is a modern re-imagining of 'httr' that uses a pipe-based interface and solves more of the problems that API wrapping packages face.
+
+4. Set up git by typing usethis::use_git() in console. When prompted "\*Is it ok to commit them?\*", selection "\*Not now\*". You will observe an icon GI+ appeared in toolbar menu.
+
+5. Create a github token through the following codes in console:
+
+ a\\) install.packages(c("gh", "gitcreds"))
+
+ b\\) usethis::create_github_token()
+
+ c\\) gitcreds::gitcreds_set() and enter your token
+
+ d\\) gh::gh_whoami()
+
+6. Set up new github repository for the project by typing usethis::use_github() in console.
+
+7. Publish webpage through Netlify: https://www.netlify.com.
+
+ a\\) Sign up through Github account.
+
+ b\\) Add a new site and indicate \\\_site in \*Publish directory\*.
+
+ c\\) Deploy site.
