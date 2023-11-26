@@ -51,6 +51,7 @@ busstop <- st_read(dsn = "data",
                    layer = "BusStop") %>%
   st_transform(crs = 3414)
 ```
+
 The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
 ## mpsz

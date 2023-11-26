@@ -15,6 +15,8 @@ editor: visual
 
 # 1.2 Load packages
 
+`sf` `dplyr` `mapview` `tmap`
+
 ```{r}
 pacman::p_load(knitr, mapview, spdep, tmap, tidyverse, sf)
 ```
@@ -22,7 +24,7 @@ pacman::p_load(knitr, mapview, spdep, tmap, tidyverse, sf)
 # 1.3 Import data
 
 ::: panel-tabset
-## busstops
+## Bus Stops
 
 `busstops` contains the detailed information for all bus stops currently being serviced by buses, including bus stop code, road name, description, location coordinates. Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/BusStops))
 
@@ -31,26 +33,19 @@ busstops <- st_read(dsn = "data/BusStopLocation_Jul2023", layer = "BusStop") %>%
   st_transform(crs = 3414)
 ```
 
-```{r}
-glimpse(busstops)
-```
-
 The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
-## odbus
+## Passenger Volume
 
 `odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. It indicates passenger volume for **October 2023**. Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
 
 ```{r}
 odbus = read_csv("data/origin_destination_bus_202310.csv")
-odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
-odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
-glimpse(odbus)
 ```
 
 The output does not indicate any geospatial objects. There are **5,694,297 records** and 7 fields.
 
-## mpsz
+## Subzone
 
 Master Plan 2019 Subzone Boundary
 
@@ -66,79 +61,122 @@ Using `st_read()` to import the new file returns an error: 'Error in CPL_get_z\_
 To resolve, we use `geojsonsf` to convert GeoJSON and simple feature objects.
 :::
 
+## Hexagon
+
+Spatial grids are commonly used in spatial analysis to divide the study area into equal size, regular polygons that tessellate the area of interest. On the selection of grid, regular geographic units, such as square grid or fishnets, rarely reflect real world situations. Hexagons are compact shape and can overcome oddly-shaped geographical units.
+
+Step 1: Create a hexgonal grid
+
 ```{r}
-#mpsz_2019 <- geojsonsf::geojson_sf("data/MasterPlan2019SubzoneBoundaryNoSeaGEOJSON.geojson")
-#glimpse(mpsz_2019)
+# Create hexagonal grid (250m from center to edges)
+area_hexagon_grid = st_make_grid(busstops, cellsize = 500, what = "polygons", square = FALSE)
+area_hexagon_grid
 ```
 
-The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in SVY21 projected coordinates system with XY dimension.
+Step 2: Add Grid ID
 
 ```{r}
-#mpsz_2019$geometry[[1]]
+hexagon_grid_sf = st_sf(area_hexagon_grid) %>% 
+  mutate(grid_id = 1:length(lengths(area_hexagon_grid)))
+hexagon_grid_sf
 ```
 
-## hexagon
+Step 3: Count the number of bus stops in each grid and remove grids without any value.
 
 ```{r}
-# Create the hexagon grid
-#hexagon <- st_make_grid(mpsz_2019, cellsize = c(250, 250 * sqrt(3)), 
-#                        what = "polygons", 
-#                        square = FALSE)
-
-# Convert the grid to an sf object
-#hexagon_sf <- st_sf(geometry = hexagon)
-
-# Add a grid ID to each hexagon
-#hexagon_sf$grid_id <- seq_along(hexagon_sf$geometry)
+hexagon_grid_sf$grid_id = lengths(st_intersects(hexagon_grid_sf, busstops))
+hexagon_count = filter(hexagon_grid_sf, grid_id>0)
 ```
 
-```{r}
-#plot(st_geometry(mpsz_2019))
-```
+Step 4: Set tmap to view mode for interactive plotting.
 
 ```{r}
-#str(hexagon_sf)
-```
-
-```{r}
-#mapview(hexagon_sf)
-```
-
-```{r}
-# Load the necessary library
-#library(jsonlite)
-
-# Read the JSON file (assuming it's saved locally as 'bus_stops.json')
-# Replace 'path_to_json_file.json' with the actual path to your JSON file
-#bus_stops_json <- fromJSON('data/BusStops202310.json')
-
-# The actual data is usually in a list within the JSON object, often named 'value' or similar
-# Extract that list into a data frame
-#bus_stops_df <- as.data.frame(bus_stops_json$value)
-
-# Select only the columns that we are interested in
-#bus_stops_df <- bus_stops_df[, c("BusStopCode", "RoadName", "Description", "Latitude", "Longitude")]
-
-# Write the data frame to a CSV file
-#write.csv(bus_stops_df, 'bus_stops.csv', row.names = FALSE)
-
+tmap_mode("view")
+hexagon = tm_shape(hexagon_count)+
+  tm_fill(
+    col = "grid_id",
+    palette = "Reds",
+    style = "cont",
+    title = "Number of Bus Stops",
+    id = "grid_id",
+    showNA = FALSE,
+    alpha = 0.6,
+    popup.format = list(
+      grid_id = list(format = "f", digits = 0)
+    )
+  )+
+  tm_borders(col = "grey40", lwd = 0.7)
+hexagon
 ```
 :::
 
 # 1.4 Explore data
 
+::: panel-tabset
+## Bus Stops
 ```{r}
-#st_geometry(mpsz_2019)
+glimpse(busstops)
+```
+```{r}
+location = mapview(busstops, cex = 3, alpha = 0.5, popup = NULL)
+location
 ```
 
-The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in SVY21 projected coordinates system with XY dimension.
+```{r}
+# Filter hexagons that contain more than 8 bus stops
+hexagon_red = filter(hexagon_grid_sf, grid_id>8)
 
-# 1.5 Geovisualisation and Analysis
+tmap_mode("view")
+redhex = tm_shape(hexagon_red)+
+  tm_fill(
+    col = "grid_id",
+    palette = "Reds",
+    style = "cont",
+    title = "Number of Bus Stops",
+    id = "grid_id",
+    showNA = FALSE,
+    alpha = 0.6,
+    popup.format = list(
+      grid_id = list(format = "f", digits = 0)
+    )
+  )+
+  tm_borders(col = "grey40", lwd = 0.7)
+redhex
+```
+
+Sembawang MRT (9 bus stops)
+
+![](images/Screenshot%202023-11-26%20at%206.01.46%E2%80%AFPM.png){fig-align="left" width="700"}
+
+Pasir Ris (11 bus stops)
+
+![](images/Screenshot%202023-11-27%20at%202.20.59%E2%80%AFAM.png){fig-align="left" width="700"}
+
+## Passenger Volume
+
+```{r}
+odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
+odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
+glimpse(odbus)
+```
+
+## Subzone
+:::
+
+# 1.5 Plot data
+
+::: panel-tabset
+# Bus Stops
+
+```{r}
+
+```
+:::
+
+# 1.6 Geovisualisation and Analysis
 
 # 1.6 Local Indicators of Spatial Association (LISA) Analysis
 
 # 1.7 Emerging Hot Spot Analysis (EHSA)
 
-# 1.8 Plot data
-
-# weekday evening peak passenger trips by origin; hexagons dont not have shared boundary; isolated with no neighbours but a hotspot. hexagon is a compact shape, grid is a regular geographic unit, rarely real world reflection to overcome odd shape geographical units.
+# weekday evening peak passenger trips by origin; hexagons dont not have shared boundary; isolated with no neighbours but a hotspot.
