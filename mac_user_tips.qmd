@@ -3,40 +3,121 @@ title: "Mac User Tips"
 author: "Wan Kee"
 ---
 
-Mac User Journey
+# Getting Started
 
-1. Install R studio
+1.  Install R and R studio from [posit](https://posit.co/download/rstudio-desktop/) for macOS 11 and higher.
 
-2. Install git
+2.  Install git
 
-3. Several packages requires \*Rtools\* and works under Windows. To resolve, type the following codes in console:
+    Note: [Git recommendations](https://git-scm.com/download/mac) did not work; I have tested Homebrew, MacPorts and Xcode.
 
- a\\) install.packages("remotes")
+3.  Several packages requires \*Rtools\* and works under Windows. To resolve, type the following codes in console:
 
- b\\) remotes::install_github("rmacoslib/macrtools")
+a\\) install.packages("remotes")
 
- c\\) install.packages("httr2")
+b\\) remotes::install_github("rmacoslib/macrtools")
 
- Note: httr2 is a package that provides tools for creating and modifying HTTP requests, then performing them and processing the results. 'httr2' is a modern re-imagining of 'httr' that uses a pipe-based interface and solves more of the problems that API wrapping packages face.
+c\\) install.packages("httr2")
 
-4. Set up git by typing usethis::use_git() in console. When prompted "\*Is it ok to commit them?\*", selection "\*Not now\*". You will observe an icon GI+ appeared in toolbar menu.
+Note: httr2 is a package that provides tools for creating and modifying HTTP requests, then performing them and processing the results. 'httr2' is a modern re-imagining of 'httr' that uses a pipe-based interface and solves more of the problems that API wrapping packages face.
 
-5. Create a github token through the following codes in console:
+4.  Set up git by typing usethis::use_git() in console. When prompted "\*Is it ok to commit them?\*", selection "\*Not now\*". You will observe an icon GI+ appeared in toolbar menu.
 
- a\\) install.packages(c("gh", "gitcreds"))
+5.  Create a github token through the following codes in console:
 
- b\\) usethis::create_github_token()
+a\\) install.packages(c("gh", "gitcreds"))
 
- c\\) gitcreds::gitcreds_set() and enter your token
+b\\) usethis::create_github_token()
 
- d\\) gh::gh_whoami()
+c\\) gitcreds::gitcreds_set() and enter your token
 
-6. Set up new github repository for the project by typing usethis::use_github() in console.
+d\\) gh::gh_whoami()
 
-7. Publish webpage through Netlify: https://www.netlify.com.
+6.  Set up new github repository for the project by typing usethis::use_github() in console.
 
- a\\) Sign up through Github account.
+7.  Publish webpage through Netlify: https://www.netlify.com.
 
- b\\) Add a new site and indicate \\\_site in \*Publish directory\*.
+a\\) Sign up through Github account.
 
- c\\) Deploy site.
+b\\) Add a new site and indicate \\\_site in \*Publish directory\*.
+
+c\\) Deploy site.
+
+# Troubleshooting Journey
+
+::: panel-tabset
+
+## Git
+
+To https://github.com/chockwk/ISSS624_Geospatial_Analytics.git
+ ! [rejected]        HEAD -> main (fetch first)
+error: failed to push some refs to 'https://github.com/chockwk/ISSS624_Geospatial_Analytics.git'
+hint: Updates were rejected because the remote contains work that you do not have locally. This is usually caused by another repository pushing to the same ref. You may want to first integrate the remote changes (e.g., 'git pull ...') before pushing again. See the 'Note about fast-forwards' in 'git push --help' for details.
+
+Step 1: Use the `git status` command to see the status of the repository and the changes that have been made.
+
+```{bash}
+git status
+```
+
+Step 2: Merge or rebase the local changes with the changes from the remote main branch. Choose one of the following approaches:
+
+a. Merge:
+
+```{bash}
+git merge origin/main
+```
+
+This will create a new merge commit that combines your changes with the remote changes. Resolve any merge conflicts if they occur.
+
+b. Rebase (if you want a linear history):
+
+If you want a linear history (without merge commits), you can rebase your local branch onto the updated remote branch:
+
+```{bash}
+git rebase origin/main
+```
+
+Step 3: Push the changes to the remote repository:
+
+```{bash}
+git push origin main
+```
+
+
+Auto-merging Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd
+CONFLICT (content): Merge conflict in Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd
+Auto-merging _quarto.yml
+CONFLICT (content): Merge conflict in _quarto.yml
+Auto-merging _site/Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
+CONFLICT (content): Merge conflict in _site/Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
+Auto-merging _site/search.json
+CONFLICT (content): Merge conflict in _site/search.json
+Automatic merge failed; fix conflicts and then commit the result.
+
+
+Step 4: Open the files that have conflicts in a text editor or code editor. In this case, the files with conflicts are:
+
+Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd
+_quarto.yml
+_site/Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
+_site/search.json
+In these files, you will see sections surrounded by conflict markers like this:
+
+<<<<<<< HEAD
+// Your local changes
+=======
+// Remote changes
+">>>>>>> origin/main
+
+
+The section between <<<<<<< HEAD and ======= represents your local changes.
+The section between ======= and >>>>>>> origin/main represents the remote changes.
+Manually review and edit the conflicting sections to resolve the differences. Decide which changes to keep and which to discard. You can delete the conflict markers (<<<<<<< HEAD, =======, >>>>>>> origin/main) once you've resolved the conflicts.
+
+After resolving the conflicts, save the edited files.
+
+## GitHub
+
+## Nelify
+:::

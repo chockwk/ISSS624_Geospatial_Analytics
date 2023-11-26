@@ -125,6 +125,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../mac_user_tips.html" rel="" target="">
+ <span class="menu-text">Mac User Tips</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../useful_links.html" rel="" target="">
+ <span class="menu-text">Useful Links</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item dropdown ">
@@ -134,19 +142,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-hands-on-ex">    
         <li>
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html" rel="" target="">
- <span class="dropdown-text">Geospatial Data Wrangling</span></a>
+ <span class="dropdown-text">Data Wrangling</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html" rel="" target="">
- <span class="dropdown-text">Spatial Weights and Application</span></a>
+ <span class="dropdown-text">Spatial Weights</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html" rel="" target="">
- <span class="dropdown-text">Global Measures of Spatial Autocorrelation</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02c.html" rel="" target="">
- <span class="dropdown-text">Local Measures of Spatial Autocorrelation</span></a>
+ <span class="dropdown-text">Spatial Autocorrelation</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html" rel="" target="">
@@ -163,11 +167,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-in-class-ex">    
         <li>
     <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex01/In_class_Ex01.html" rel="" target="">
- <span class="dropdown-text">In-class Ex01</span></a>
+ <span class="dropdown-text">Choropleth Map</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex02/In_class_Ex02.html" rel="" target="">
- <span class="dropdown-text">In-class Ex02</span></a>
+ <span class="dropdown-text">sfdep Package</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex03/In_class_Ex03.html" rel="" target="">
@@ -372,14 +376,14 @@ $ geometry  &lt;POLYGON [°]&gt; POLYGON ((112.0625 29.75523..., POLYGON ((112.2
 <pre><code>Rows: 88
 Columns: 21
 $ ii           &lt;dbl&gt; -1.468468e-03, 2.587817e-02, -1.198765e-02, 1.022468e-03,…
-$ eii          &lt;dbl&gt; 1.004223e-03, -1.709327e-02, -6.309814e-03, 4.758297e-04,…
-$ var_ii       &lt;dbl&gt; 4.380627e-04, 1.284208e-02, 1.047813e-01, 7.196704e-06, 2…
-$ z_ii         &lt;dbl&gt; -0.11814129, 0.37919470, -0.01754045, 0.20376659, 0.19664…
-$ p_ii         &lt;dbl&gt; 0.9059557043, 0.7045432864, 0.9860054639, 0.8385359021, 0…
-$ p_ii_sim     &lt;dbl&gt; 0.88, 0.84, 0.90, 0.80, 0.74, 0.88, 0.02, 0.18, 0.04, 0.2…
-$ p_folded_sim &lt;dbl&gt; 0.44, 0.42, 0.45, 0.40, 0.37, 0.44, 0.01, 0.09, 0.02, 0.1…
-$ skewness     &lt;dbl&gt; -0.5432163, -1.1380317, 0.7912871, 0.5765325, 1.0788092, …
-$ kurtosis     &lt;dbl&gt; -0.5617237207, 1.2317495374, 0.0489174638, -0.5347695385,…
+$ eii          &lt;dbl&gt; -1.191847e-03, 1.261342e-02, -2.458540e-02, 2.054280e-04,…
+$ var_ii       &lt;dbl&gt; 4.921572e-04, 8.352084e-03, 1.191731e-01, 5.084601e-06, 1…
+$ z_ii         &lt;dbl&gt; -0.012469049, 0.145144856, 0.036492528, 0.362338696, 0.14…
+$ p_ii         &lt;dbl&gt; 0.9900513961, 0.8845965035, 0.9708896367, 0.7170989450, 0…
+$ p_ii_sim     &lt;dbl&gt; 0.88, 0.94, 0.90, 0.66, 0.80, 0.70, 0.12, 0.16, 0.02, 0.2…
+$ p_folded_sim &lt;dbl&gt; 0.44, 0.47, 0.45, 0.33, 0.40, 0.35, 0.06, 0.08, 0.01, 0.1…
+$ skewness     &lt;dbl&gt; -1.0222309, -0.7639663, 1.2528141, 0.6705833, 0.7657104, …
+$ kurtosis     &lt;dbl&gt; 1.12521493, 0.34038445, 3.05243672, 0.09158164, -0.056729…
 $ mean         &lt;fct&gt; Low-High, Low-Low, High-Low, High-High, High-High, High-L…
 $ median       &lt;fct&gt; High-High, High-High, High-High, High-High, High-High, Hi…
 $ pysal        &lt;fct&gt; Low-High, Low-Low, High-Low, High-High, High-High, High-L…

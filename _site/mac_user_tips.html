@@ -94,6 +94,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link active" href="./mac_user_tips.html" rel="" target="" aria-current="page">
  <span class="menu-text">Mac User Tips</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./useful_links.html" rel="" target="">
+ <span class="menu-text">Useful Links</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item dropdown ">
@@ -103,19 +107,15 @@ ul.task-list li input[type="checkbox"] {
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-hands-on-ex">    
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html" rel="" target="">
- <span class="dropdown-text">Geospatial Data Wrangling</span></a>
+ <span class="dropdown-text">Data Wrangling</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02.html" rel="" target="">
- <span class="dropdown-text">Spatial Weights and Application</span></a>
+ <span class="dropdown-text">Spatial Weights</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html" rel="" target="">
- <span class="dropdown-text">Global Measures of Spatial Autocorrelation</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02c.html" rel="" target="">
- <span class="dropdown-text">Local Measures of Spatial Autocorrelation</span></a>
+ <span class="dropdown-text">Spatial Autocorrelation</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html" rel="" target="">
@@ -132,11 +132,11 @@ ul.task-list li input[type="checkbox"] {
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-in-class-ex">    
         <li>
     <a class="dropdown-item" href="./In_class_Ex/In_class_Ex01/In_class_Ex01.html" rel="" target="">
- <span class="dropdown-text">In-class Ex01</span></a>
+ <span class="dropdown-text">Choropleth Map</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./In_class_Ex/In_class_Ex02/In_class_Ex02.html" rel="" target="">
- <span class="dropdown-text">In-class Ex02</span></a>
+ <span class="dropdown-text">sfdep Package</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./In_class_Ex/In_class_Ex03/In_class_Ex03.html" rel="" target="">
@@ -167,7 +167,14 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a></li>
+  <li><a href="#troubleshooting-journey" id="toc-troubleshooting-journey" class="nav-link" data-scroll-target="#troubleshooting-journey">Troubleshooting Journey</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -195,10 +202,12 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>Mac User Journey</p>
+<section id="getting-started" class="level1">
+<h1>Getting Started</h1>
 <ol type="1">
-<li><p>Install R studio</p></li>
-<li><p>Install git</p></li>
+<li><p>Install R and R studio from <a href="https://posit.co/download/rstudio-desktop/">posit</a> for macOS 11 and higher.</p></li>
+<li><p>Install git</p>
+<p>Note: <a href="https://git-scm.com/download/mac">Git recommendations</a> did not work; I have tested Homebrew, MacPorts and Xcode.</p></li>
 <li><p>Several packages requires *Rtools* and works under Windows. To resolve, type the following codes in console:</p></li>
 </ol>
 <p>a\) install.packages(“remotes”)</p>
@@ -220,8 +229,47 @@ ul.task-list li input[type="checkbox"] {
 <p>a\) Sign up through Github account.</p>
 <p>b\) Add a new site and indicate \_site in *Publish directory*.</p>
 <p>c\) Deploy site.</p>
+</section>
+<section id="troubleshooting-journey" class="level1">
+<h1>Troubleshooting Journey</h1>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Git</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">GitHub</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Nelify</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>To https://github.com/chockwk/ISSS624_Geospatial_Analytics.git ! [rejected] HEAD -&gt; main (fetch first) error: failed to push some refs to ‘https://github.com/chockwk/ISSS624_Geospatial_Analytics.git’ hint: Updates were rejected because the remote contains work that you do not have locally. This is usually caused by another repository pushing to the same ref. You may want to first integrate the remote changes (e.g., ‘git pull …’) before pushing again. See the ‘Note about fast-forwards’ in ‘git push –help’ for details.</p>
+<p>Step 1: Use the <code>git status</code> command to see the status of the repository and the changes that have been made.</p>
+<pre class="{bash}"><code>git status</code></pre>
+<p>Step 2: Merge or rebase the local changes with the changes from the remote main branch. Choose one of the following approaches:</p>
+<ol type="a">
+<li>Merge:</li>
+</ol>
+<pre class="{bash}"><code>git merge origin/main</code></pre>
+<p>This will create a new merge commit that combines your changes with the remote changes. Resolve any merge conflicts if they occur.</p>
+<ol start="2" type="a">
+<li>Rebase (if you want a linear history):</li>
+</ol>
+<p>If you want a linear history (without merge commits), you can rebase your local branch onto the updated remote branch:</p>
+<pre class="{bash}"><code>git rebase origin/main</code></pre>
+<p>Step 3: Push the changes to the remote repository:</p>
+<pre class="{bash}"><code>git push origin main</code></pre>
+<p>Auto-merging Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd CONFLICT (content): Merge conflict in Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd Auto-merging _quarto.yml CONFLICT (content): Merge conflict in _quarto.yml Auto-merging _site/Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html CONFLICT (content): Merge conflict in _site/Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html Auto-merging _site/search.json CONFLICT (content): Merge conflict in _site/search.json Automatic merge failed; fix conflicts and then commit the result.</p>
+<p>Step 4: Open the files that have conflicts in a text editor or code editor. In this case, the files with conflicts are:</p>
+<p>Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd _quarto.yml _site/Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html _site/search.json In these files, you will see sections surrounded by conflict markers like this:</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD // Your local changes ======= // Remote changes “&gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/main</p>
+<p>The section between &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD and ======= represents your local changes. The section between ======= and &gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/main represents the remote changes. Manually review and edit the conflicting sections to resolve the differences. Decide which changes to keep and which to discard. You can delete the conflict markers (&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD, =======, &gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/main) once you’ve resolved the conflicts.</p>
+<p>After resolving the conflicts, save the edited files.</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+
+</div>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

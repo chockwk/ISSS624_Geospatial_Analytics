@@ -1,5 +1,5 @@
 ---
-title: "1 Geospatial Data Wrangling with R"
+title: "Geospatial Data Wrangling with R"
 author: "Wan Kee"
 date: "15 November 2023"
 date modified: "18 November 2023"
@@ -99,8 +99,7 @@ Source: LTA (Download [here](https://datamall.lta.gov.sg/content/datamall/en/sea
 ```{r}
 cyclingpath = st_read(dsn="data/geospatial", layer="CyclingPathGazette")
 ```
-
-The output indicates that the geospatial objects are multilinestring features. There are 2558 features and 2 fields. It is in svy21 projected coordinates system with XY dimension.
+The output indicates that the geospatial objects are **multilinestring** features. There are **2558 features** and 2 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
 ## airbnb
 

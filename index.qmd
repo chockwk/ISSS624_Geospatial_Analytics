@@ -4,6 +4,8 @@ title: "Geospatial Analytics"
 
 Welcome to ISSS624 Applied Geospatial Analytics, Winter 2024 class!
 
+This page documents my learning journey of geospatial analytics taught by Prof Kam Tin Seong.
+
 ::: {.tenor-gif-embed data-postid="13844757" data-share-method="host" data-aspect-ratio="1" data-width="100%"}
 <a href="https://tenor.com/view/map-explore-trail-compass-colorful-gif-13844757">Map Explore Sticker</a>from <a href="https://tenor.com/search/map-stickers">Map Stickers</a>
 :::
@@ -11,4 +13,3 @@ Welcome to ISSS624 Applied Geospatial Analytics, Winter 2024 class!
 ```{=html}
 <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
 ```
-This page documents my learning journey of geospatial analytics taught by Prof Kam Tin Seong.

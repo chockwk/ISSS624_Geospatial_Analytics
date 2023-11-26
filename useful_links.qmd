@@ -3,6 +3,8 @@ title: "Useful Links"
 author: "Wan Kee"
 ---
 
-# Useful Links
-
 [Quarto Markdown Basics](https://quarto.org/docs/authoring/markdown-basics.html) documents the variation of markdown as its underlying document syntax.
+
+[Quarto Callbout Blocks](https://quarto.org/docs/authoring/callouts.html) outlines the creation of callouts in markdown.
+
+[QGIS](https://www.qgis.org/en/site/forusers/download.html)

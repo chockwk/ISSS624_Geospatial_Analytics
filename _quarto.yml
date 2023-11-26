@@ -31,9 +31,9 @@ website:
           - text: Hands-on Ex05
       - text: In-class Ex
         menu: 
-          - text: In-class Ex01
+          - text: Choropleth Map
             href: In_class_Ex/In_class_Ex01/In_class_Ex01.html
-          - text: In-class Ex02
+          - text: sfdep Package
             href: In_class_Ex/In_class_Ex02/In_class_Ex02.html
           - text: In-class Ex03
             href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
@@ -42,6 +42,7 @@ website:
       - text: Take-home Ex
         menu:
           - text: Geospatial Analytics for Public Good
+            href: Take_home_Ex/Take_home_Ex01/Take_home_Ex01.html
           - text: Regionalisation of Multivariate Water Point Attributes with Clustering Methods
     
   page-navigation: true
