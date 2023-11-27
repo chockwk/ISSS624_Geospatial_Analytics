@@ -49,10 +49,13 @@ c\\) Deploy site.
 
 ## Git
 
+::: {.callout-warning}
 To https://github.com/chockwk/ISSS624_Geospatial_Analytics.git
  ! [rejected]        HEAD -> main (fetch first)
 error: failed to push some refs to 'https://github.com/chockwk/ISSS624_Geospatial_Analytics.git'
 hint: Updates were rejected because the remote contains work that you do not have locally. This is usually caused by another repository pushing to the same ref. You may want to first integrate the remote changes (e.g., 'git pull ...') before pushing again. See the 'Note about fast-forwards' in 'git push --help' for details.
+:::
+
 
 Step 1: Use the `git status` command to see the status of the repository and the changes that have been made.
 
@@ -84,7 +87,7 @@ Step 3: Push the changes to the remote repository:
 git push origin main
 ```
 
-
+::: {.callout-note}
 Auto-merging Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd
 CONFLICT (content): Merge conflict in Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd
 Auto-merging _quarto.yml
@@ -94,7 +97,7 @@ CONFLICT (content): Merge conflict in _site/Hands_on_Ex/Hands_on_Ex01/Hands_on_E
 Auto-merging _site/search.json
 CONFLICT (content): Merge conflict in _site/search.json
 Automatic merge failed; fix conflicts and then commit the result.
-
+:::
 
 Step 4: Open the files that have conflicts in a text editor or code editor. In this case, the files with conflicts are:
 
@@ -102,14 +105,13 @@ Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.qmd
 _quarto.yml
 _site/Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
 _site/search.json
-In these files, you will see sections surrounded by conflict markers like this:
 
+In these files, you will see sections surrounded by conflict markers like this:
 <<<<<<< HEAD
 // Your local changes
 =======
 // Remote changes
 ">>>>>>> origin/main
-
 
 The section between <<<<<<< HEAD and ======= represents your local changes.
 The section between ======= and >>>>>>> origin/main represents the remote changes.
@@ -120,4 +122,6 @@ After resolving the conflicts, save the edited files.
 ## GitHub
 
 ## Nelify
+
+## QGIS
 :::

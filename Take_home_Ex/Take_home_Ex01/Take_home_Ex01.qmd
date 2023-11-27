@@ -35,14 +35,35 @@ busstops <- st_read(dsn = "data/BusStopLocation_Jul2023", layer = "BusStop") %>%
 
 The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
-## Passenger Volume
+## Population
 
+Geospatial statistics are published by the Singapore Department of Statistics. They are available from the Population Trends, Census of Population and General Household Survey reports. Singapore Residents by Planning Area/Subzone, Age Group, Sex and Floor Area of Residence, June 2011 onwards
+
+PA - Planning Area
+SZ - Subzone
+AG - Age Group
+Sex - Sex
+FA - Floor Area of Residence
+Pop - Resident Count
+Time - Time / Period
+
+1) For June 2011 to 2019, Planning Areas refer to areas demarcated in the Urban Redevelopment Authority's Master Plan 2014.
+2) For June 2020, Planning Areas refer to areas demarcated in the Urban Redevelopment Authority's Master Plan 2019.
+3) Data from 2003 onwards exclude residents who have been away from Singapore for a continuous period of 12 months or longer as at the reference period.
+4) The figures have been rounded to the nearest 10. 
+5) The data may not add up due to rounding.
+
+Source: Department of Statistics ([Link](https://www.singstat.gov.sg/-/media/files/find_data/population/statistical_tables/respopagesexfa2011to2020.ashx))
+
+```{r}
+popdata <- read_csv("data/respopagesexfa2011to2020/respopagesexfa2011to2020.csv")
+```
+## Passenger Volume
 `odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. It indicates passenger volume for **October 2023**. Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
 
 ```{r}
 odbus = read_csv("data/origin_destination_bus_202310.csv")
 ```
-
 The output does not indicate any geospatial objects. There are **5,694,297 records** and 7 fields.
 
 ## Subzone
@@ -55,11 +76,37 @@ The Master Plan is a forward looking guiding plan for Singapore's development in
 
 Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 
-::: {.callout-tip title="New Package"}
-Using `st_read()` to import the new file returns an error: 'Error in CPL_get_z\_range(obj, 3) : z error - expecting three columns' `sf` expects a 3D geometry (X, Y, Z coordinates) but the file being read only contains 2D geometries (X and Y coordinates).
+```{r}
+mpsz = st_read(dsn="data/MPSZ-2019", layer="MPSZ-2019") %>% 
+  st_transform(crs=3414)
+```
 
-To resolve, we use `geojsonsf` to convert GeoJSON and simple feature objects.
+The output indicates that the geospatial objects are **multipolygon** features. There are **332 features** and 6 fields. It is in **WGS84** projected coordinates system with **XY** dimension.
+
+```{r}
+# Assuming mpsz is your sf object
+#mpsz <- st_read(dsn="data/MP19_SUBZONE", layer="MP19_SUBZONE_NO_SEA")
+
+# Ensure that 'geometry' is the active geometry column
+#mpsz <- st_set_geometry(mpsz, "geometry")
+
+# Check for invalid geometries and apply st_make_valid if needed
+#mpsz$geometry_is_valid <- st_is_valid(mpsz$geometry)
+#mpsz <- mpsz %>%
+#  mutate(geometry = ifelse(!geometry_is_valid, st_make_valid(geometry), geometry))
+
+# Now, remove the Z dimension explicitly if it exists
+#mpsz <- st_zm(mpsz, drop = TRUE, what = "Z")
+
+# View the data structure to confirm changes
+#print(mpsz1)
+```
+
+::: {.callout-tip title="Warning"}
+Warning: GDAL Message 1: Sub-geometry 0 has coordinate dimension 2, but container has 3
 :::
+
+The warning message indicate that a discrepancy in the dimensionality of the geometries in `mpsz` Shapefile. Some of the sub-geometries have 2D coordinates (X and Y), while the overall container expects 3D coordinates (X, Y, and Z). The `st_zm(what = "Z")` function drops the Z dimension from the geometries, which eliminate the warnings about coordinate dimensions. We are not performing 3D analysis, this approach should work fine for most applications.
 
 ## Hexagon
 
@@ -114,9 +161,11 @@ hexagon
 
 ::: panel-tabset
 ## Bus Stops
+
 ```{r}
 glimpse(busstops)
 ```
+
 ```{r}
 location = mapview(busstops, cex = 3, alpha = 0.5, popup = NULL)
 location
@@ -152,6 +201,10 @@ Pasir Ris (11 bus stops)
 
 ![](images/Screenshot%202023-11-27%20at%202.20.59%E2%80%AFAM.png){fig-align="left" width="700"}
 
+## Population
+```{r}
+glimpse(popdata)
+```
 ## Passenger Volume
 
 ```{r}
@@ -161,6 +214,10 @@ glimpse(odbus)
 ```
 
 ## Subzone
+
+```{r}
+glimpse(mpsz)
+```
 :::
 
 # 1.5 Plot data
