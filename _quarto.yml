@@ -41,7 +41,7 @@ website:
           - text: In-class Ex05
       - text: Take-home Ex
         menu:
-          - text: Geospatial Analytics for Public Good
+          - text: Dynamic Patterns of Public Transport Usage
             href: Take_home_Ex/Take_home_Ex01/Take_home_Ex01.html
           - text: Regionalisation of Multivariate Water Point Attributes with Clustering Methods
     
