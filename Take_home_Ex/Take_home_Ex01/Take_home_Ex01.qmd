@@ -627,8 +627,16 @@ rswm_q <- nb2listw(wm_q,
 rswm_q
 ```
 ```{r}
-localMI_weekday <- localmoran(passengergrid_total$WEEKDAY_TRIPS, rswm_q)
-head(localMI_weekday)
+
+# Remove NA values from WEEKDAY_TRIPS
+passengergrid_total <- passengergrid_total[!is.na(passengergrid_total$WEEKDAY_TRIPS),]
+
+# Compute local Moran's I
+#localIMI_weekday <- localmoran(passengergrid_total$WEEKDAY_TRIPS, rswm_q)
+
+# View the results
+#head(localIMI_weekday)
+
 ```
 
 
