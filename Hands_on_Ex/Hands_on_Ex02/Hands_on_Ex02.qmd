@@ -18,38 +18,40 @@ Spatial weights are a fundamental concept in spatial analysis and spatial statis
 There are two types of spatial weights:
 
 ::: panel-tabset
-## Contiguity Weights
+## Contiguity
 
-Contiguity-based weights define relationships based on common geographic boundary.
+Contiguity-based weights define two spatial units share a common border of non-zero length.
 
-![](/_site/Hands_on_Ex/Hands_on_Ex02/images/Screenshot%202023-11-21%20at%208.52.53%E2%80%AFPM.png){fig-align="center" width="300"}
+-   **Rook** criterion defines neighbors by the existence of a common edge between two spatial units.
 
-## Distance-Band Weights
+-   **Queen** criterion defines neighbors as spatial units sharing a common edge or a common vertex.
 
-Distance-based weights assign weights based on the Euclidean or other distance measures between locations. Locations closer to each other receive higher weights.
+-   **Bishop's** approach relies on a common vertex.
 
-![](/_site/Hands_on_Ex/Hands_on_Ex02/images/Screenshot%202023-11-21%20at%208.58.23%E2%80%AFPM.png){fig-align="center" width="500"}
+## Distance
+
+Distance-based weights assign weights based on the Euclidean or other distance measures between two locations or points. Locations closer to each other receive higher weights.
+
+-   Distance/radii-based
+
+-   Number/kth neighbor-based
+
+![](images/Screenshot%202023-11-30%20at%2012.34.41%E2%80%AFPM.png){fig-align="left"}
 :::
 
 Learning Objectives:
 
-1.  xx
-2.  xx
+1.  Compute **Global Spatial Autocorrelation (GSA) statistics** using **`spdep`** and plot Moran scatterplot and spatial correlogram.
+
+2.  Compute **Local Indicator of Spatial Association (LISA)** statistics for detecting clusters and outliers using **`spdep`**
+
+3.  Compute **Getis-Ord\'s Gi-statistics** for detecting hot spot or/and cold spot area using **`spdep`** package
 
 # 1.2 Load packages
 
-::: {.card .text-white .bg-secondary .mb-3 style="max-width: 40rem;"}
-::: card-body
-```         
-**New package**
-`spdep` is comprehensive package for spatial econometrics and spatial 
-statistics. It provides the functions and tools for handling spatial 
-data, creating spatial weights matrices, and conducting spatial data 
-analysis.
-```
-:::
-:::
+`spdep` is comprehensive package for spatial econometrics and spatial statistics. It provides the functions and tools for handling spatial data, creating spatial weights matrices, and conducting spatial data analysis.
 
+Here are the functions of `spdep`:
 ::: panel-tabset
 ## Spatial Weights Matrices
 
@@ -72,6 +74,8 @@ analysis.
 `sdpep` allows for regional aggregation using minimum spanning tree-based methods.
 :::
 
+`sf` imports and handles geospatial data in R. `tidyverse` wrangles attribute data in R. `knitr` is a general-purpose tool for dynamic report generation. `tmap` prepare cartographic quality choropleth map.
+
 ```{r}
 pacman::p_load(sf, spdep, tmap, tidyverse, knitr)
 ```
@@ -79,43 +83,43 @@ pacman::p_load(sf, spdep, tmap, tidyverse, knitr)
 # 1.3 Import data
 
 ::: panel-tabset
+## hunan_geo
+```{r}
+hunan_geo = st_read(dsn="data/geospatial", layer="Hunan")
+```
+`hunan` output indicates that the geospatial objects are **polygon** features. There are **88 features** and **7 fields**. It is in **WGS84** projected coordinates system with **XY** dimension.
+
+## hunan_ind
+```{r}
+hunan_ind = read_csv("data/aspatial/Hunan_2012.csv")
+```
+`hunan_ind` output indicates 88 features, and 29 fields.
+
 ## hunan
 
-`hunan` output indicates that the geospatial objects are polygon features. There are 88 features and 7 fields. It is in WGS84 projected coordinates system with XY dimension.
+We will perform relational join of the attribute table of `hunan_geo` spatial polygons dataFrame with the attribute fields of `hunan_ind` dataframe to create a fused dataset `hunan`. `left_join()` will merge the selected columns.
 
 ```{r}
-hunan = st_read(dsn="data/geospatial", layer="Hunan")
-```
-
-## hunan2012
-
-`hunan2012` output indicates 88 features, and 29 fields.
-
-```{r}
-hunan2012 = read_csv("data/aspatial/Hunan_2012.csv")
-```
-
-## hunan_hunan2012
-
-`left_join()` will merge the selected columns of `hunan` and `hunan2012`.
-
-```{r}
-hunan2 = left_join(hunan, hunan2012) %>% 
+hunan = left_join(hunan_geo, hunan_ind) %>% 
   select(1:4, 7, 15)
-head(hunan2, n=5)
+head(hunan, n=5)
 ```
 :::
 
-# 1.4 Explore data
+# 1.4 Explore and plot data
 
-# 1.5 Plot data
+`hunan` contains 88 county and its geospatial objects are **polygon** features. It has retained **WGS84** projected coordinates system.
+```{r}
+glimpse(hunan)
+```
+```{r}
+st_crs(hunan)
+```
 
-`GDPPC` is the gross domestic product per capita shows a country's GDP divided by its total population. We will visualise the regional development indicator by plotting a basemap nad a choropleth map with the distribution of GDPPC using `qtm()`.
-
-`qtm()` draws a quick thematic map without arguments or with a search term.
+`GDPPC` is the gross domestic product per capita shows a country's GDP divided by its total population. We will visualise the regional development indicator by plotting a basemap nad a choropleth map with the distribution of GDPPC using `qtm()`, which draws a quick thematic map without arguments or with a search term.
 
 ```{r}
-basemap <- tm_shape(hunan2) +
+basemap <- tm_shape(hunan) +
   tm_polygons() +
   tm_text("NAME_3", size=0.5)
 
