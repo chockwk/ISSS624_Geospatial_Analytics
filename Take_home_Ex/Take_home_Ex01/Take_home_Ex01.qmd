@@ -19,26 +19,11 @@ In the intricate mosaic of urban transportation, bus stops serve as pivotal node
 
 This geospatial analysis is anchored in the bustling landscape of a metropolitan area, where data on bus stops, population distribution, urban development plans, and passenger volume intertwine to paint a comprehensive picture of transit dynamics.
 
-This analysis aims to dissect the rhythms of urban mobility in Singapore through the following analysis:
-
-1.  **Geovisualization and Analysis**
-
-    -   Compute the passenger trips
-    -   Visualize the geographical distribution of the passenger trips
-
-2.  **Local Indicators of Spatial Association (LISA) Analysis**
-
-    -   Compute LISA of the passengers trips
-    -   Visualize the LISA maps of the passengers trips
-
-3.  **Emerging Hot Spot Analysis (EHSA)**
-
-    -   Perform Mann-Kendall Test by using the spatio-temporal local Gi\* values
-    -   Visualize EHSA maps of the Gi\* values of the passenger trips by origin at the hexagon level
+This analysis aims to dissect the rhythms of urban mobility in Singapore through **geovisualization and emerging hot spot analysis (EHSA)** through spatio-temporal attributes.
 
 # 1.2 Load packages
 
-The following packages will be useful
+The analysis involves the following packages:
 
 -   `sf` imports and handles geospatial data
 -   `tidyverse` performs aspatial data import, wrangling and visualization
@@ -53,9 +38,9 @@ pacman::p_load(sf, dplyr, ggplot2, knitr, mapview, spdep, sfdep, tmap, tidyverse
 
 # 1.3 Import data
 
-We will be using the following **geospatial** (`busstops`, `mpsz`) and **aspatial** (`odbus`, `pop`) datasets.
+We will be using the following **geospatial** (`busstops`, `subzone`) and **aspatial** (`odbus`, `malls`) datasets.
 
-`st_geometry()` displays basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data. `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values in every column in a data frame.
+`st_geometry()` displays basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data. `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values within a data frame.
 
 ::: panel-tabset
 ## Bus Stops
@@ -91,7 +76,6 @@ Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 mpsz = st_read(dsn="data/MPSZ-2019", layer="MPSZ-2019") %>% 
   st_transform(crs=3414)
 ```
-
 The output indicates that the geospatial objects are **multipolygon** features. There are **332 features** and 6 fields. It is in **WGS84** projected coordinates system with **XY** dimension.
 
 ## Passenger Volume
@@ -113,7 +97,6 @@ odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
 odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
 glimpse(odbus)
 ```
-
 The output indicates **5,694,297 records** and 7 fields. The bus stop codes are converted into factor for data handling.
 
 ## Population
@@ -133,25 +116,37 @@ pop <- read_csv("data/respopagesexfa2011to2020/respopagesexfa2011to2020.csv")
 #| code-summary: "Show the code"
 glimpse(pop)
 ```
-
 The output indicates **738,492 records** and 7 fields to illustrate the population distribution by planning area (PA), subzone (SZ), age group (AG), residence floor area (FA), resident count (Pop).
 
-odbus contains the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic for October 2023.
+## Passenger Volume
+
+`odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic for **October 2023**.
 
 Source: LTA DataMall (Postman URL)
 
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 odbus = read_csv("data/origin_destination_bus_202310.csv")
+```
 
 The output does not indicate any geospatial objects. There are 5,694,297 records and 7 fields.
 
 ## Malls
+`malls` was a web scraper project conducted to scrape the list of shopping malls off a wikipedia site, and the the SVY21 coordinates from One Map API.
+
+Source: Valary Lim ([GitHub](https://github.com/ValaryLim/Mall-Coordinates-Web-Scraper/blob/master/README.md))
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 malls <- read_csv("data/mall_coordinates_updated.csv")
-glimpse(malls)
 ```
+`st_as_sf()` and `st_transforms()` uses the `longitude` and `latitude` to create spatial objects.
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 malls_sf <- st_as_sf(malls,
                      coords = c("longitude","latitude"),
                      crs = 4326,
@@ -159,6 +154,7 @@ malls_sf <- st_as_sf(malls,
   st_transform(crs = 3414)
 glimpse(malls_sf)
 ```
+The output indicates that the geospatial objects are **point** features. There are **184 features** and 5 fields.
 
 :::
 
@@ -168,8 +164,9 @@ glimpse(malls_sf)
 
 `hexagon` is a hexagon layer of 250m where the distance is the perpendicular distance between the centre of the hexagon and its edges. It is a substitute for multipolygon in `mpsz` which is relatively coarse and irregular.
 
-::: Panel-tabset
+::: panel-tabset
 ## Step 1
+
 First, we will create hexagonal grids using `st_make_grid()` to cover the geometry of `busstops`.
 
 ```{r}
@@ -180,7 +177,8 @@ area_hexagon_grid
 ```
 The output indicates that the geospatial objects are **polygon** features. There are **5580 features** and 1 fields. It is in **SVY21** projected coordinates system with **XY** dimension, same as that in `busstops` dataset.
 
-## Step 2:
+## Step 2
+
 We also assign grid id to each hexagon using `length()` to calculate the length of the geometry and generate a sequence from 1 to the length of vectors in `area_hexagon_grid`.
 
 ```{r}
@@ -190,17 +188,21 @@ hexagon_grid_sf = st_sf(area_hexagon_grid) %>%
   mutate(grid_id = 1:length(lengths(area_hexagon_grid)))
 hexagon_grid_sf
 ```
-
 The output indicates that the geospatial objects retained **polygon** features and there are more than one polygon feature in a grid_id. The intersection of `busstops` and `hexagon_grid_sf` yields **1524 features** and 1 fields, indicating only 1524 out of 5580 features contains bus stops. It is in **SVY21** projected coordinates system with **XY** dimension.
 
-Step 3:
+## Step 3
+
+The grids without any bus stops are removed to avoid errors in calculations.
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hexagon_grid_sf$grid_id = lengths(st_intersects(hexagon_grid_sf, busstops))
 hexagon_count = filter(hexagon_grid_sf, grid_id > 0)
 hexagon_count
 ```
-## Step 3
+
+## Step 4
 
 Using `tmap`, the distribution of bus stops across Singapore can be visualised in the interactive map below.
 
@@ -213,7 +215,7 @@ hexagon = tm_shape(hexagon_count)+
     col = "grid_id",
     palette = "Reds",
     style = "cont",
-    title = "Number of Bus Stops in Singapore",
+    title = "Number of Bus Stops",
     id = "grid_id",
     showNA = FALSE,
     alpha = 0.6,
@@ -224,9 +226,9 @@ hexagon = tm_shape(hexagon_count)+
   tm_borders(col = "grey40", lwd = 0.7)
 hexagon
 ```
-
-The geospatial distribution of bus stops in Singapore, as visualized in the above map, is extensive and dispersed throughout the central region, with a notable concentration of stops with darker shades of red signifying higher concentrations. Outlying regions, along the coastal areas, show fewer bus stops as indicated by the presence of lighter-colored hexagons or even white spaces where no stops are present. This distribution pattern suggests a robust public transportation infrastructure in urban and densely populated areas, tapering off in less populated or industrial regions.
 :::
+
+The geospatial distribution of bus stops in Singapore is extensive and dispersed throughout the region, with a notable concentration of stops with darker shades of red signifying higher concentrations. Outlying regions, along the coastal areas, show fewer bus stops as indicated by the presence of lighter-colored hexagons or even white spaces where no stops are present. This distribution pattern suggests a robust public transportation infrastructure in urban and densely populated areas, tapering off in less populated or industrial regions.
 
 # 1.5 Explore data
 
@@ -235,7 +237,7 @@ The geospatial distribution of bus stops in Singapore, as visualized in the abov
 `plot()` takes parameters for specifying points in the diagram. At its simplest, it can plot two numbers against each other. With datasets, it can generate maps and plot the specified columns/attributes, with default up to nine plots or maximum all plots.
 
 ::: panel-tabset
-## Bus Stops
+## Distribution
 
 The map below shows the location of each bus stop in Singapore.
 
@@ -246,6 +248,8 @@ mapview(busstops, cex = 3, alpha = 0.5, popup = NULL, col.regions = "darkseagree
 ```
 
 ## High Density Areas
+
+High-density bus stop areas typically indicate regions with better public transport accessibility. This makes it easier for residents and visitors to move around without personal vehicles, which can reduce traffic congestion and the environmental impact of transportation. These regions may be **suburban town centres** with a higher concentration of services, amenities, and potentially population. 
 
 ```{r}
 # Filter hexagons that contain more than 8 bus stops
@@ -268,10 +272,12 @@ highdensity = tm_shape(highdensityhex)+
   tm_borders(col = "grey40", lwd = 0.7)
 highdensity
 ```
+The top two hexagons are further examined to understand these high density areas.
 
 ![](images/Screenshot%202023-12-01%20at%204.30.35%E2%80%AFPM.png){fig-align="left"}
 
 ![](images/Screenshot%202023-12-01%20at%204.30.06%E2%80%AFPM.png){fig-align="left"}
+The hexagons are residential areas a short distance from MRT stations to link these local centers to the city. Each hexagon also contains a shopping mall which promotes local economic activity and community interaction.
 
 ```{r}
 library(tmap)
@@ -335,11 +341,9 @@ highdensity_malls <- tm_shape(highdensityhex) +
 # Print the map
 highdensity_malls
 ```
-
 :::
 
 ::: panel-tabset
-
 ## Passenger Volume
 
 ```{r}
@@ -504,7 +508,7 @@ glimpse(passengergrid_time)
 
 ### Step 5: Split passengers trip into weekday and weekend
 
-::: panel-tabset 
+::: panel-tabset
 
 #### Day
 
@@ -740,6 +744,7 @@ passengergrid_day_total <- passengergrid_day %>%
 wm_q_day <- poly2nb(passengergrid_day_total, queen=TRUE)
 summary(wm_q_day)
 ```
+
 The output shown is a summary of a neighbors list object using Queen contiguity weight matrix. There are **5,029 regions** and approximately **42.69%** of all possible neighbor pairs are neighbors with nonzero links. Each region has an **average** of **21.47 neighboring regions**. For poorly connected regions, there are 7 regions without neighbors and 14 regions with 1 neighbour. There are 8 well-connected regions with 48 neighbours.
 
 #### Time
@@ -754,6 +759,7 @@ passengergrid_time_total <- passengergrid_time %>%
 wm_q_time <- poly2nb(passengergrid_time_total, queen=TRUE)
 summary(wm_q_time)
 ```
+
 The output shown is a summary of a neighbors list object. There are **5,029 regions** and approximately **42.69%** of all possible neighbor pairs are neighbors with nonzero links. Each region has an **average** of **21.47 neighboring regions**. For poorly connected regions, there are 7 regions without neighbors and 14 regions with 1 neighbour. There are 8 well-connected regions with 48 neighbours.
 
 ```{r}
@@ -762,7 +768,7 @@ rswm_q_time <- nb2listw(wm_q_time, style="W", zero.policy = TRUE)
 
 ```{r}
 fips_time <- order(passengergrid_time_total$BUS_STOP_N)
-localMI_time <- localmoran(passengergrid_time_total$TOTAL_TRIPS, rswm_q_time)
+#localMI_time <- localmoran(passengergrid_time_total$TOTAL_TRIPS, rswm_q_time)
 ```
 :::
 
@@ -779,9 +785,6 @@ latitude <- map_dbl(passengergrid_time_total$area_hexagon_grid, ~st_centroid(.x)
 coords <- cbind(longitude, latitude)
 head(coords)
 ```
-
-
-
 
 ```{r}
 k1 <- knn2nb(knearneigh(coords))
@@ -804,12 +807,10 @@ wm_d16229_subset <- wm_d16229[1:5]
 str(wm_d16229_subset)
 ```
 
-
 ```{r}
 wm_d16229_lw <- nb2listw(wm_d16229, style = 'B')
 summary(wm_d16229_lw)
 ```
-
 
 Compute Gi statistics
 
@@ -817,7 +818,6 @@ Compute Gi statistics
 fips <- order(passengergrid_time_total$BUS_STOP_N)
 gi.fixed <- localG(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw)
 ```
-
 
 ```{r}
 passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.fixed)) %>%
@@ -836,7 +836,6 @@ Gimap_fixed <-tm_shape(passengergrid_time_total.gi) +
 Gimap_fixed
 #tmap_arrange(gi_total_trips, Gimap, asp=1, ncol=2)
 ```
-
 
 Computing adaptive distance weight matrix
 
