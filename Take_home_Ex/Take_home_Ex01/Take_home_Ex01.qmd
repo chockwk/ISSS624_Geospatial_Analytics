@@ -43,17 +43,19 @@ The following packages will be useful
 -   `sf` imports and handles geospatial data
 -   `tidyverse` performs aspatial data import, wrangling and visualization
 -   `dplyr` perform relational join
--   `spdep` compute spatial weights and calculate spatially lagged variables
+-   `spdep` compute spatial weights and spatially lagged variables
 -   `spfep` compute spatial autocorrelation
 -   `ggplot2`, `mapview` and `tmap` supports data visualisation
 
 ```{r}
-pacman::p_load(sf, dplyr, ggplot2, knitr, mapview, spdep, tmap, tidyverse)
+pacman::p_load(sf, dplyr, ggplot2, knitr, mapview, spdep, sfdep, tmap, tidyverse)
 ```
 
 # 1.3 Import data
 
-We will be using the following geospatial (`busstops`, `mpsz`) and aspatial (`odbus`, `pop`) datasets:
+We will be using the following **geospatial** (`busstops`, `mpsz`) and **aspatial** (`odbus`, `pop`) datasets.
+
+`st_geometry()` displays basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data. `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values in every column in a data frame.
 
 ::: panel-tabset
 ## Bus Stops
@@ -69,39 +71,13 @@ busstops <- st_read(dsn = "data/BusStopLocation_Jul2023", layer = "BusStop") %>%
   st_transform(crs = 3414)
 ```
 
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+st_geometry(busstops)
+```
+
 The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
-## Passenger Volume
-
-`odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic for **October 2023**.
-
-Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
-
-```{r}
-odbus = read_csv("data/origin_destination_bus_202310.csv")
-```
-
-The output does not indicate any geospatial objects. There are **5,694,297 records** and 7 fields.
-
-## Population
-
-`pop` contains Singapore residents grouped by planning Area or subzone, age group, sex and floor area of residence. The data period is from **June 2011 onwards**. From June 2011 to 2019, the planning areas refer to areas demarcated in the Master Plan 2014, and from June 2020 onwards will be Master Plan 2019.
-
-| x    | Description          |
-|------|----------------------|
-| PA   | Planning area        |
-| SZ   | Subzone              |
-| AG   | Age group            |
-| Sex  | Sex                  |
-| FA   | Residence floor area |
-| Pop  | Resident count       |
-| Time | Time/period          |
-
-Source: Department of Statistics ([Link](https://www.singstat.gov.sg/-/media/files/find_data/population/statistical_tables/respopagesexfa2011to2020.ashx))
-
-```{r}
-pop <- read_csv("data/respopagesexfa2011to2020/respopagesexfa2011to2020.csv")
-```
 
 ## Subzone
 
@@ -110,75 +86,127 @@ pop <- read_csv("data/respopagesexfa2011to2020/respopagesexfa2011to2020.csv")
 Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 mpsz = st_read(dsn="data/MPSZ-2019", layer="MPSZ-2019") %>% 
   st_transform(crs=3414)
 ```
 
 The output indicates that the geospatial objects are **multipolygon** features. There are **332 features** and 6 fields. It is in **WGS84** projected coordinates system with **XY** dimension.
 
+## Passenger Volume
+
+`odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used.
+
+Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
+
 ```{r}
-# Assuming mpsz is your sf object
-#mpsz <- st_read(dsn="data/MP19_SUBZONE", layer="MP19_SUBZONE_NO_SEA")
-
-# Ensure that 'geometry' is the active geometry column
-#mpsz <- st_set_geometry(mpsz, "geometry")
-
-# Check for invalid geometries and apply st_make_valid if needed
-#mpsz$geometry_is_valid <- st_is_valid(mpsz$geometry)
-#mpsz <- mpsz %>%
-#  mutate(geometry = ifelse(!geometry_is_valid, st_make_valid(geometry), geometry))
-
-# Now, remove the Z dimension explicitly if it exists
-#mpsz <- st_zm(mpsz, drop = TRUE, what = "Z")
-
-# View the data structure to confirm changes
-#print(mpsz1)
+#| code-fold: true
+#| code-summary: "Show the code"
+odbus = read_csv("data/origin_destination_bus_202310.csv")
 ```
 
-::: {.callout-tip title="Warning"}
-Warning: GDAL Message 1: Sub-geometry 0 has coordinate dimension 2, but container has 3
-:::
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
+odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
+glimpse(odbus)
+```
 
-The warning message indicate that a discrepancy in the dimensionality of the geometries in `mpsz` Shapefile. Some of the sub-geometries have 2D coordinates (X and Y), while the overall container expects 3D coordinates (X, Y, and Z). The `st_zm(what = "Z")` function drops the Z dimension from the geometries, which eliminate the warnings about coordinate dimensions. We are not performing 3D analysis, this approach should work fine for most applications.
+The output indicates **5,694,297 records** and 7 fields. The bus stop codes are converted into factor for data handling.
+
+## Population
+
+`pop` contains Singapore residents grouped by planning area or subzone, age group, sex and floor area of residence. The data period is from **June 2011 onwards**. From June 2011 to 2019, the planning areas refer to areas demarcated in the Master Plan 2014, and from June 2020 onwards will be Master Plan 2019.
+
+Source: Department of Statistics ([Link](https://www.singstat.gov.sg/-/media/files/find_data/population/statistical_tables/respopagesexfa2011to2020.ashx))
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+pop <- read_csv("data/respopagesexfa2011to2020/respopagesexfa2011to2020.csv")
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+glimpse(pop)
+```
+
+The output indicates **738,492 records** and 7 fields to illustrate the population distribution by planning area (PA), subzone (SZ), age group (AG), residence floor area (FA), resident count (Pop).
+
+odbus contains the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic for October 2023.
+
+Source: LTA DataMall (Postman URL)
+
+odbus = read_csv("data/origin_destination_bus_202310.csv")
+
+The output does not indicate any geospatial objects. There are 5,694,297 records and 7 fields.
+
+## Malls
+
+```{r}
+malls <- read_csv("data/mall_coordinates_updated.csv")
+glimpse(malls)
+```
+
+```{r}
+malls_sf <- st_as_sf(malls,
+                     coords = c("longitude","latitude"),
+                     crs = 4326,
+                     remove = F) %>% 
+  st_transform(crs = 3414)
+glimpse(malls_sf)
+```
+
 :::
 
 # 1.4 Create Spatial Grids
 
-Spatial grids are commonly used in spatial analysis to divide the study area into equal size, regular polygons that tessellate the area of interest. On the selection of grid, regular geographic units, such as square grid or fishnets, rarely reflect real world situations. Hexagons are compact shape and can overcome oddly-shaped geographical units.
+**Spatial grids** are commonly used in spatial analysis to divide the study area into equal size, regular polygons that tessellate the area of interest. Square grid rarely reflect real world situations, whereas **hexagons** are compact and can overcome oddly-shaped geographical units.
 
-**Step 1: Create a hexgonal grid**
-
-`hexagon` is a hexagon layer of 250m where the distance is the perpendicular distance between the centre of the hexagon and its edges. It is a substitute for 'mpsz' which is relatively coarse and irregular.
+`hexagon` is a hexagon layer of 250m where the distance is the perpendicular distance between the centre of the hexagon and its edges. It is a substitute for multipolygon in `mpsz` which is relatively coarse and irregular.
 
 ::: Panel-tabset
 ## Step 1
+First, we will create hexagonal grids using `st_make_grid()` to cover the geometry of `busstops`.
 
 ```{r}
-# Create hexagonal grid (250m from center to edges) and add grid ID.
+#| code-fold: true
+#| code-summary: "Show the code"
 area_hexagon_grid = st_make_grid(busstops, cellsize = 500, what = "polygons", square = FALSE)
+area_hexagon_grid
+```
+The output indicates that the geospatial objects are **polygon** features. There are **5580 features** and 1 fields. It is in **SVY21** projected coordinates system with **XY** dimension, same as that in `busstops` dataset.
 
+## Step 2:
+We also assign grid id to each hexagon using `length()` to calculate the length of the geometry and generate a sequence from 1 to the length of vectors in `area_hexagon_grid`.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hexagon_grid_sf = st_sf(area_hexagon_grid) %>% 
   mutate(grid_id = 1:length(lengths(area_hexagon_grid)))
 hexagon_grid_sf
 ```
 
-The output indicates that the geospatial objects are **polygon** features. There are **5580 features** and 1 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+The output indicates that the geospatial objects retained **polygon** features and there are more than one polygon feature in a grid_id. The intersection of `busstops` and `hexagon_grid_sf` yields **1524 features** and 1 fields, indicating only 1524 out of 5580 features contains bus stops. It is in **SVY21** projected coordinates system with **XY** dimension.
 
-## Step 2
+Step 3:
 
 ```{r}
-# Count the number of bus stops in each grid and remove grids without any value.
 hexagon_grid_sf$grid_id = lengths(st_intersects(hexagon_grid_sf, busstops))
 hexagon_count = filter(hexagon_grid_sf, grid_id > 0)
 hexagon_count
 ```
-
-The output indicates that the geospatial objects retained **polygon** features and there are more than one polygon feature in a grid_id. The intersection of `busstops` and `hexagon_grid_sf` is **1524 features** and 1 fields, indicating only 1524 out of 5580 features contains bus stops. It is in **SVY21** projected coordinates system with **XY** dimension.
-
 ## Step 3
 
+Using `tmap`, the distribution of bus stops across Singapore can be visualised in the interactive map below.
+
 ```{r}
-# Set tmap to view mode for interactive plotting.
+#| code-fold: true
+#| code-summary: "Show the code"
 tmap_mode("view")
 hexagon = tm_shape(hexagon_count)+
   tm_fill(
@@ -202,72 +230,6 @@ The geospatial distribution of bus stops in Singapore, as visualized in the abov
 
 # 1.5 Explore data
 
-`st_geometry()` displays basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data. `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values in every column in a data frame.
-
-::: panel-tabset
-## Bus Stops
-
-```{r}
-st_geometry(busstops)
-```
-
-```{r}
-glimpse(busstops)
-```
-
-## Passenger Volume
-
-```{r}
-odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
-odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
-glimpse(odbus)
-```
-
-## Population
-
-```{r}
-glimpse(pop)
-```
-
-```{r}
-popdata2020 <- pop %>%
-  filter(Time == 2020) %>%
-  group_by(PA, SZ, AG) %>%
-  summarise(`POP` = sum(`Pop`)) %>%
-  ungroup()%>%
-  pivot_wider(names_from=AG, 
-              values_from=POP) %>%
-  mutate(YOUNG = rowSums(.[3:6])
-         +rowSums(.[12])) %>%
-mutate(`ECONOMY ACTIVE` = rowSums(.[7:11])+
-rowSums(.[13:15]))%>%
-mutate(`AGED`=rowSums(.[16:21])) %>%
-mutate(`TOTAL`=rowSums(.[3:21])) %>%  
-mutate(`DEPENDENCY` = (`YOUNG` + `AGED`)
-/`ECONOMY ACTIVE`) %>%
-  select(`PA`, `SZ`, `YOUNG`, 
-       `ECONOMY ACTIVE`, `AGED`, 
-       `TOTAL`, `DEPENDENCY`)
-```
-
-## Subzone
-
-```{r}
-glimpse(mpsz)
-```
-
-## Population in Subzones
-
-convert the values in PA and SZ fields to uppercase. This is because the values of PA and SZ fields are made up of upper- and lowercase. On the other, hand the SUBZONE_N and PLN_AREA_N are in uppercase.
-
-```{r}
-mpsz_pop<- left_join(mpsz, popdata2020,
-                     by = c("SUBZONE_N" = "SZ"))
-```
-:::
-
-# 1.5 Plot data
-
 `mapview` creates interactive visualisations of spatial data to examine and visually investigate both aspects of spatial data, the geometries and their attributes.
 
 `plot()` takes parameters for specifying points in the diagram. At its simplest, it can plot two numbers against each other. With datasets, it can generate maps and plot the specified columns/attributes, with default up to nine plots or maximum all plots.
@@ -275,23 +237,25 @@ mpsz_pop<- left_join(mpsz, popdata2020,
 ::: panel-tabset
 ## Bus Stops
 
+The map below shows the location of each bus stop in Singapore.
+
 ```{r}
-mapview(busstops, cex = 3, alpha = 0.5, popup = NULL)
+#| code-fold: true
+#| code-summary: "Show the code"
+mapview(busstops, cex = 3, alpha = 0.5, popup = NULL, col.regions = "darkseagreen")
 ```
 
-## Bus Stops (high density)
-
-## 1.6.1 Compute the bus stop density
+## High Density Areas
 
 ```{r}
 # Filter hexagons that contain more than 8 bus stops
-hexagon_red = filter(hexagon_grid_sf, grid_id>8)
+highdensityhex = filter(hexagon_grid_sf, grid_id > 8)
 
 tmap_mode("view")
-redhex = tm_shape(hexagon_red)+
+highdensity = tm_shape(highdensityhex)+
   tm_fill(
     col = "grid_id",
-    palette = "Reds",
+    palette = "Greens",
     style = "cont",
     title = "Number of Bus Stops",
     id = "grid_id",
@@ -302,12 +266,79 @@ redhex = tm_shape(hexagon_red)+
     )
   )+
   tm_borders(col = "grey40", lwd = 0.7)
-redhex
+highdensity
 ```
 
-Sembawang MRT (9 bus stops) ![](images/Screenshot%202023-11-26%20at%206.01.46%E2%80%AFPM.png){fig-align="left" width="700"}
+![](images/Screenshot%202023-12-01%20at%204.30.35%E2%80%AFPM.png){fig-align="left"}
 
-Pasir Ris (11 bus stops) ![](images/Screenshot%202023-11-27%20at%202.20.59%E2%80%AFAM.png){fig-align="left" width="700"}
+![](images/Screenshot%202023-12-01%20at%204.30.06%E2%80%AFPM.png){fig-align="left"}
+
+```{r}
+library(tmap)
+
+# Assuming highdensityhex is already an sf object with a geometry column
+# and has a 'grid_id' column for fill
+# Filter highdensityhex to include only the desired grid_id values
+highdensityhex <- highdensityhex[highdensityhex$grid_id > 8, ]
+
+# Set the tmap mode to interactive viewing
+tmap_mode("view")
+
+# Create the map
+highdensity <- tm_basemap("OneMapSG.Grey") + # Use the same basemap as plot_wdm
+  tm_shape(highdensityhex) +
+  tm_fill(
+    col = "grid_id",
+    palette = "Greens",
+    style = "cont",
+    title = "Number of Bus Stops",
+    id = "grid_id",
+    showNA = FALSE,
+    alpha = 0.6,
+    popup.format = list(
+      grid_id = list(format = "f", digits = 0)
+    )
+  ) +
+  tm_borders(col = "grey40", lwd = 0.7) +
+  tm_layout(
+    title = "High-Density Bus Stops",
+    title.size = 1
+  )
+
+# Print the map
+highdensity
+```
+
+```{r}
+library(tmap)
+
+# Assuming malls_sf is your spatial object for malls
+# and highdensityhex is your spatial object for high-density hexagons
+# Set the tmap mode to interactive viewing
+tmap_mode("view")
+
+# Create the map
+highdensity_malls <- tm_shape(highdensityhex) +
+  tm_polygons(
+    col = "grid_id",
+    palette = "Greens",
+    style = "cont",
+    title = "Number of Bus Stops",
+    id = "grid_id",
+    showNA = FALSE,
+    alpha = 0.6
+  ) +
+  tm_borders(col = "grey40", lwd = 0.7) +
+  tm_shape(malls_sf) +
+  tm_dots(size = 0.05, col = "salmon", title = "Malls") # Add malls as cyan dots
+
+# Print the map
+highdensity_malls
+```
+
+:::
+
+::: panel-tabset
 
 ## Passenger Volume
 
@@ -473,7 +504,9 @@ glimpse(passengergrid_time)
 
 ### Step 5: Split passengers trip into weekday and weekend
 
-::: panel-tabset \#### Day
+::: panel-tabset 
+
+#### Day
 
 ```{r}
 # Subset for Weekday
@@ -707,7 +740,6 @@ passengergrid_day_total <- passengergrid_day %>%
 wm_q_day <- poly2nb(passengergrid_day_total, queen=TRUE)
 summary(wm_q_day)
 ```
-
 The output shown is a summary of a neighbors list object using Queen contiguity weight matrix. There are **5,029 regions** and approximately **42.69%** of all possible neighbor pairs are neighbors with nonzero links. Each region has an **average** of **21.47 neighboring regions**. For poorly connected regions, there are 7 regions without neighbors and 14 regions with 1 neighbour. There are 8 well-connected regions with 48 neighbours.
 
 #### Time
@@ -722,8 +754,16 @@ passengergrid_time_total <- passengergrid_time %>%
 wm_q_time <- poly2nb(passengergrid_time_total, queen=TRUE)
 summary(wm_q_time)
 ```
-
 The output shown is a summary of a neighbors list object. There are **5,029 regions** and approximately **42.69%** of all possible neighbor pairs are neighbors with nonzero links. Each region has an **average** of **21.47 neighboring regions**. For poorly connected regions, there are 7 regions without neighbors and 14 regions with 1 neighbour. There are 8 well-connected regions with 48 neighbours.
+
+```{r}
+rswm_q_time <- nb2listw(wm_q_time, style="W", zero.policy = TRUE)
+```
+
+```{r}
+fips_time <- order(passengergrid_time_total$BUS_STOP_N)
+localMI_time <- localmoran(passengergrid_time_total$TOTAL_TRIPS, rswm_q_time)
+```
 :::
 
 ### Method 2: Computing distance based neighbours
@@ -739,6 +779,9 @@ latitude <- map_dbl(passengergrid_time_total$area_hexagon_grid, ~st_centroid(.x)
 coords <- cbind(longitude, latitude)
 head(coords)
 ```
+
+
+
 
 ```{r}
 k1 <- knn2nb(knearneigh(coords))
@@ -761,12 +804,70 @@ wm_d16229_subset <- wm_d16229[1:5]
 str(wm_d16229_subset)
 ```
 
-derive a spatial weight matrix based on Inversed Distance method.
 
 ```{r}
-#dist_day <- nbdists(wm_q_day, coords, longlat = TRUE)
-#ids_day <- lapply(dist, function(x) 1/(x))
-#ids_day
+wm_d16229_lw <- nb2listw(wm_d16229, style = 'B')
+summary(wm_d16229_lw)
+```
+
+
+Compute Gi statistics
+
+```{r}
+fips <- order(passengergrid_time_total$BUS_STOP_N)
+gi.fixed <- localG(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw)
+```
+
+
+```{r}
+passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.fixed)) %>%
+  rename(gstat_fixed = as.matrix.gi.fixed.)
+```
+
+```{r}
+#gi_total_trips <- qtm(passengergrid_time_total, "TOTAL_TRIPS")
+
+Gimap_fixed <-tm_shape(passengergrid_time_total.gi) +
+  tm_fill(col = "gstat_fixed", 
+          style = "pretty",
+          palette="-RdBu",
+          title = "local Gi") +
+  tm_borders(alpha = 0.5)
+Gimap_fixed
+#tmap_arrange(gi_total_trips, Gimap, asp=1, ncol=2)
+```
+
+
+Computing adaptive distance weight matrix
+
+```{r}
+knn <- knn2nb(knearneigh(coords, k=22))
+knn
+```
+
+```{r}
+knn_lw <- nb2listw(knn, style = 'B')
+summary(knn_lw)
+```
+
+```{r}
+fips_adaptive <- order(passengergrid_time_total$BUS_STOP_N)
+gi.adaptive <- localG(passengergrid_time_total$TOTAL_TRIPS, knn_lw)
+```
+
+```{r}
+passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.adaptive)) %>%
+  rename(gstat_adaptive = as.matrix.gi.adaptive.)
+```
+
+```{r}
+Gimap_adaptive <-tm_shape(passengergrid_time_total.gi) +
+  tm_fill(col = "gstat_adaptive", 
+          style = "pretty",
+          palette="-RdBu",
+          title = "local Gi using adaptive weight matrix") +
+  tm_borders(alpha = 0.5)
+Gimap_adaptive
 ```
 
 # 1.6.2 Display the LISA maps of the passengers trips generate by origin at hexagon level.
