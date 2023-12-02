@@ -130,7 +130,7 @@
     "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html",
     "title": "Spatial Interactions",
     "section": "",
-    "text": "1.1 Overview\n\n\n1.2 Load packages\n\npacman::p_load(tmap, sf, DT, stplanr, performance, ggpubr, tidyverse)\n\n\nThe downloaded binary packages are in\n    /var/folders/yb/8mcgsm5s7dn_6hxtm7czbmy40000gn/T//Rtmp3FbXeG/downloaded_packages\n\nThe downloaded binary packages are in\n    /var/folders/yb/8mcgsm5s7dn_6hxtm7czbmy40000gn/T//Rtmp3FbXeG/downloaded_packages\n\n\n\n\n1.3 Import data\n\n\n1.4 Explore data\n\n\n1.5 Plot data"
+    "text": "Spatial interaction represent the dynamic flow or movementmof people, material, or information between locations in geographical space. Each spatial interaction is composed of a discrete origin and destination (OD) pair and represented as a spatial interaction matrix of centroids from origin and destination. The connection between origin and their destination can be visualized by desire lines, typically straight lines that records the the number of people travelling between locations.\nLearning Objectives 1. Build a spatial interaction matrix 2. Construct desire lines in geospatial data"
   },
   {
     "objectID": "Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html",
@@ -383,5 +383,40 @@
     "title": "Dynamic Patterns of Public Transport Usage",
     "section": "Step 4",
     "text": "Step 4\nUsing tmap, the distribution of bus stops across Singapore can be visualised in the interactive map below.\n\n\nShow the code\ntmap_mode(\"view\")\nhexagon = tm_shape(hexagon_count)+\n  tm_fill(\n    col = \"grid_id\",\n    palette = \"Reds\",\n    style = \"cont\",\n    title = \"Number of Bus Stops\",\n    id = \"grid_id\",\n    showNA = FALSE,\n    alpha = 0.6,\n    popup.format = list(\n      grid_id = list(format = \"f\", digits = 0)\n    )\n  )+\n  tm_borders(col = \"grey40\", lwd = 0.7)\nhexagon"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-1",
+    "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-1",
+    "title": "Spatial Interactions",
+    "section": "Step 1",
+    "text": "Step 1\nCommuting flows on weekday between 5pm to 8pm are extracted and there are 226,658 records during weekday afternoon peak hours based on bus stop code. The data table can be viewed using datatable() and saved to rds using write_rds().\n\n\nShow the code\nodbus5_8 &lt;- odbus %&gt;%\n  filter(DAY_TYPE == \"WEEKDAY\") %&gt;%\n  filter(TIME_PER_HOUR &gt;= 5 & TIME_PER_HOUR &lt;= 8) %&gt;%\n  group_by(ORIGIN_PT_CODE, DESTINATION_PT_CODE) %&gt;%\n  summarise(TRIPS = sum(TOTAL_TRIPS))\n\ndatatable(odbus5_8)\n\n\n\n\n\n\n\n\n# save and read\nwrite_rds(odbus5_8, \"rds/odbus5_8.rds\")\nodbus5_8 &lt;- read_rds(\"rds/odbus5_8.rds\")"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-2",
+    "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-2",
+    "title": "Spatial Interactions",
+    "section": "Step 2",
+    "text": "Step 2\nTo integrate the planning subzone codes SUBZONE_C of mpsz sf data frame into busstop sf data frame, st_intersection() is used to perform point and polygon overly and the output will be in point sf object.select() of dplyr package is then use to retain only BUS_STOP_N and SUBZONE_C in the busstop_mpsz sf data frame. There are 5,156 bus stops in the subzones.\n\nbusstop_mpsz &lt;- st_intersection(busstop, mpsz) %&gt;%\n  select(BUS_STOP_N, SUBZONE_C) %&gt;%\n  st_drop_geometry()\n\ndatatable(busstop_mpsz)"
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-3",
+    "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-3",
+    "title": "Spatial Interactions",
+    "section": "Step 3",
+    "text": "Step 3\nAppend the planning subzone code from busstop_mpsz data frame onto odbus5_8 data frame.\n\nod_data &lt;- left_join(odbus5_8, busstop_mpsz,\n            by = c(\"ORIGIN_PT_CODE\" = \"BUS_STOP_N\")) %&gt;%\n  rename(ORIGIN_BS = ORIGIN_PT_CODE,\n         ORIGIN_SZ = SUBZONE_C,\n         DESTIN_BS = DESTINATION_PT_CODE)\nglimpse(od_data)\n\nRows: 224,042\nColumns: 4\nGroups: ORIGIN_BS [5,006]\n$ ORIGIN_BS &lt;chr&gt; \"01012\", \"01012\", \"01012\", \"01012\", \"01012\", \"01012\", \"01012…\n$ DESTIN_BS &lt;fct&gt; 01112, 01113, 01121, 01211, 01311, 01621, 07371, 60011, 6002…\n$ TRIPS     &lt;dbl&gt; 146, 91, 57, 88, 137, 2, 7, 27, 14, 25, 18, 7, 1, 2, 1, 12, …\n$ ORIGIN_SZ &lt;chr&gt; \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", …\n\n\nThere are 224,042 commuting flows with origin and destinations."
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-4",
+    "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-4",
+    "title": "Spatial Interactions",
+    "section": "Step 4",
+    "text": "Step 4\nCheck for duplicate records.\n\nduplicate &lt;- od_data %&gt;%\n  group_by_all() %&gt;%\n  filter(n() &gt; 1) %&gt;%\n  ungroup()\n\nduplicate\n\n# A tibble: 1,084 × 4\n   ORIGIN_BS DESTIN_BS TRIPS ORIGIN_SZ\n   &lt;chr&gt;     &lt;fct&gt;     &lt;dbl&gt; &lt;chr&gt;    \n 1 11009     01411         4 QTSZ01   \n 2 11009     01411         4 QTSZ01   \n 3 11009     01421        18 QTSZ01   \n 4 11009     01421        18 QTSZ01   \n 5 11009     01511        10 QTSZ01   \n 6 11009     01511        10 QTSZ01   \n 7 11009     01521         3 QTSZ01   \n 8 11009     01521         3 QTSZ01   \n 9 11009     01611         3 QTSZ01   \n10 11009     01611         3 QTSZ01   \n# … with 1,074 more rows\n\n\nThe output shows 1,084 duplicated rows with same values across 4 fields. Duplicates are removed by unique().\n\nod_data &lt;- unique(od_data)\nglimpse(od_data)\n\nRows: 223,500\nColumns: 4\nGroups: ORIGIN_BS [5,006]\n$ ORIGIN_BS &lt;chr&gt; \"01012\", \"01012\", \"01012\", \"01012\", \"01012\", \"01012\", \"01012…\n$ DESTIN_BS &lt;fct&gt; 01112, 01113, 01121, 01211, 01311, 01621, 07371, 60011, 6002…\n$ TRIPS     &lt;dbl&gt; 146, 91, 57, 88, 137, 2, 7, 27, 14, 25, 18, 7, 1, 2, 1, 12, …\n$ ORIGIN_SZ &lt;chr&gt; \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", \"RCSZ10\", …\n\n\nFrom previous 224,042 records, 542 duplicates are removed and 223,500 unique records remain in od_data."
+  },
+  {
+    "objectID": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-5",
+    "href": "Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html#step-5",
+    "title": "Spatial Interactions",
+    "section": "Step 5",
+    "text": "Step 5\nAppend planning subzone codes to od_data.\n\nod_data &lt;- left_join(od_data , busstop_mpsz,\n            by = c(\"DESTIN_BS\" = \"BUS_STOP_N\")) \n\nod_data &lt;- od_data %&gt;%\n  rename(DESTIN_SZ = SUBZONE_C) %&gt;%\n  drop_na() %&gt;%\n  group_by(ORIGIN_SZ, DESTIN_SZ) %&gt;%\n  summarise(MORNING_PEAK = sum(TRIPS)) %&gt;%\n  ungroup()\n\nglimpse(od_data)\n\nRows: 20,597\nColumns: 3\n$ ORIGIN_SZ    &lt;chr&gt; \"AMSZ01\", \"AMSZ01\", \"AMSZ01\", \"AMSZ01\", \"AMSZ01\", \"AMSZ01…\n$ DESTIN_SZ    &lt;chr&gt; \"AMSZ01\", \"AMSZ02\", \"AMSZ03\", \"AMSZ04\", \"AMSZ05\", \"AMSZ06…\n$ MORNING_PEAK &lt;dbl&gt; 1643, 7435, 10995, 1913, 5455, 1546, 1169, 2138, 1319, 11…\n\n\nSumming the trips by origin and destination, there are 20,597 OD flows.\n\n#save and read\nwrite_rds(od_data, \"rds/od_data.rds\")\nod_data &lt;- read_rds(\"rds/od_data.rds\")"
   }
 ]

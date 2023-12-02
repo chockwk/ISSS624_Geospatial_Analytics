@@ -13,10 +13,235 @@ editor: visual
 
 # 1.1 Overview
 
+Notes diagonals of distance matrix will be zero.
+
 # 1.2 Load packages
 
+```{r}
+pacman::p_load(tmap, sf, sp, DT, stplanr, performance, reshape2, ggpubr, units, tidyverse)
+```
+
 # 1.3 Import data
+
+mpsz
+
+```{r}
+mpsz = st_read(dsn="data/geospatial", layer="MPSZ-2019") %>% 
+  st_transform(crs=3414)
+```
+
+```{r}
+write_rds(mpsz, "data/rds/mpsz.rds")
+mpsz <- read_rds("data/rds/mpsz.rds")
+mpsz
+```
+
+
+# 1.4 Prepare data
+
+Converting from sf data.table to SpatialPolygonsDataFrame
+
+`as.Spatial()` will be used to convert mpsz from sf tibble data frame to SpatialPolygonsDataFrame of sp object.
+
+```{r}
+mpsz_sp <- as(mpsz, "Spatial")
+#mpsz_sp <- mpsz %>% 
+#  as_Spatial()
+mpsz_sp
+```
+
+Compute the distance matrix
+
+`spDists()` of sp package will be used to compute the Euclidean distance between the centroids of the planning subzones
+
+```{r}
+dist <- spDists(mpsz_sp, longlat = FALSE)
+head(dist, n = c(5, 5))
+```
+there are 332 features hence 332 points, we will limit to 5 columns and 5 rows.
+
+usual: 
+mpsz_sp_selected <- mpsz_sp %>%
+slect(mpsz@data$SUBZONE)
+
+sp: no need
+
+Labelling column and row heanders of a distance matrix
+
+Create a list sorted according to the the distance matrix by planning sub-zone code.
+
+```{r}
+sz_names <- mpsz$SUBZONE_C
+glimpse(sz_names)
+```
+
+attach SUBZONE_C to row and column for distance matrix matching ahead
+
+`paste0` concatenates vectors after converting to characters.
+
+```{r}
+colnames(dist) <- paste0(sz_names)
+rownames(dist) <- paste0(sz_names)
+```
+
+Pivoting distance value by SUBZONE_C
+
+`melt()` convert object into molten dataframe. 
+
+NEVER SORT THE DATA; SEQUENCE IS IMPT
+
+```{r}
+distPair <- melt(dist) %>% 
+  rename(dist = value)
+head(distPair, 5)
+```
+
+Updating intra-zonal distances
+
+append a constant value to replace the intra-zonal distance of 0.
+
+select and find out the minimum value of the distance by using summary().
+
+```{r}
+distPair %>% 
+  filter(dist > 0) %>% 
+  summary()
+```
+A constant distance value of 50m is added into intra-zones distance.
+
+```{r}
+distPair$dist <- ifelse(distPair$dist == 0,
+                        50, distPair$dist)
+```
+
+rename the origin and destination fields
+
+```{r}
+distPair <- distPair %>% 
+  rename(orig = Var1,
+         dest = Var2)
+summary(distPair)
+write_rds(distPair, "data/rds/distPair.rds")
+```
+Prepare data flow
+
+import od_data
+
+```{r}
+od_data <- read_rds("data/rds/od_data.rds")
+```
+
+compute the total passenger trip between and within planning subzones 
+
+```{r}
+flow_data <- od_data %>% 
+  group_by(ORIGIN_BS, DESTIN_BS) %>% 
+  summarise(TRIPS = sum(MORNING_PEAK))
+head(flow_data, n = 5)
+```
+
+Separating intra-flow from passenger volume df
+
+Add two new fields in flow_data dataframe.
+
+convert data value type of ORIGIN_SZ and DESTIN_SZ fields of flow_data dataframe into factor data type.
+
+```{r}
+flow_data$FlowNoIntra <- ifelse(
+  flow_data$ORIGIN_BS == flow_data$DESTIN_BS, 
+  0, flow_data$TRIPS)
+flow_data$offset <- ifelse(
+  flow_data$ORIGIN_BS == flow_data$DESTIN_BS, 
+  0.000001, 1)
+
+flow_data$ORIGIN_BS <- as.factor(flow_data$ORIGIN_BS)
+flow_data$DESTIN_BS <- as.factor(flow_data$DESTIN_BS)
+
+head(flow_data, n = 5)
+```
+
+Combining passenger volume data with distance value
+
+left_join() of dplyr will be used to flow_data dataframe and distPair dataframe.
+
+```{r}
+flow_data1 <- flow_data %>% 
+  left_join(distPair,
+            by = c("ORIGIN_BS" = "orig",
+                   "DESTIN_BS" = "dest"))
+glimpse(flow_data1)
+```
+
+Preparing Origin and Destination Attributes
+
+```{r}
+pop <- read_csv("data/aspatial/pop.csv")
+glimpse(pop)
+```
+
+Geospatial data wrangling
+
+Add SZ to pop
+
+```{r}
+pop <- pop %>%
+  left_join(mpsz,
+            by = c("PA" = "PLN_AREA_N",
+                   "SZ" = "SUBZONE_N")) %>%
+  select(1:6) %>%
+  rename(SZ_NAME = SZ,
+         SZ = SUBZONE_C)
+glimpse(pop)
+```
+
+```{r}
+SIM_data <- read_rds("data/rds/SIM_data.rds")
+glimpse(SIM_data)
+```
 
 # 1.4 Explore data
 
 # 1.5 Plot data
+
+Calibrating Spatial Interaction Models
+
+Visualising the dependent variable
+
+plot the distribution of the dependent variable (i.e. TRIPS) by using histogram
+
+```{r}
+ggplot(data = SIM_data, aes(x = TRIPS)) +
+  geom_histogram(fill = "pink", color = "black",
+                 binwidth = 2500) +
+  theme(
+    panel.background = element_blank()
+  )
+```
+
+isualise the relation between the dependent variable and one of the key independent variable in Spatial Interaction Model, namely distance.
+
+```{r}
+ggplot(data = SIM_data,
+       aes(x = dist,
+           y = TRIPS)) +
+  geom_point(size = 1, colour = "lightblue") +
+  geom_smooth(method = lm) +
+  theme(
+    panel.background = element_blank()
+  )
+```
+
+plot the scatter plot by using the log transformed version of both variables, we can see that their relationship is more resemble linear relationship.
+
+```{r}
+ggplot(data = SIM_data,
+       aes(x = log(dist),
+           y = log(TRIPS))) +
+  geom_point(size = 1, colour = "lightblue") +
+  labs(title = "Trips by Distance") +
+  geom_smooth(method = lm) + 
+  theme(
+    panel.background = element_blank()
+  )
+```
+

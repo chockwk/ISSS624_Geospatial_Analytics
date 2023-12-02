@@ -8,3 +8,5 @@ author: "Wan Kee"
 [Quarto Callbout Blocks](https://quarto.org/docs/authoring/callouts.html) outlines the creation of callouts in markdown.
 
 [QGIS](https://www.qgis.org/en/site/forusers/download.html)
+
+[Happy Git](https://happygitwithr.com/) provides recommendations on working smoothly with Git and GitHub.

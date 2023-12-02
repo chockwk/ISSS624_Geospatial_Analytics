@@ -38,35 +38,35 @@ pacman::p_load(sf, dplyr, ggplot2, knitr, mapview, spdep, sfdep, tmap, tidyverse
 
 # 1.3 Import data
 
-We will be using the following **geospatial** (`busstops`, `subzone`) and **aspatial** (`odbus`, `malls`) datasets.
+We will be using the following **geospatial** (`busstop`, `subzone`) and **aspatial** (`odbus`, `malls`) datasets.
 
 `st_geometry()` displays basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data. `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values within a data frame.
 
 ::: panel-tabset
-## Bus Stops
+## Bus Stop
 
-`busstops` contains the detailed information for all bus stops currently serviced by buses, including bus stop code, road name, description, location coordinates.
+`busstop` contains the detailed information for all bus stops currently serviced by buses, including bus stop code, road name, description, location coordinates. The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
 Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/BusStops))
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-busstops <- st_read(dsn = "data/BusStopLocation_Jul2023", layer = "BusStop") %>%
+busstop <- st_read(dsn = "data/BusStopLocation_Jul2023", layer = "BusStop") %>%
   st_transform(crs = 3414)
 ```
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-st_geometry(busstops)
+st_geometry(busstop)
 ```
-
-The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
 ## Subzone
 
 `mpsz` is the Master Plan 2019, a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years published in **2019**. Note this `mpsz` differs from that in previous chapter, [Data Wrangling](https://cosmic-kitten.netlify.app/hands_on_ex/hands_on_ex01/hands_on_ex01).
+
+The output indicates that the geospatial objects are **multipolygon** features. There are **332 features** and 6 fields. It is in **WGS84** projected coordinates system with **XY** dimension.
 
 Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 
@@ -76,11 +76,10 @@ Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 mpsz = st_read(dsn="data/MPSZ-2019", layer="MPSZ-2019") %>% 
   st_transform(crs=3414)
 ```
-The output indicates that the geospatial objects are **multipolygon** features. There are **332 features** and 6 fields. It is in **WGS84** projected coordinates system with **XY** dimension.
 
 ## Passenger Volume
 
-`odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used.
+`odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used. `odbus` is an aspatial data containing 5,694,297 records and 7 fields.
 
 Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
 
@@ -97,6 +96,7 @@ odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
 odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
 glimpse(odbus)
 ```
+
 The output indicates **5,694,297 records** and 7 fields. The bus stop codes are converted into factor for data handling.
 
 ## Population
@@ -116,6 +116,7 @@ pop <- read_csv("data/respopagesexfa2011to2020/respopagesexfa2011to2020.csv")
 #| code-summary: "Show the code"
 glimpse(pop)
 ```
+
 The output indicates **738,492 records** and 7 fields to illustrate the population distribution by planning area (PA), subzone (SZ), age group (AG), residence floor area (FA), resident count (Pop).
 
 ## Passenger Volume
@@ -133,6 +134,7 @@ odbus = read_csv("data/origin_destination_bus_202310.csv")
 The output does not indicate any geospatial objects. There are 5,694,297 records and 7 fields.
 
 ## Malls
+
 `malls` was a web scraper project conducted to scrape the list of shopping malls off a wikipedia site, and the the SVY21 coordinates from One Map API.
 
 Source: Valary Lim ([GitHub](https://github.com/ValaryLim/Mall-Coordinates-Web-Scraper/blob/master/README.md))
@@ -142,6 +144,7 @@ Source: Valary Lim ([GitHub](https://github.com/ValaryLim/Mall-Coordinates-Web-S
 #| code-summary: "Show the code"
 malls <- read_csv("data/mall_coordinates_updated.csv")
 ```
+
 `st_as_sf()` and `st_transforms()` uses the `longitude` and `latitude` to create spatial objects.
 
 ```{r}
@@ -167,15 +170,16 @@ The output indicates that the geospatial objects are **point** features. There a
 ::: panel-tabset
 ## Step 1
 
-First, we will create hexagonal grids using `st_make_grid()` to cover the geometry of `busstops`.
+First, we will create hexagonal grids using `st_make_grid()` to cover the geometry of `busstop`.
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-area_hexagon_grid = st_make_grid(busstops, cellsize = 500, what = "polygons", square = FALSE)
+area_hexagon_grid = st_make_grid(busstop, cellsize = 500, what = "polygons", square = FALSE)
 area_hexagon_grid
 ```
-The output indicates that the geospatial objects are **polygon** features. There are **5580 features** and 1 fields. It is in **SVY21** projected coordinates system with **XY** dimension, same as that in `busstops` dataset.
+
+The output indicates that the geospatial objects are **polygon** features. There are **5580 features** and 1 fields. It is in **SVY21** projected coordinates system with **XY** dimension, same as that in `busstop` dataset.
 
 ## Step 2
 
@@ -188,7 +192,8 @@ hexagon_grid_sf = st_sf(area_hexagon_grid) %>%
   mutate(grid_id = 1:length(lengths(area_hexagon_grid)))
 hexagon_grid_sf
 ```
-The output indicates that the geospatial objects retained **polygon** features and there are more than one polygon feature in a grid_id. The intersection of `busstops` and `hexagon_grid_sf` yields **1524 features** and 1 fields, indicating only 1524 out of 5580 features contains bus stops. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+The output indicates that the geospatial objects retained **polygon** features and there are more than one polygon feature in a grid_id. The intersection of `busstop` and `hexagon_grid_sf` yields **1524 features** and 1 fields, indicating only 1524 out of 5580 features contains bus stops. It is in **SVY21** projected coordinates system with **XY** dimension.
 
 ## Step 3
 
@@ -197,7 +202,7 @@ The grids without any bus stops are removed to avoid errors in calculations.
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-hexagon_grid_sf$grid_id = lengths(st_intersects(hexagon_grid_sf, busstops))
+hexagon_grid_sf$grid_id = lengths(st_intersects(hexagon_grid_sf, busstop))
 hexagon_count = filter(hexagon_grid_sf, grid_id > 0)
 hexagon_count
 ```
@@ -209,11 +214,11 @@ Using `tmap`, the distribution of bus stops across Singapore can be visualised i
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-tmap_mode("view")
+tmap_mode("plot")
 hexagon = tm_shape(hexagon_count)+
   tm_fill(
     col = "grid_id",
-    palette = "Reds",
+    palette = "Greens",
     style = "cont",
     title = "Number of Bus Stops",
     id = "grid_id",
@@ -244,48 +249,18 @@ The map below shows the location of each bus stop in Singapore.
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-mapview(busstops, cex = 3, alpha = 0.5, popup = NULL, col.regions = "darkseagreen")
+mapview(busstop, cex = 3, alpha = 0.5, popup = NULL, col.regions = "darkseagreen")
 ```
 
 ## High Density Areas
 
-High-density bus stop areas typically indicate regions with better public transport accessibility. This makes it easier for residents and visitors to move around without personal vehicles, which can reduce traffic congestion and the environmental impact of transportation. These regions may be **suburban town centres** with a higher concentration of services, amenities, and potentially population. 
+High-density bus stop areas typically indicate regions with better public transport accessibility. This makes it easier for residents and visitors to move around without personal vehicles, which can reduce traffic congestion and the environmental impact of transportation. These regions may be **suburban town centres** with a higher concentration of services, amenities, and potentially population.
 
 ```{r}
-# Filter hexagons that contain more than 8 bus stops
-highdensityhex = filter(hexagon_grid_sf, grid_id > 8)
-
-tmap_mode("view")
-highdensity = tm_shape(highdensityhex)+
-  tm_fill(
-    col = "grid_id",
-    palette = "Greens",
-    style = "cont",
-    title = "Number of Bus Stops",
-    id = "grid_id",
-    showNA = FALSE,
-    alpha = 0.6,
-    popup.format = list(
-      grid_id = list(format = "f", digits = 0)
-    )
-  )+
-  tm_borders(col = "grey40", lwd = 0.7)
-highdensity
-```
-The top two hexagons are further examined to understand these high density areas.
-
-![](images/Screenshot%202023-12-01%20at%204.30.35%E2%80%AFPM.png){fig-align="left"}
-
-![](images/Screenshot%202023-12-01%20at%204.30.06%E2%80%AFPM.png){fig-align="left"}
-The hexagons are residential areas a short distance from MRT stations to link these local centers to the city. Each hexagon also contains a shopping mall which promotes local economic activity and community interaction.
-
-```{r}
-library(tmap)
-
-# Assuming highdensityhex is already an sf object with a geometry column
-# and has a 'grid_id' column for fill
+#| code-fold: true
+#| code-summary: "Show the code"
 # Filter highdensityhex to include only the desired grid_id values
-highdensityhex <- highdensityhex[highdensityhex$grid_id > 8, ]
+highdensityhex <- hexagon_count[hexagon_count$grid_id > 8, ]
 
 # Set the tmap mode to interactive viewing
 tmap_mode("view")
@@ -309,44 +284,27 @@ highdensity <- tm_basemap("OneMapSG.Grey") + # Use the same basemap as plot_wdm
   tm_layout(
     title = "High-Density Bus Stops",
     title.size = 1
-  )
+  ) +
+  tm_shape(malls_sf) +
+  tm_dots(size = 0.01, col = "cyan", title = "Malls") 
 
 # Print the map
 highdensity
 ```
 
-```{r}
-library(tmap)
+The top two hexagons are further examined to understand these high density areas.
 
-# Assuming malls_sf is your spatial object for malls
-# and highdensityhex is your spatial object for high-density hexagons
-# Set the tmap mode to interactive viewing
-tmap_mode("view")
+![](images/Screenshot%202023-12-01%20at%204.30.35%E2%80%AFPM.png){fig-align="left"}
 
-# Create the map
-highdensity_malls <- tm_shape(highdensityhex) +
-  tm_polygons(
-    col = "grid_id",
-    palette = "Greens",
-    style = "cont",
-    title = "Number of Bus Stops",
-    id = "grid_id",
-    showNA = FALSE,
-    alpha = 0.6
-  ) +
-  tm_borders(col = "grey40", lwd = 0.7) +
-  tm_shape(malls_sf) +
-  tm_dots(size = 0.05, col = "salmon", title = "Malls") # Add malls as cyan dots
+![](images/Screenshot%202023-12-01%20at%204.30.06%E2%80%AFPM.png){fig-align="left"}
 
-# Print the map
-highdensity_malls
-```
-:::
+The hexagons are residential areas a short distance from MRT stations to link these local centers to the city. Each hexagon also contains a shopping mall which promotes local economic activity and community interaction.
 
-::: panel-tabset
 ## Passenger Volume
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 # Summarize the total trips by day type
 total_trips <- odbus %>%
   group_by(DAY_TYPE) %>%
@@ -359,15 +317,11 @@ ggplot(total_trips, aes(x = DAY_TYPE, y = total, fill = DAY_TYPE)) +
   labs(title = "Total Trips by Day Type", x = "Day Type", y = "Total Trips")
 ```
 
-## Population
-
 ## Subzone
 
 ```{r}
 plot(mpsz["PLN_AREA_N"])
 ```
-
-## Population in Subzone
 :::
 
 # 1.6 Geovisualisation and Analysis
@@ -377,6 +331,8 @@ plot(mpsz["PLN_AREA_N"])
 ### Step 1: Classify by time interval
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 # Function to assign peak and non-peak times
 time_interval <- function(day_type, time_per_hour) {
   if (day_type == "WEEKDAY") {
@@ -410,14 +366,19 @@ head(odbus)
 ### Step 2: Join datasets
 
 ```{r}
-passengertrips <- left_join(busstops, odbus, 
+#| code-fold: true
+#| code-summary: "Show the code"
+passengertrips <- left_join(busstop, odbus, 
                             by = c("BUS_STOP_N" = "ORIGIN_PT_CODE"))
+head(passengertrips, n=5)
 ```
 
 ::: panel-tabset
 #### Day
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 passengertrips_day <- passengertrips %>%
   group_by(BUS_STOP_N, BUS_ROOF_N, LOC_DESC, YEAR_MONTH, geometry) %>%
   summarise(
