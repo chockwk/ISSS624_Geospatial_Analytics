@@ -17,7 +17,7 @@ website:
       - text: Useful Links
         href: useful_links.html
     right: 
-      - text: "{{< fa-solid fa-earth-oceania >}} Hands-on Ex"
+      - text: "{{< fa-solid fa-earth-americas >}} Hands-on Ex"
         menu: 
           - text: Data Wrangling
             href: Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
