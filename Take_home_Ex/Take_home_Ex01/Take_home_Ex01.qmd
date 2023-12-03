@@ -38,7 +38,7 @@ pacman::p_load(sf, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse)
 
 # 3. Import data
 
-We will be using the following **geospatial** (`busstop`, `subzone`) and **aspatial** (`odbus`, `malls`) datasets.
+We will be using the following **geospatial** (`busstop`) and **aspatial** (`odbus`, `malls`) datasets.
 
 `st_geometry()` displays basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data. `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values within a data frame.
 
@@ -710,7 +710,7 @@ The output indicated there are 5,029 regions with an average of 4495 links.
 
 ```{r}
 wm_d16229_lw <- nb2listw(wm_d16229, style = 'B')
-summary(wm_d16229_lw)
+#summary(wm_d16229_lw)
 ```
 The output indicated there is 1 least connected region with 4058 links and 4 most connected regions with 4818 links.
 

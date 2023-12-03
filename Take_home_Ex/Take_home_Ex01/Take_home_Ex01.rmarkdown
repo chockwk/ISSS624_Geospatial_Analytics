@@ -2,7 +2,7 @@
 title: "Dynamic Patterns of Public Transport Usage"
 author: "Wan Kee"
 date: "25 November 2023"
-date modified: "25 November 2023"
+date modified: "3 December 2023"
 format: html
 execute: 
   echo: true
@@ -41,7 +41,7 @@ pacman::p_load(sf, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse)
 
 # 3. Import data
 
-We will be using the following **geospatial** (`busstop`, `subzone`) and **aspatial** (`odbus`, `malls`) datasets.
+We will be using the following **geospatial** (`busstop`) and **aspatial** (`odbus`, `malls`) datasets.
 
 `st_geometry()` displays basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data. `glimpse()` transposes the columns in a dataset and makes it possible to see the column name, data type and values within a data frame.
 
@@ -752,24 +752,14 @@ wm_d16229 <- dnearneigh(coords, 0, 16229, longlat = TRUE)
 wm_d16229
 ```
 
-The output indicated there are 
+The output indicated there are 5,029 regions with an average of 4495 links.
 
-
-```{r}
-# Make a new list with only the first 5 elements
-wm_d16229_subset <- wm_d16229[1:5]
-
-# Now use str() on this subset
-str(wm_d16229_subset)
-```
-
-
-nb2listw() is used to convert the nb object into spatial weights object.
+`nb2listw()` converts the nb object into spatial weights object.
 
 
 ```{r}
 wm_d16229_lw <- nb2listw(wm_d16229, style = 'B')
-summary(wm_d16229_lw)
+#summary(wm_d16229_lw)
 ```
 
 The output indicated there is 1 least connected region with 4058 links and 4 most connected regions with 4818 links.
@@ -778,11 +768,9 @@ The output indicated there is 1 least connected region with 4058 links and 4 mos
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-plot(passengergrid_time_total$area_hexagon_grid, border="grey")
-plot(wm_d16229_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
+#plot(passengergrid_time_total$area_hexagon_grid, border="grey")
+#plot(wm_d16229_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
-
-
 
 ### Step 3b (adaptive distance)
 
@@ -804,33 +792,59 @@ summary(knn_lw)
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-plot(passengergrid_time_total$area_hexagon_grid, border="grey")
-plot(knn_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
+# plot(passengergrid_time_total$area_hexagon_grid, border="grey")
+# plot(knn_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
 
 :::
 
-# 8. Compute Gi statistics
+# 8. Gi statistics
 
-The **local spatial statistic G** is calculated for each zone based on the spatial weights object used. The value returned is a **Z-value**. High positive values indicate the posibility of a local cluster of high values of the variable being analysed and very low relative values a similar cluster of low values.
+The **local Getis-Ord statistic** is a ratio of the weighted average of the values in the neighboring locations to the sum of all values. It is called local g or local g*, when not including the value at the location. 
+
+In local g/g*, a value larger than the mean (or, a positive value for a standardized z-value) suggests a High-High cluster or hot spot, a value smaller than the mean (or, negative for a z-value) indicates a Low-Low cluster or cold spot. 
 
 ::: panel-tabset
 
 ## Fixed Distance
 
+Step 1: `localG()` calculate the local Geary statistic for a given variable and a neighbor list object `nb`.
+
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 fips <- order(passengergrid_time_total$BUS_STOP_N)
 gi.fixed <- localG(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw)
 ```
 
+
+The output returns a dataframe with the following columns:
+gi: the observed statistic
+e_gi: the permutation sample mean
+var_gi: the permutation sample variance
+p_value: the p-value using sample mean and standard deviation
+p_folded_sim: p-value based on the implementation of Pysal which always assumes a two-sided test taking the minimum possible p-value
+
+Step 2: `cbind()` joins the Gi values calculated from fixed distance weight matrix to their corresponding `passengergrid_time_total` sf data frame.
+
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.fixed)) %>%
   rename(gstat_fixed = as.matrix.gi.fixed.)
 ```
 
+
+Step 3: Map the Gi values calculated from fixed distance weight matrix.
+
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 #gi_total_trips <- qtm(passengergrid_time_total, "TOTAL_TRIPS")
+
 
 Gimap_fixed <-tm_shape(passengergrid_time_total.gi) +
   tm_fill(col = "gstat_fixed", 
@@ -842,33 +856,42 @@ Gimap_fixed
 #tmap_arrange(gi_total_trips, Gimap, asp=1, ncol=2)
 ```
 
+The **Getis-Ord Gi* statistic map** illustrates the **local spatial autocorrelation** of passenger volume during peak hours, indicating where high or low values cluster spatially. The colors indicate the z-scores from the Gi* statistic. **Dark red** areas represent locations with **high z-scores**, indicating a cluster of **hot spots**. These are areas with a significantly higher passenger volume. **Dark blue** areas have **negative z-scores**, pointing to clusters of **cold spots**.
+
+From the map, we can infer that there are distinct pockets where the passenger volume is significantly higher or lower than the average for the region. However, the distribution of hots spots and cold spots are dispersed and can be further improved by adaptive distance matrix.
+
+
 ```{r}
-par(mfrow=c(1,2))
-plot(passengergrid_time_total$area_hexagon_grid, border="grey", main="1st nearest neighbours")
-plot(k1, coords, add=TRUE, col="lightblue", length=0.08)
-plot(passengergrid_time_total$area_hexagon_grid, border="grey", main="Distance link")
-plot(wm_d16229_lw, coords, add=TRUE, pch = 19, cex = 0.1)
+#| code-fold: true
+#| code-summary: "Show the code"
+#par(mfrow=c(1,2))
+#plot(passengergrid_time_total$area_hexagon_grid, border="grey", main="1st nearest neighbours")
+#plot(k1, coords, add=TRUE, col="lightblue", length=0.08)
+#lot(passengergrid_time_total$area_hexagon_grid, border="grey", main="Distance link")
+#plot(wm_d16229_lw, coords, add=TRUE, pch = 19, cex = 0.1)
 ```
 
 ```{r}
-gstar.fixed <- localG_perm(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw, nsim = 499)
+#| code-fold: true
+#| code-summary: "Show the code"
+#gstar.fixed <- localG_perm(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw, nsim = 499)
 ```
 
 
 ## Adaptive Distance
 
+`localG()` compute the Gi values for `passengergrid_time_total` by using an adaptive distance weight matrix, `knb_lw`.
+
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 fips_adaptive <- order(passengergrid_time_total$BUS_STOP_N)
 gi.adaptive <- localG(passengergrid_time_total$TOTAL_TRIPS, knn_lw)
-```
 
-```{r}
 passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.adaptive)) %>%
   rename(gstat_adaptive = as.matrix.gi.adaptive.)
-```
 
-```{r}
 Gimap_adaptive <-tm_shape(passengergrid_time_total.gi) +
   tm_fill(col = "gstat_adaptive", 
           style = "pretty",
@@ -878,17 +901,39 @@ Gimap_adaptive <-tm_shape(passengergrid_time_total.gi) +
 Gimap_adaptive
 ```
 
+```{r}
+tmap_mode("view")
 
+Gimap_adaptive_map <- tm_basemap("OneMapSG.Grey") +
+  tm_shape(passengergrid_time_total.gi) +
+  tm_fill(
+    col = "gstat_adaptive", 
+    palette="-RdBu",
+    style = "pretty",
+    id = "grid_id",
+    showNA = FALSE,
+    alpha = 0.3,
+    popup.format = list(
+      grid_id = list(format = "f", digits = 0)
+    )
+  ) +
+  tm_borders(col = "grey40", lwd = 0.7) +
+  tm_layout(
+    title = "local Gi using adaptive weight matrix",
+    title.size = 1
+  ) +
+  tm_shape(malls_sf) +
+  tm_dots(size = 0.01, col = "cyan", title = "Malls") 
+
+Gimap_adaptive_map
+```
+
+Compared to the previous map, which appears to use a fixed distance weight matrix, this map may show a different pattern of clustering due to the adaptive nature of the weight matrix. The hot spots and cold spots in the adaptive distance matrix map is **localized**, leading to a **finer resolution of clustering patterns** and can be particularly useful when the distribution of data points is uneven across the space. 
+
+**The hotspots are Boon Lay, Clementi, Woodlands, Ang Mo Kio, Bedok and Tampines. **
 :::
 
+# 9. Conclusion
 
-1.6.2 Display the LISA maps of the passengers trips generate by origin at hexagon level.
-
-1.7 Emerging Hot Spot Analysis (EHSA)
-
-1.7.1 Perform Mann-Kendall Test by using the spatio-temporal local Gi\* values.
-
-1.7.2 Prepared EHSA maps of the Gi\* values of the passenger trips by origin at the hexagon level.
-
-weekday evening peak passenger trips by origin; hexagons dont not have shared boundary; isolated with no neighbours but a hotspot.
+The geospatial analysis of transportation patterns in Singapore reveals **distinct hotspots of high commuter activity**, specifically in the areas of Boon Lay, Clementi, Woodlands, Ang Mo Kio, Bedok, and Tampines. These regions, characterized by their significant bus stop density and strategic importance in the **public transportation network**, serve as crucial nodes facilitating the mobility of a large number of commuters daily. The concentration of activity in these hotspots underscores their role as **essential transit hubs**, likely supported by a mix of residential, commercial, and industrial developments. The data suggests a high demand for public transportation services in these areas, which may be attributed to their development as **regional centers** and their connectivity to other parts of Singapore. As such, these hotspots could be focal points for future urban planning and transportation services enhancement to cater to the high volume of daily travelers efficiently.
 
