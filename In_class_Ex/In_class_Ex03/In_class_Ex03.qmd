@@ -1,5 +1,5 @@
 ---
-title: "In_class_Ex03"
+title: "Spatial Interaction Models"
 author: "Wan Kee"
 date: "21 November 2023"
 date modified: "21 November 2023"
@@ -8,7 +8,7 @@ execute:
   echo: true
   eval: true
   warning: false
-editor: visual
+editor: source
 ---
 
 # 1.1 Overview
@@ -36,7 +36,6 @@ mpsz <- read_rds("data/rds/mpsz.rds")
 mpsz
 ```
 
-
 # 1.4 Prepare data
 
 Converting from sf data.table to SpatialPolygonsDataFrame
@@ -58,11 +57,10 @@ Compute the distance matrix
 dist <- spDists(mpsz_sp, longlat = FALSE)
 head(dist, n = c(5, 5))
 ```
+
 there are 332 features hence 332 points, we will limit to 5 columns and 5 rows.
 
-usual: 
-mpsz_sp_selected <- mpsz_sp %>%
-slect(mpsz@data$SUBZONE)
+usual: mpsz_sp_selected \<- mpsz_sp %\>% slect(mpsz\@data\$SUBZONE)
 
 sp: no need
 
@@ -86,7 +84,7 @@ rownames(dist) <- paste0(sz_names)
 
 Pivoting distance value by SUBZONE_C
 
-`melt()` convert object into molten dataframe. 
+`melt()` convert object into molten dataframe.
 
 NEVER SORT THE DATA; SEQUENCE IS IMPT
 
@@ -107,6 +105,7 @@ distPair %>%
   filter(dist > 0) %>% 
   summary()
 ```
+
 A constant distance value of 50m is added into intra-zones distance.
 
 ```{r}
@@ -123,6 +122,7 @@ distPair <- distPair %>%
 summary(distPair)
 write_rds(distPair, "data/rds/distPair.rds")
 ```
+
 Prepare data flow
 
 import od_data
@@ -131,7 +131,7 @@ import od_data
 od_data <- read_rds("data/rds/od_data.rds")
 ```
 
-compute the total passenger trip between and within planning subzones 
+compute the total passenger trip between and within planning subzones
 
 ```{r}
 flow_data <- od_data %>% 
@@ -243,5 +243,127 @@ ggplot(data = SIM_data,
   theme(
     panel.background = element_blank()
   )
+```
+Checking for variables with zero values
+
+```{r}
+summary(SIM_data)
+```
+
+replace zero values to 0.99
+
+```{r}
+SIM_data$DESTIN_AGE7_12 <- ifelse(
+  SIM_data$DESTIN_AGE7_12 == 0,
+  0.99, SIM_data$DESTIN_AGE7_12)
+SIM_data$DESTIN_AGE13_24 <- ifelse(
+  SIM_data$DESTIN_AGE13_24 == 0,
+  0.99, SIM_data$DESTIN_AGE13_24)
+SIM_data$DESTIN_AGE25_64 <- ifelse(
+  SIM_data$DESTIN_AGE25_64 == 0,
+  0.99, SIM_data$DESTIN_AGE25_64)
+SIM_data$ORIGIN_AGE7_12 <- ifelse(
+  SIM_data$ORIGIN_AGE7_12 == 0,
+  0.99, SIM_data$ORIGIN_AGE7_12)
+SIM_data$ORIGIN_AGE13_24 <- ifelse(
+  SIM_data$ORIGIN_AGE13_24 == 0,
+  0.99, SIM_data$ORIGIN_AGE13_24)
+SIM_data$ORIGIN_AGE25_64 <- ifelse(
+  SIM_data$ORIGIN_AGE25_64 == 0,
+  0.99, SIM_data$ORIGIN_AGE25_64)
+
+summary(SIM_data)
+```
+
+
+Unconstrained Spatial Interaction Model
+
+```{r}
+uncSIM <- glm(formula = TRIPS ~ 
+                log(ORIGIN_AGE25_64) + 
+                log(DESTIN_AGE25_64) +
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+uncSIM
+```
+
+
+R-squared function
+
+
+```{r}
+CalcRSquared <- function(observed,estimated){
+  r <- cor(observed,estimated)
+  R2 <- r^2
+  R2
+}
+```
+
+compute the R-squared of the unconstrained SIM
+
+```{r}
+CalcRSquared(uncSIM$data$TRIPS, uncSIM$fitted.values)
+```
+
+
+```{r}
+r2_mcfadden(uncSIM)
+```
+
+Origin (Production) constrained SIM
+
+```{r}
+orcSIM <- glm(formula = TRIPS ~ 
+                 ORIGIN_SZ +
+                 log(DESTIN_AGE25_64) +
+                 log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(orcSIM)
+```
+
+examine how the constraints hold for destinations this time.
+
+```{r}
+CalcRSquared(orcSIM$data$TRIPS, orcSIM$fitted.values)
+```
+
+Destination constrained
+
+```{r}
+decSIM <- glm(formula = TRIPS ~ 
+                DESTIN_SZ + 
+                log(ORIGIN_AGE25_64) + 
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(decSIM)
+```
+
+
+```{r}
+CalcRSquared(decSIM$data$TRIPS, decSIM$fitted.values)
+```
+
+
+Doubly constrained
+
+```{r}
+dbcSIM <- glm(formula = TRIPS ~ 
+                ORIGIN_SZ + 
+                DESTIN_SZ + 
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(dbcSIM)
+```
+
+```{r}
+CalcRSquared(dbcSIM$data$TRIPS, dbcSIM$fitted.values)
 ```
 
