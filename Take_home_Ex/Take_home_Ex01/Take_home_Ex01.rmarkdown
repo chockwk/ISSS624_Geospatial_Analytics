@@ -11,6 +11,7 @@ execute:
 editor: source
 ---
 
+
 # **A Geospatial Analysis of Passenger Volume in Urban Environments**
 
 # 1. Overview
@@ -32,9 +33,11 @@ The analysis involves the following packages:
 -   `spfep` compute spatial autocorrelation
 -   `mapview` and `tmap` supports data visualisation
 
+
 ```{r}
 pacman::p_load(sf, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse)
 ```
+
 
 # 3. Import data
 
@@ -51,6 +54,7 @@ The output indicates that the geospatial objects are **point** features. There a
 
 Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/BusStops))
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -64,6 +68,7 @@ busstop <- st_read(dsn = "data/BusStopLocation_Jul2023", layer = "BusStop") %>%
 st_geometry(busstop)
 ```
 
+
 ## Passenger Volume
 
 `odbus` is an **aspatial** dataset containing the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used.
@@ -71,6 +76,7 @@ st_geometry(busstop)
 The output indicates **5,694,297 records** and 7 fields. The bus stop codes are converted into factor for data handling.
 
 Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
+
 
 ```{r}
 #| code-fold: true
@@ -86,6 +92,7 @@ odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
 glimpse(odbus)
 ```
 
+
 ## Malls
 
 `malls` is an aspatial transformed **spatial** dataset of shopping malls listed on a wikipedia site with SVY21 coordinates retrieved from One Map API. `st_as_sf()` and `st_transforms()` uses the `longitude` and `latitude` to create spatial objects.
@@ -93,6 +100,7 @@ glimpse(odbus)
 The output indicates that the geospatial objects are **point** features. There are **184 features** and 5 fields.
 
 Source: Valary Lim ([GitHub](https://github.com/ValaryLim/Mall-Coordinates-Web-Scraper/blob/master/README.md))
+
 
 ```{r}
 #| code-fold: true
@@ -110,6 +118,7 @@ malls_sf <- st_as_sf(malls,
   st_transform(crs = 3414)
 glimpse(malls_sf)
 ```
+
 :::
 
 # 4. Create Spatial Grids
@@ -125,6 +134,7 @@ First, we will create hexagonal grids using `st_make_grid()` to cover the geomet
 
 The output indicates that the geospatial objects are **polygon** features. There are **5,580 features** and 1 fields. It is in **SVY21** projected coordinates system with **XY** dimension, same as that in `busstop` dataset.
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -132,11 +142,13 @@ area_hexagon_grid = st_make_grid(busstop, cellsize = 500, what = "polygons", squ
 area_hexagon_grid
 ```
 
+
 ## Step 2
 
 We also assign grid id to each hexagon using `length()` to calculate the length of the geometry and generate a sequence from 1 to the length of vectors in `area_hexagon_grid`.
 
 The output indicates that the geospatial objects retained **polygon** features and there are more than one polygon feature in a grid_id. The intersection of `busstop` and `hexagon_grid_sf` yields **1524 features** and 1 fields, indicating only 1524 out of 5580 features contains bus stops. It is in **SVY21** projected coordinates system with **XY** dimension.
+
 
 ```{r}
 #| code-fold: true
@@ -146,17 +158,21 @@ hexagon_grid_sf = st_sf(area_hexagon_grid) %>%
 hexagon_grid_sf
 ```
 
+
 ## Step 3
 
 `st_intersects()` combines `hexagon_grid_sf` and `busstop` and `filter()` removes empty grids.
+
 
 ```{r}
 hexagon_grid_sf$grid_id = lengths(st_intersects(hexagon_grid_sf, busstop))
 hexagon_count = filter(hexagon_grid_sf, grid_id > 0)
 ```
+
 :::
 
 Using `tmap`, the distribution of bus stops across Singapore can be visualised in the map below.
+
 
 ```{r}
 #| code-fold: true
@@ -179,6 +195,7 @@ hexagon = tm_shape(hexagon_count)+
 hexagon
 ```
 
+
 The geospatial distribution of bus stops in Singapore is extensive and dispersed throughout the region, with a notable concentration of stops with darker shades of red signifying higher concentrations. Outlying regions, along the coastal areas, show fewer bus stops as indicated by the presence of lighter-colored hexagons or even white spaces where no stops are present. This distribution pattern suggests a robust public transportation infrastructure in urban and densely populated areas, tapering off in less populated or industrial regions.
 
 # 5. Explore data
@@ -192,15 +209,18 @@ The geospatial distribution of bus stops in Singapore is extensive and dispersed
 
 The map below shows the overview of all bus stops in Singapore. Each dot represents a bus stop.
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
 mapview(busstop, cex = 3, alpha = 0.5, popup = NULL, col.regions = "darkseagreen")
 ```
 
+
 ## Bus Stop Density and Malls
 
 High-density bus stop areas typically indicate regions with better **public transport accessibility**. This makes it easier for residents and visitors to move around without personal vehicles, which can reduce traffic congestion and the environmental impact of transportation. These regions may be **suburban town centres** with a higher concentration of services, amenities, and potentially population.
+
 
 ```{r}
 #| code-fold: true
@@ -234,6 +254,7 @@ highdensity <- tm_basemap("OneMapSG.Grey") +
 highdensity
 ```
 
+
 The **top two** hexagons in dark green are further examined to understand these high density areas.
 
 ![](images/Screenshot%202023-12-01%20at%204.30.35%E2%80%AFPM.png){fig-align="left"}
@@ -255,6 +276,7 @@ Weekends volume shows a different pattern, with the number of trips gradually in
     -   **Weekday afternoon peak** 5pm to 8pm
     -   **Weekend/holiday morning peak** 11am to 2pm
     -   **Weekend/holiday evening peak** 4pm to 7pm
+
 
 ```{r}
 #| code-fold: true
@@ -325,6 +347,7 @@ weekend_plot <- ggplot(data = filter(total_trips, DAY_TYPE == "WEEKENDS/HOLIDAY"
 grid.arrange(weekday_plot, weekend_plot, ncol = 2)
 ```
 
+
 :::
 
 # 6. Geovisualisation and Analysis
@@ -335,6 +358,7 @@ We will compute the passenger trips using geospatial data from `busstop` and asp
 
 `busstop` and `odbus` are joined by the bus stop codes to append geospatial objects the the passenger volume.
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -343,9 +367,11 @@ passengertrips <- left_join(busstop, odbus,
 head(passengertrips, n=5)
 ```
 
+
 ## Step 2
 
 Create `passengertrips_time` to summarize the trips by time intervals.
+
 
 ```{r}
 #| code-fold: true
@@ -372,6 +398,7 @@ passengertrips_time <- passengertrips_time %>%
 glimpse(passengertrips_time)
 ```
 
+
 ## Step 3
 
 Ensure both datasets are in the same coordinate reference system (CRS).
@@ -379,20 +406,25 @@ Ensure both datasets are in the same coordinate reference system (CRS).
 ::: panel-tabset
 ### Passenger Volume
 
+
 ```{r}
 st_crs(passengertrips_time)
 ```
 
+
 ### Hexagon grid
+
 
 ```{r}
 st_crs(hexagon_grid_sf)
 ```
+
 :::
 
 ## Step 4
 
 Perform a spatial join between `hexagon_grid_sf` and `passengertrip_time` to match trips to hexagons.
+
 
 ```{r}
 #| code-fold: true
@@ -400,7 +432,9 @@ Perform a spatial join between `hexagon_grid_sf` and `passengertrip_time` to mat
 passengergrid_time <- st_join(hexagon_grid_sf, passengertrips_time, join = st_intersects)
 ```
 
+
 Drop the bus stops with no passenger volume.
+
 
 ```{r}
 #| code-fold: true
@@ -411,9 +445,11 @@ passengergrid_time <- passengergrid_time %>%
 glimpse(passengergrid_time)
 ```
 
+
 ## Step 5
 
 Split passenger volume by peak hour.
+
 
 ```{r}
 #| code-fold: true
@@ -463,9 +499,11 @@ if (length(problematic_stops) > 0) {
 }
 ```
 
+
 ## Step 6a (Breaks)
 
 Plot passenger trips traffic for each time interval using `tmap`.
+
 
 ```{r}
 #| code-fold: true
@@ -534,7 +572,6 @@ weekend_evening_plot <- tm_shape(weekend_evening_peak_sf) +
             frame = FALSE)
 ```
 
-
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -552,9 +589,11 @@ grid.arrange(
 )
 ```
 
+
 Binning by pre=determined **breaks** allows the comparison of passenger volume during peak hours on the **same scale**. Due to underlying difference in the number of days, weekdays are likely to see more passenger volume than weekends. Comparing the **weekday morning peak** and afternoon peak, there is more passenger volume observed in the **peripheral areas** where residents are commuting from residential areas (origin) to central areas (destinations). Whereas the **weekend** morning and evening peak has **constant** passenger volume originating from the same hexagons, indicating high activity levels in these popular areas.
 
 ## Step 6b (Quantile)
+
 
 ```{r}
 #| code-fold: true
@@ -647,6 +686,7 @@ grid.arrange(
 )
 ```
 
+
 Binning by **quantiles** enables **relative comparison** of the passenger traffic between hexagons on the map.
 
 :::
@@ -659,6 +699,7 @@ Binning by **quantiles** enables **relative comparison** of the passenger traffi
 
 ### Contiguity Weight Matrix `poly2nb` defines the spatial relationship between different regions by computing **contiguity weight matrices** and build a neighbours list based on regions with contiguous boundaries.
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -670,11 +711,13 @@ wm_q_time <- poly2nb(passengergrid_time_total, queen=TRUE)
 summary(wm_q_time)
 ```
 
+
 The output shown is a summary of a neighbors list object. There are **5,029 regions** and approximately **42.69%** of all possible neighbor pairs are neighbors with nonzero links. Each region has an **average** of **21.47 neighboring regions**. For poorly connected regions, there are 7 regions without neighbors and 14 regions with 1 neighbour. There are 8 well-connected regions with 48 neighbours.
 
 ### Connectivity Graph
 
 A **connectivity graph** takes a point and displays a line to each neighboring point.
+
 
 ```{r}
 #| code-fold: true
@@ -682,6 +725,7 @@ A **connectivity graph** takes a point and displays a line to each neighboring p
 #plot(passengergrid_time_total$area_hexagon_grid, border="grey")
 #plot(wm_q_time, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
+
 
 ## Method 2: Computing distance based neighbours
 
@@ -692,6 +736,7 @@ Derive the centroid
 
 `passengergrid` is made up of polygons features, so we will derive points to make our connectivity graphs. The most typically method is **polygon centroids**.
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -701,11 +746,13 @@ coords <- cbind(longitude, latitude)
 head(coords)
 ```
 
+
 ### Step 2
 
 Determine the cut-off distance
 
 Determine the upper limit for distance band by using the steps below: 1. Return a matrix with the indices of points belonging to the set of the k nearest neighbours of each other by using knearneigh() of spdep. 2. Convert the knn object returned by knearneigh() into a neighbours list of class nb with a list of integer vectors containing neighbour region number ids by using knn2nb(). 3. Return the length of neighbour relationship edges by using nbdists() of spdep. The function returns in the units of the coordinates if the coordinates are projected, in km otherwise. 4. Remove the list structure of the returned object by using unlist().
+
 
 ```{r}
 #| code-fold: true
@@ -715,11 +762,13 @@ k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
 summary(k1dists)
 ```
 
+
 The summary report shows that the largest first nearest neighbour distance is **16228.8km**, so using this as the upper threshold gives certainty that all units will have at least one neighbour.
 
 ### Step 3a (fixed distance)
 
 Compute fixed distance weight matrix using `dnearneigh()` where the lower distance bound is 0 and the upper distance bound is the largest neighbour distance. `longlat` is TRUE if point coordinates are geographical longitude-latitude decimal degrees, in which case distances are measured in kilometers.
+
 
 ```{r}
 #| code-fold: true
@@ -728,9 +777,11 @@ wm_d16229 <- dnearneigh(coords, 0, 16229, longlat = TRUE)
 wm_d16229
 ```
 
+
 The output indicated there are 5,029 regions with an average of 4495 links.
 
 `nb2listw()` converts the nb object into spatial weights object.
+
 
 ```{r}
 #| code-fold: true
@@ -739,7 +790,9 @@ wm_d16229_lw <- nb2listw(wm_d16229, style = 'B')
 #summary(wm_d16229_lw)
 ```
 
+
 The output indicated there is 1 least connected region with 4058 links and 4 most connected regions with 4818 links.
+
 
 ```{r}
 #| code-fold: true
@@ -748,11 +801,13 @@ The output indicated there is 1 least connected region with 4058 links and 4 mos
 #plot(wm_d16229_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
 
+
 ### Step 3b (adaptive distance)
 
 Computing adaptive distance weight matrix
 
 `knearneigh()` obtains a matrix with the indices of points belonging to the set of the k nearest neighbours of each area. The number of neighbours can be imposed by `k` where the average number of neighbours is previously computed to be **21.47 neighboring regions**.
+
 
 ```{r}
 #| code-fold: true
@@ -774,6 +829,7 @@ summary(knn_lw)
 # plot(passengergrid_time_total$area_hexagon_grid, border="grey")
 # plot(knn_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
+
 :::
 
 # 8. Gi statistics
@@ -787,6 +843,7 @@ In local g/g\*, a value larger than the mean (or, a positive value for a standar
 
 Step 1: `localG()` calculate the local Geary statistic for a given variable and a neighbor list object `nb`.
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -794,9 +851,11 @@ fips <- order(passengergrid_time_total$BUS_STOP_N)
 gi.fixed <- localG(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw)
 ```
 
+
 The output returns a dataframe with the following columns: gi: the observed statistic e_gi: the permutation sample mean var_gi: the permutation sample variance p_value: the p-value using sample mean and standard deviation p_folded_sim: p-value based on the implementation of Pysal which always assumes a two-sided test taking the minimum possible p-value
 
 Step 2: `cbind()` joins the Gi values calculated from fixed distance weight matrix to their corresponding `passengergrid_time_total` sf data frame.
+
 
 ```{r}
 #| code-fold: true
@@ -805,7 +864,9 @@ passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.fixe
   rename(gstat_fixed = as.matrix.gi.fixed.)
 ```
 
+
 Step 3: Map the Gi values calculated from fixed distance weight matrix.
+
 
 ```{r}
 #| code-fold: true
@@ -821,9 +882,11 @@ Gimap_fixed
 #tmap_arrange(gi_total_trips, Gimap, asp=1, ncol=2)
 ```
 
+
 The **Getis-Ord Gi\* statistic map** illustrates the **local spatial autocorrelation** of passenger volume during peak hours, indicating where high or low values cluster spatially. The colors indicate the z-scores from the Gi\* statistic. **Dark red** areas represent locations with **high z-scores**, indicating a cluster of **hot spots**. These are areas with a significantly higher passenger volume. **Dark blue** areas have **negative z-scores**, pointing to clusters of **cold spots**.
 
 From the map, we can infer that there are distinct pockets where the passenger volume is significantly higher or lower than the average for the region. However, the distribution of hots spots and cold spots are dispersed and can be further improved by adaptive distance matrix.
+
 
 ```{r}
 #| code-fold: true
@@ -841,9 +904,11 @@ From the map, we can infer that there are distinct pockets where the passenger v
 #gstar.fixed <- localG_perm(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw, nsim = 499)
 ```
 
+
 ## Adaptive Distance
 
 `localG()` compute the Gi values for `passengergrid_time_total` by using an adaptive distance weight matrix, `knb_lw`.
+
 
 ```{r}
 #| code-fold: true
@@ -892,6 +957,7 @@ Gimap_adaptive_map <- tm_basemap("OneMapSG.Grey") +
 Gimap_adaptive_map
 ```
 
+
 Compared to the previous map, which appears to use a fixed distance weight matrix, this map may show a different pattern of clustering due to the adaptive nature of the weight matrix. The hot spots and cold spots in the adaptive distance matrix map is **localized**, leading to a **finer resolution of clustering patterns** and can be particularly useful when the distribution of data points is uneven across the space.
 
 **The hotspots are Boon Lay, Clementi, Woodlands, Ang Mo Kio, Bedok and Tampines.**
@@ -900,3 +966,4 @@ Compared to the previous map, which appears to use a fixed distance weight matri
 # 9. Conclusion
 
 The geospatial analysis of transportation patterns in Singapore reveals **distinct hotspots of high commuter activity**, specifically in the areas of Boon Lay, Clementi, Woodlands, Ang Mo Kio, Bedok, and Tampines. These regions, characterized by their significant bus stop density and strategic importance in the **public transportation network**, serve as crucial nodes facilitating the mobility of a large number of commuters daily. The concentration of activity in these hotspots underscores their role as **essential transit hubs**, likely supported by a mix of residential, commercial, and industrial developments. The data suggests a high demand for public transportation services in these areas, which may be attributed to their development as **regional centers** and their connectivity to other parts of Singapore. As such, these hotspots could be focal points for future urban planning and transportation services enhancement to cater to the high volume of daily travelers efficiently.
+
