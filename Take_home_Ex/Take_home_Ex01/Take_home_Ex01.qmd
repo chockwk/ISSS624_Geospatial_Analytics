@@ -45,7 +45,7 @@ We will be using the following **geospatial** (`busstop`) and **aspatial** (`odb
 ::: panel-tabset
 ## Bus Stop
 
-`busstop` is a **geospatial** dataset containing the detailed information for all bus stops currently serviced by buses, including bus stop code, road name, description, location coordinates. 
+`busstop` is a **geospatial** dataset containing the detailed information for all bus stops currently serviced by buses, including bus stop code, road name, description, location coordinates.
 
 The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
@@ -63,9 +63,10 @@ busstop <- st_read(dsn = "data/BusStopLocation_Jul2023", layer = "BusStop") %>%
 #| code-summary: "Show the code"
 st_geometry(busstop)
 ```
+
 ## Passenger Volume
 
-`odbus` is an **aspatial** dataset containing the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used. 
+`odbus` is an **aspatial** dataset containing the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used.
 
 The output indicates **5,694,297 records** and 7 fields. The bus stop codes are converted into factor for data handling.
 
@@ -84,6 +85,7 @@ odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
 odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
 glimpse(odbus)
 ```
+
 ## Malls
 
 `malls` is an aspatial transformed **spatial** dataset of shopping malls listed on a wikipedia site with SVY21 coordinates retrieved from One Map API. `st_as_sf()` and `st_transforms()` uses the `longitude` and `latitude` to create spatial objects.
@@ -142,11 +144,17 @@ The output indicates that the geospatial objects retained **polygon** features a
 hexagon_grid_sf = st_sf(area_hexagon_grid) %>% 
   mutate(grid_id = 1:length(lengths(area_hexagon_grid)))
 hexagon_grid_sf
+```
 
+## Step 3
+
+`st_intersects()` combines `hexagon_grid_sf` and `busstop` and `filter()` removes empty grids.
+
+```{r}
 hexagon_grid_sf$grid_id = lengths(st_intersects(hexagon_grid_sf, busstop))
 hexagon_count = filter(hexagon_grid_sf, grid_id > 0)
 ```
-## Step 3
+:::
 
 Using `tmap`, the distribution of bus stops across Singapore can be visualised in the map below.
 
@@ -171,8 +179,6 @@ hexagon = tm_shape(hexagon_count)+
 hexagon
 ```
 
-:::
-
 The geospatial distribution of bus stops in Singapore is extensive and dispersed throughout the region, with a notable concentration of stops with darker shades of red signifying higher concentrations. Outlying regions, along the coastal areas, show fewer bus stops as indicated by the presence of lighter-colored hexagons or even white spaces where no stops are present. This distribution pattern suggests a robust public transportation infrastructure in urban and densely populated areas, tapering off in less populated or industrial regions.
 
 # 5. Explore data
@@ -184,7 +190,7 @@ The geospatial distribution of bus stops in Singapore is extensive and dispersed
 ::: panel-tabset
 ## Bus Stop Distribution
 
-The map below shows the overview of all bus stops in Singapore. Each dot represents a bus stop. 
+The map below shows the overview of all bus stops in Singapore. Each dot represents a bus stop.
 
 ```{r}
 #| code-fold: true
@@ -206,23 +212,22 @@ tmap_mode("view")
 
 highdensity <- tm_basemap("OneMapSG.Grey") +
   tm_shape(highdensityhex) +
-  tm_fill(
-    col = "grid_id",
-    palette = "Greens",
-    style = "cont",
-    title = "Number of Bus Stops",
-    id = "grid_id",
-    showNA = FALSE,
-    alpha = 0.6,
-    popup.format = list(
-      grid_id = list(format = "f", digits = 0)
-    )
-  ) +
+  tm_fill(col = "grid_id",
+          palette = "Greens",
+          style = "cont",
+          title = "Number of Bus Stops",
+          id = "grid_id",
+          showNA = FALSE,
+          alpha = 0.6,
+          popup.format = list(
+            grid_id = list(format = "f", digits = 0)
+            )
+          )+
   tm_borders(col = "grey40", lwd = 0.7) +
   tm_layout(
     title = "High-Density Bus Stops",
     title.size = 1
-  ) +
+    ) +
   tm_shape(malls_sf) +
   tm_dots(size = 0.01, col = "cyan", title = "Malls") 
 
@@ -245,88 +250,88 @@ On weekdays, there is a prominent peak in trips during the morning hours (**6am 
 
 Weekends volume shows a different pattern, with the number of trips gradually increasing as the day progresses, peaking in the mid to late afternoon, and then tapering off. This suggests a **constant** travel throughout the day, which could be due to leisure activities, or social events during weekends or holidays.
 
-Here we classify the peak hours by time intervals for four categories:
-**Weekday morning peak**	6am to 9am
-**Weekday afternoon peak**	5pm to 8pm
-**Weekend/holiday morning peak**	11am to 2pm
-**Weekend/holiday evening peak**	4pm to 7pm
+  Here we classify the peak hours by time intervals for four categories:
+    -   **Weekday morning peak** 6am to 9am
+    -   **Weekday afternoon peak** 5pm to 8pm
+    -   **Weekend/holiday morning peak** 11am to 2pm
+    -   **Weekend/holiday evening peak** 4pm to 7pm
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-time_interval <- function(day_type, time_per_hour) {
-  if (day_type == "WEEKDAY") {
-    if (time_per_hour >= 6 & time_per_hour <= 9) {
-      "morning peak"
-    } else if (time_per_hour >= 17 & time_per_hour <= 20) {
-      "afternoon peak"
-    } else {
-      "non peak"
+    #| code-fold: true
+    #| code-summary: "Show the code"
+    time_interval <- function(day_type, time_per_hour) {
+      if (day_type == "WEEKDAY") {
+        if (time_per_hour >= 6 & time_per_hour <= 9) {
+          "morning peak"
+        } else if (time_per_hour >= 17 & time_per_hour <= 20) {
+          "afternoon peak"
+        } else {
+          "non peak"
+        }
+      } else if (day_type == "WEEKENDS/HOLIDAY") {
+        if (time_per_hour >= 11 & time_per_hour <= 14) {
+          "morning peak"
+        } else if (time_per_hour >= 16 & time_per_hour <= 19) {
+          "evening peak"
+        } else {
+          "non peak"
+        }
+      } else {
+        "non peak"
+      }
     }
-  } else if (day_type == "WEEKENDS/HOLIDAY") {
-    if (time_per_hour >= 11 & time_per_hour <= 14) {
-      "morning peak"
-    } else if (time_per_hour >= 16 & time_per_hour <= 19) {
-      "evening peak"
-    } else {
-      "non peak"
-    }
-  } else {
-    "non peak"
-  }
-}
 
-odbus$TIME <- mapply(time_interval, odbus$DAY_TYPE, odbus$TIME_PER_HOUR)
+    odbus$TIME <- mapply(time_interval, odbus$DAY_TYPE, odbus$TIME_PER_HOUR)
 
-head(odbus, n = 5)
+    head(odbus, n = 5)
 ```
-
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-odbus$TIME_PER_HOUR <- factor(odbus$TIME_PER_HOUR)
+    #| code-fold: true
+    #| code-summary: "Show the code"
+    odbus$TIME_PER_HOUR <- factor(odbus$TIME_PER_HOUR)
 
-total_trips <- odbus %>%
-  group_by(DAY_TYPE, TIME_PER_HOUR) %>%
-  summarise(Total_Trips = sum(TOTAL_TRIPS, na.rm = TRUE)) %>%
-  ungroup()
+    total_trips <- odbus %>%
+      group_by(DAY_TYPE, TIME_PER_HOUR) %>%
+      summarise(Total_Trips = sum(TOTAL_TRIPS, na.rm = TRUE)) %>%
+      ungroup()
 
-max_trips <- max(total_trips$Total_Trips)
+    max_trips <- max(total_trips$Total_Trips)
 
-weekday_plot <- ggplot(data = filter(total_trips, DAY_TYPE == "WEEKDAY"), 
-                       aes(x = TIME_PER_HOUR, y = Total_Trips, fill = as.factor(TIME_PER_HOUR))) +
-  geom_bar(stat = "identity", width = 0.9) +
-  labs(title = "Weekday Trips", x = "Hour of Day", y = "Total Trips") +
-  theme_minimal() +
-  ylim(0, max_trips) +
-  scale_fill_viridis_d(option = "mako", guide = FALSE) + 
-  theme(legend.position = "none",
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(colour = "grey"))
+    weekday_plot <- ggplot(data = filter(total_trips, DAY_TYPE == "WEEKDAY"), 
+                           aes(x = TIME_PER_HOUR, y = Total_Trips, fill = as.factor(TIME_PER_HOUR))) +
+      geom_bar(stat = "identity", width = 0.9) +
+      labs(title = "Weekday Trips", x = "Hour of Day", y = "Total Trips") +
+      theme_minimal() +
+      ylim(0, max_trips) +
+      scale_fill_viridis_d(option = "mako", guide = FALSE) + 
+      theme(legend.position = "none",
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            axis.line = element_line(colour = "grey"))
 
-weekend_plot <- ggplot(data = filter(total_trips, DAY_TYPE == "WEEKENDS/HOLIDAY"), 
-                       aes(x = TIME_PER_HOUR, y = Total_Trips, fill = as.factor(TIME_PER_HOUR))) +
-  geom_bar(stat = "identity", width = 0.9) +
-  labs(title = "Weekend/Holiday Trips", x = "Hour of Day", y = "Total Trips") +
-  theme_minimal() +
-  ylim(0, max_trips) +
-  scale_fill_viridis_d(option = "mako", guide = FALSE) +
-  theme(legend.position = "none",
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(colour = "grey"))
+    weekend_plot <- ggplot(data = filter(total_trips, DAY_TYPE == "WEEKENDS/HOLIDAY"), 
+                           aes(x = TIME_PER_HOUR, y = Total_Trips, fill = as.factor(TIME_PER_HOUR))) +
+      geom_bar(stat = "identity", width = 0.9) +
+      labs(title = "Weekend/Holiday Trips", x = "Hour of Day", y = "Total Trips") +
+      theme_minimal() +
+      ylim(0, max_trips) +
+      scale_fill_viridis_d(option = "mako", guide = FALSE) +
+      theme(legend.position = "none",
+            panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(),
+            axis.line = element_line(colour = "grey"))
 
-grid.arrange(weekday_plot, weekend_plot, ncol = 2)
+    grid.arrange(weekday_plot, weekend_plot, ncol = 2)
 ```
+
 :::
 
 # 6. Geovisualisation and Analysis
 
-We will compute the passenger trips using geospatial data from `busstop` and aspatial data from `odbus`. 
+We will compute the passenger trips using geospatial data from `busstop` and aspatial data from `odbus`.
 
-## Step 1 
+## Step 1
 
 `busstop` and `odbus` are joined by the bus stop codes to append geospatial objects the the passenger volume.
 
@@ -366,12 +371,12 @@ passengertrips_time <- passengertrips_time %>%
            & WEEKENDS_HOLIDAYS_NON_PEAK == 0))
 glimpse(passengertrips_time)
 ```
+
 ## Step 3
 
 Ensure both datasets are in the same coordinate reference system (CRS).
 
 ::: panel-tabset
-
 ### Passenger Volume
 
 ```{r}
@@ -408,7 +413,7 @@ glimpse(passengergrid_time)
 
 ## Step 5
 
-Split passengers trips by peak hour groups
+Split passenger volume by peak hour.
 
 ```{r}
 #| code-fold: true
@@ -527,7 +532,12 @@ weekend_evening_plot <- tm_shape(weekend_evening_peak_sf) +
   tm_layout(main.title = "Weekend Evening Peak", 
             main.title.position = "center", 
             frame = FALSE)
+```
 
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 # Convert tmap plots to grobs
 weekday_morning_grob <- tmap_grob(weekday_morning_plot)
 weekday_afternoon_grob <- tmap_grob(weekday_afternoon_plot)
@@ -545,8 +555,8 @@ grid.arrange(
 )
 
 ```
-Binning by pre=determined **breaks** allows the comparison of passenger volume during peak hours on the **same scale**. Due to underlying difference in the number of days, weekdays are likely to see more passenger volume than weekends. Comparing the **weekday morning peak** and afternoon peak, there is more passenger volume observed in the **peripheral areas** where residents are commuting from residential areas (origin) to central areas (destinations). Whereas the **weekend** morning and evening peak has **constant** passenger volume originating from the same hexagons, indicating high activity levels in these popular areas.
 
+Binning by pre=determined **breaks** allows the comparison of passenger volume during peak hours on the **same scale**. Due to underlying difference in the number of days, weekdays are likely to see more passenger volume than weekends. Comparing the **weekday morning peak** and afternoon peak, there is more passenger volume observed in the **peripheral areas** where residents are commuting from residential areas (origin) to central areas (destinations). Whereas the **weekend** morning and evening peak has **constant** passenger volume originating from the same hexagons, indicating high activity levels in these popular areas.
 
 ## Step 6b (Quantile)
 
@@ -602,7 +612,11 @@ weekend_evening_plot_q<- tm_shape(weekend_evening_peak_sf) +
   tm_layout(main.title = "Weekend Evening Peak Q", 
             main.title.position = "center", 
             frame = FALSE)
+```
 
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 # Convert tmap plots to grobs
 weekday_morning_q_grob <- tmap_grob(weekday_morning_plot_q)
 weekday_afternoon_q_grob <- tmap_grob(weekday_afternoon_plot_q)
@@ -619,19 +633,20 @@ grid.arrange(
   nrow = 2
 )
 ```
+
+
+
 Binning by **quantiles** enables **relative comparison** of the passenger traffic between hexagons on the map.
 
 :::
 
 # 7. Hot Spot and Cold Spot Area Analysis
 
-**Getis and Ord’s G-statistics** looks at neighbours within a defined proximity to identify where either high or low values cluster spatially. Statistically significant hot-spots are recognised as areas of high values where other areas within a neighbourhood range also share high values too.
+**Getis and Ord's G-statistics** looks at neighbours within a defined proximity to identify where either high or low values cluster spatially. Statistically significant hot-spots are recognised as areas of high values where other areas within a neighbourhood range also share high values too.
 
 ## Method 1: Computing Contiguity Spatial Weights
 
-:::panel-tabset
-### Contiguity Weight Matrix
-`poly2nb` defines the spatial relationship between different regions by computing **contiguity weight matrices** and build a neighbours list based on regions with contiguous boundaries.
+### Contiguity Weight Matrix `poly2nb` defines the spatial relationship between different regions by computing **contiguity weight matrices** and build a neighbours list based on regions with contiguous boundaries.
 
 ```{r}
 #| code-fold: true
@@ -647,7 +662,8 @@ summary(wm_q_time)
 The output shown is a summary of a neighbors list object. There are **5,029 regions** and approximately **42.69%** of all possible neighbor pairs are neighbors with nonzero links. Each region has an **average** of **21.47 neighboring regions**. For poorly connected regions, there are 7 regions without neighbors and 14 regions with 1 neighbour. There are 8 well-connected regions with 48 neighbours.
 
 ### Connectivity Graph
-A **connectivity graph** takes a point and displays a line to each neighboring point. 
+
+A **connectivity graph** takes a point and displays a line to each neighboring point.
 
 ```{r}
 #| code-fold: true
@@ -659,7 +675,6 @@ A **connectivity graph** takes a point and displays a line to each neighboring p
 ## Method 2: Computing distance based neighbours
 
 ::: panel-tabset
-
 ### Step 1
 
 Derive the centroid
@@ -674,15 +689,12 @@ latitude <- map_dbl(passengergrid_time_total$area_hexagon_grid, ~st_centroid(.x)
 coords <- cbind(longitude, latitude)
 head(coords)
 ```
+
 ### Step 2
 
 Determine the cut-off distance
 
-Determine the upper limit for distance band by using the steps below:
-1. Return a matrix with the indices of points belonging to the set of the k nearest neighbours of each other by using knearneigh() of spdep.
-2. Convert the knn object returned by knearneigh() into a neighbours list of class nb with a list of integer vectors containing neighbour region number ids by using knn2nb().
-3. Return the length of neighbour relationship edges by using nbdists() of spdep. The function returns in the units of the coordinates if the coordinates are projected, in km otherwise.
-4. Remove the list structure of the returned object by using unlist().
+Determine the upper limit for distance band by using the steps below: 1. Return a matrix with the indices of points belonging to the set of the k nearest neighbours of each other by using knearneigh() of spdep. 2. Convert the knn object returned by knearneigh() into a neighbours list of class nb with a list of integer vectors containing neighbour region number ids by using knn2nb(). 3. Return the length of neighbour relationship edges by using nbdists() of spdep. The function returns in the units of the coordinates if the coordinates are projected, in km otherwise. 4. Remove the list structure of the returned object by using unlist().
 
 ```{r}
 #| code-fold: true
@@ -704,14 +716,18 @@ Compute fixed distance weight matrix using `dnearneigh()` where the lower distan
 wm_d16229 <- dnearneigh(coords, 0, 16229, longlat = TRUE)
 wm_d16229
 ```
+
 The output indicated there are 5,029 regions with an average of 4495 links.
 
 `nb2listw()` converts the nb object into spatial weights object.
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 wm_d16229_lw <- nb2listw(wm_d16229, style = 'B')
 #summary(wm_d16229_lw)
 ```
+
 The output indicated there is 1 least connected region with 4058 links and 4 most connected regions with 4818 links.
 
 ```{r}
@@ -720,6 +736,7 @@ The output indicated there is 1 least connected region with 4058 links and 4 mos
 #plot(passengergrid_time_total$area_hexagon_grid, border="grey")
 #plot(wm_d16229_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
+
 ### Step 3b (adaptive distance)
 
 Computing adaptive distance weight matrix
@@ -727,11 +744,15 @@ Computing adaptive distance weight matrix
 `knearneigh()` obtains a matrix with the indices of points belonging to the set of the k nearest neighbours of each area. The number of neighbours can be imposed by `k` where the average number of neighbours is previously computed to be **21.47 neighboring regions**.
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 knn <- knn2nb(knearneigh(coords, k=22))
 knn
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 knn_lw <- nb2listw(knn, style = 'B')
 summary(knn_lw)
 ```
@@ -746,12 +767,11 @@ summary(knn_lw)
 
 # 8. Gi statistics
 
-The **local Getis-Ord statistic** is a ratio of the weighted average of the values in the neighboring locations to the sum of all values. It is called local g or local g*, when not including the value at the location. 
+The **local Getis-Ord statistic** is a ratio of the weighted average of the values in the neighboring locations to the sum of all values. It is called local g or local g\*, when not including the value at the location.
 
-In local g/g*, a value larger than the mean (or, a positive value for a standardized z-value) suggests a High-High cluster or hot spot, a value smaller than the mean (or, negative for a z-value) indicates a Low-Low cluster or cold spot. 
+In local g/g\*, a value larger than the mean (or, a positive value for a standardized z-value) suggests a High-High cluster or hot spot, a value smaller than the mean (or, negative for a z-value) indicates a Low-Low cluster or cold spot.
 
 ::: panel-tabset
-
 ## Fixed Distance
 
 Step 1: `localG()` calculate the local Geary statistic for a given variable and a neighbor list object `nb`.
@@ -763,12 +783,7 @@ fips <- order(passengergrid_time_total$BUS_STOP_N)
 gi.fixed <- localG(passengergrid_time_total$TOTAL_TRIPS, wm_d16229_lw)
 ```
 
-The output returns a dataframe with the following columns:
-gi: the observed statistic
-e_gi: the permutation sample mean
-var_gi: the permutation sample variance
-p_value: the p-value using sample mean and standard deviation
-p_folded_sim: p-value based on the implementation of Pysal which always assumes a two-sided test taking the minimum possible p-value
+The output returns a dataframe with the following columns: gi: the observed statistic e_gi: the permutation sample mean var_gi: the permutation sample variance p_value: the p-value using sample mean and standard deviation p_folded_sim: p-value based on the implementation of Pysal which always assumes a two-sided test taking the minimum possible p-value
 
 Step 2: `cbind()` joins the Gi values calculated from fixed distance weight matrix to their corresponding `passengergrid_time_total` sf data frame.
 
@@ -785,8 +800,6 @@ Step 3: Map the Gi values calculated from fixed distance weight matrix.
 #| code-fold: true
 #| code-summary: "Show the code"
 #gi_total_trips <- qtm(passengergrid_time_total, "TOTAL_TRIPS")
-
-
 Gimap_fixed <-tm_shape(passengergrid_time_total.gi) +
   tm_fill(col = "gstat_fixed", 
           style = "pretty",
@@ -796,7 +809,8 @@ Gimap_fixed <-tm_shape(passengergrid_time_total.gi) +
 Gimap_fixed
 #tmap_arrange(gi_total_trips, Gimap, asp=1, ncol=2)
 ```
-The **Getis-Ord Gi* statistic map** illustrates the **local spatial autocorrelation** of passenger volume during peak hours, indicating where high or low values cluster spatially. The colors indicate the z-scores from the Gi* statistic. **Dark red** areas represent locations with **high z-scores**, indicating a cluster of **hot spots**. These are areas with a significantly higher passenger volume. **Dark blue** areas have **negative z-scores**, pointing to clusters of **cold spots**.
+
+The **Getis-Ord Gi\* statistic map** illustrates the **local spatial autocorrelation** of passenger volume during peak hours, indicating where high or low values cluster spatially. The colors indicate the z-scores from the Gi\* statistic. **Dark red** areas represent locations with **high z-scores**, indicating a cluster of **hot spots**. These are areas with a significantly higher passenger volume. **Dark blue** areas have **negative z-scores**, pointing to clusters of **cold spots**.
 
 From the map, we can infer that there are distinct pockets where the passenger volume is significantly higher or lower than the average for the region. However, the distribution of hots spots and cold spots are dispersed and can be further improved by adaptive distance matrix.
 
@@ -837,7 +851,10 @@ Gimap_adaptive <-tm_shape(passengergrid_time_total.gi) +
   tm_borders(alpha = 0.5)
 Gimap_adaptive
 ```
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tmap_mode("view")
 
 Gimap_adaptive_map <- tm_basemap("OneMapSG.Grey") +
@@ -863,9 +880,10 @@ Gimap_adaptive_map <- tm_basemap("OneMapSG.Grey") +
 
 Gimap_adaptive_map
 ```
-Compared to the previous map, which appears to use a fixed distance weight matrix, this map may show a different pattern of clustering due to the adaptive nature of the weight matrix. The hot spots and cold spots in the adaptive distance matrix map is **localized**, leading to a **finer resolution of clustering patterns** and can be particularly useful when the distribution of data points is uneven across the space. 
 
-**The hotspots are Boon Lay, Clementi, Woodlands, Ang Mo Kio, Bedok and Tampines. **
+Compared to the previous map, which appears to use a fixed distance weight matrix, this map may show a different pattern of clustering due to the adaptive nature of the weight matrix. The hot spots and cold spots in the adaptive distance matrix map is **localized**, leading to a **finer resolution of clustering patterns** and can be particularly useful when the distribution of data points is uneven across the space.
+
+**The hotspots are Boon Lay, Clementi, Woodlands, Ang Mo Kio, Bedok and Tampines.**
 :::
 
 # 9. Conclusion
