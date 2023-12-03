@@ -17,7 +17,7 @@ website:
       - text: Useful Links
         href: useful_links.html
     right: 
-      - text: <i class="bi bi-globe-americas"></i> Hands-on Ex
+      - text: "{{< fa-solid fa-earth-oceania >}} Hands-on Ex"
         menu: 
           - text: Data Wrangling
             href: Hands_on_Ex/Hands_on_Ex01/Hands_on_Ex01.html
@@ -29,7 +29,7 @@ website:
             href: Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html
           - text: Hands-on Ex04
           - text: Hands-on Ex05
-      - text: <i class="bi bi-globe-central-south-asia"></i> In-class Ex
+      - text: "{{< fa-solid fa-earth-africa >}} In-class Ex"
         menu: 
           - text: Choropleth Map
             href: In_class_Ex/In_class_Ex01/In_class_Ex01.html
@@ -39,7 +39,7 @@ website:
             href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
           - text: In-class Ex04
           - text: In-class Ex05
-      - text: <i class="bi bi-globe-europe-africa"></i> Take-home Ex
+      - text: "{{< fa-solid fa-earth-asia >}} Take-home Ex"
         menu:
           - text: Dynamic Patterns of Public Transport Usage
             href: Take_home_Ex/Take_home_Ex01/Take_home_Ex01.html

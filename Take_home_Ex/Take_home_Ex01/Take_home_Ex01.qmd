@@ -538,13 +538,36 @@ weekend_evening_plot <- tm_shape(weekend_evening_peak_sf) +
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-# Convert tmap plots to grobs
 weekday_morning_grob <- tmap_grob(weekday_morning_plot)
-weekday_afternoon_grob <- tmap_grob(weekday_afternoon_plot)
-weekend_morning_grob <- tmap_grob(weekend_morning_plot)
-weekend_evening_grob <- tmap_grob(weekend_evening_plot)
+```
 
-# Use grid.arrange on the grobs
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+weekday_afternoon_grob <- tmap_grob(weekday_afternoon_plot)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+weekend_morning_grob <- tmap_grob(weekend_morning_plot)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+weekend_evening_grob <- tmap_grob(weekend_evening_plot)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+weekend_evening_grob <- tmap_grob(weekend_evening_plot)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 grid.arrange(
   weekday_morning_grob,
   weekday_afternoon_grob,
@@ -553,7 +576,6 @@ grid.arrange(
   ncol = 2,
   nrow = 2
 )
-
 ```
 
 Binning by pre=determined **breaks** allows the comparison of passenger volume during peak hours on the **same scale**. Due to underlying difference in the number of days, weekdays are likely to see more passenger volume than weekends. Comparing the **weekday morning peak** and afternoon peak, there is more passenger volume observed in the **peripheral areas** where residents are commuting from residential areas (origin) to central areas (destinations). Whereas the **weekend** morning and evening peak has **constant** passenger volume originating from the same hexagons, indicating high activity levels in these popular areas.
@@ -617,13 +639,30 @@ weekend_evening_plot_q<- tm_shape(weekend_evening_peak_sf) +
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-# Convert tmap plots to grobs
 weekday_morning_q_grob <- tmap_grob(weekday_morning_plot_q)
-weekday_afternoon_q_grob <- tmap_grob(weekday_afternoon_plot_q)
-weekend_morning_q_grob <- tmap_grob(weekend_morning_plot_q)
-weekend_evening_q_grob <- tmap_grob(weekend_evening_plot_q)
+```
 
-# Use grid.arrange on the grobs
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+weekday_afternoon_q_grob <- tmap_grob(weekday_afternoon_plot_q)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+weekend_morning_q_grob <- tmap_grob(weekend_morning_plot_q)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+weekend_evening_q_grob <- tmap_grob(weekend_evening_plot_q)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 grid.arrange(
   weekday_morning_q_grob,
   weekday_afternoon_q_grob,
@@ -633,8 +672,6 @@ grid.arrange(
   nrow = 2
 )
 ```
-
-
 
 Binning by **quantiles** enables **relative comparison** of the passenger traffic between hexagons on the map.
 
