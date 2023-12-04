@@ -331,6 +331,7 @@ grid.arrange(weekday_plot, weekend_plot, ncol = 2)
 
 We will compute the passenger trips using geospatial data from `busstop` and aspatial data from `odbus`.
 
+::: Panel-tabset
 ## Step 1
 
 `busstop` and `odbus` are joined by the bus stop codes to append geospatial objects the the passenger volume.
@@ -376,19 +377,17 @@ glimpse(passengertrips_time)
 
 Ensure both datasets are in the same coordinate reference system (CRS).
 
-::: panel-tabset
-### Passenger Volume
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 st_crs(passengertrips_time)
 ```
 
-### Hexagon grid
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 st_crs(hexagon_grid_sf)
 ```
-:::
 
 ## Step 4
 
@@ -470,7 +469,10 @@ glimpse(weekend_evening_peak)
 Weekday morning peak has 4,971 records, weekday afternoon peak has 4,980 records.
 Weekend morning peak has 4,956 records, weekend evening peak has 4,940 records.
 Comparing by unique bus stop codes, there are bus stops with no passenger volume on weekends.
-## Step 6a (Breaks)
+
+:::
+
+## 6.1 Passenger Volume by Intervals
 
 Plot passenger trips traffic for each time interval using `tmap`.
 
@@ -482,6 +484,7 @@ breaks <- c(1, 2500, 5000, 7500, 10000, 25000, 50000, Inf)
 current_mode <- tmap_mode("plot")
 
 # Weekday Morning Peak
+
 weekday_morning_peak_sf <- st_as_sf(weekday_morning_peak, 
                                     coords = c("longitude", "latitude"), 
                                     crs = 3414) 
@@ -553,7 +556,7 @@ tmap_mode(current_mode)
 ```
 Binning by pre=determined **breaks** allows the comparison of passenger volume during peak hours on the **same scale**. Due to underlying difference in the number of days, weekdays are likely to see more passenger volume than weekends. Comparing the **weekday morning peak** and afternoon peak, there is more passenger volume observed in the **peripheral areas** where residents are commuting from residential areas (origin) to central areas (destinations). Whereas the **weekend** morning and evening peak has **constant** passenger volume originating from the same hexagons, indicating high activity levels in these popular areas.
 
-## Step 6b (Quantile)
+## 6.1 Passenger Volume by Quantile
 
 ```{r}
 #| code-fold: true
@@ -618,7 +621,7 @@ Binning by **quantiles** enables **relative comparison** of the passenger traffi
 
 **Getis and Ord's G-statistics** looks at neighbours within a defined proximity to identify where either high or low values cluster spatially. Statistically significant hot-spots are recognised as areas of high values where other areas within a neighbourhood range also share high values too.
 
-## Method 1: Computing Contiguity Spatial Weights
+## Method 1: Compute Contiguity Spatial Weights
 
 ### Contiguity Weight Matrix 
 
@@ -648,7 +651,7 @@ A **connectivity graph** takes a point and displays a line to each neighboring p
 #plot(wm_q_time, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
 
-## Method 2: Computing distance based neighbours
+## Method 2: Compute distance based neighbours
 
 ::: panel-tabset
 ### Step 1
@@ -739,8 +742,6 @@ summary(knn_lw)
 # plot(passengergrid_time_total$area_hexagon_grid, border="grey")
 # plot(knn_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
-
-### Step 3c (Inverse Distance)
 
 :::
 

@@ -1,0 +1,35 @@
+---
+title: "Regionalisation of Water Points"
+author: "Wan Kee"
+date: "4 December 2023"
+date modified: "4 December 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: source
+---
+
+# **Regionalisation of Multivariate Water Point Attributes with Non-spatially Constrained and Spatially Constrained Clustering Methods**
+
+# 1. Overview
+
+# 2. Load packages
+
+The analysis involves the following packages:
+
+-   `sf` imports and handles geospatial data
+-   `DT` enables R data objects (matrices or data frames) to be displayed as tables on HTML pages.
+-   `tidyverse` performs aspatial data import, wrangling and visualization
+-   `spdep` compute spatial weights and spatially lagged variables
+-   `spfep` compute spatial autocorrelation
+-   `mapview` and `tmap` supports data visualisation
+
+```{r}
+pacman::p_load(sf, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse)
+```
+
+# 3. Import data
+
+# 4. Explore data

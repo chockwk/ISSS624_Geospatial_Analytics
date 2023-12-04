@@ -425,5 +425,12 @@
     "title": "Spatial Weights and Application",
     "section": "Spatial Weights Matrices",
     "text": "Spatial Weights Matrices\nspdep offers various methods to create spatial weights matrices based on contiguity, distance, and other spatial relationships. Binary or weighted spatial weights matrices are created using functions such as poly2nb (polygon-based contiguity), dnearneigh (distance-based neighbors), and others."
+  },
+  {
+    "objectID": "Take_home_Ex/Take_home_Ex02/Take_home_Ex02.html",
+    "href": "Take_home_Ex/Take_home_Ex02/Take_home_Ex02.html",
+    "title": "Regionalisation of Water Points",
+    "section": "",
+    "text": "Regionalisation of Multivariate Water Point Attributes with Non-spatially Constrained and Spatially Constrained Clustering Methods\n\n\n1. Overview\n\n\n2. Load packages\nThe analysis involves the following packages:\n\nsf imports and handles geospatial data\nDT enables R data objects (matrices or data frames) to be displayed as tables on HTML pages.\ntidyverse performs aspatial data import, wrangling and visualization\nspdep compute spatial weights and spatially lagged variables\nspfep compute spatial autocorrelation\nmapview and tmap supports data visualisation\n\n\npacman::p_load(sf, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse)\n\n\n\n3. Import data\n\n\n4. Explore data"
   }
 ]
