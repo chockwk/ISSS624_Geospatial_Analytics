@@ -9,7 +9,7 @@
 <meta name="author" content="Wan Kee">
 <meta name="dcterms.date" content="2023-11-21">
 
-<title>Geospatial Analytics - 2a Spatial Weights and Application</title>
+<title>Geospatial Analytics - Spatial Weights and Application</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -212,6 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1.1 Overview</a></li>
   <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages">1.2 Load packages</a>
   <ul class="collapse">
+  <li><a href="#spatial-weights-matrices" id="toc-spatial-weights-matrices" class="nav-link" data-scroll-target="#spatial-weights-matrices">Spatial Weights Matrices</a></li>
   <li><a href="#spatial-autocorrelation" id="toc-spatial-autocorrelation" class="nav-link" data-scroll-target="#spatial-autocorrelation">Spatial Autocorrelation</a></li>
   <li><a href="#spatial-regression-models" id="toc-spatial-regression-models" class="nav-link" data-scroll-target="#spatial-regression-models">Spatial Regression Models</a></li>
   <li><a href="#spatial-filtering" id="toc-spatial-filtering" class="nav-link" data-scroll-target="#spatial-filtering">Spatial Filtering</a></li>
@@ -231,7 +232,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">2a Spatial Weights and Application</h1>
+<h1 class="title">Spatial Weights and Application</h1>
 </div>
 
 
@@ -297,8 +298,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="load-packages" class="level1">
 <h1>1.2 Load packages</h1>
 <p><code>spdep</code> is comprehensive package for spatial econometrics and spatial statistics. It provides the functions and tools for handling spatial data, creating spatial weights matrices, and conducting spatial data analysis.</p>
-<p>Here are the functions of <code>spdep</code>: ::: panel-tabset ## Spatial Weights Matrices</p>
+<p>Here are the functions of <code>spdep</code>:</p>
+<p>::: panel-tabset</p>
+<section id="spatial-weights-matrices" class="level2">
+<h2 class="anchored" data-anchor-id="spatial-weights-matrices">Spatial Weights Matrices</h2>
 <p><code>spdep</code> offers various methods to create spatial weights matrices based on contiguity, distance, and other spatial relationships. Binary or weighted spatial weights matrices are created using functions such as <code>poly2nb</code> (polygon-based contiguity), <code>dnearneigh</code> (distance-based neighbors), and others.</p>
+</section>
 <section id="spatial-autocorrelation" class="level2">
 <h2 class="anchored" data-anchor-id="spatial-autocorrelation">Spatial Autocorrelation</h2>
 <p><code>spdep</code> provides functions to calculate measures of spatial autocorrelation, including global Moran’s I, Geary’s C, and Getis/Ord G statistics.</p>

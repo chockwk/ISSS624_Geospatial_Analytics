@@ -267,10 +267,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level1">
 <h1>1.1 Overview</h1>
-<p>In this Hands_on_Ex01, we will handle geospatial data in R using two packages, namely tidyverse and sf.</p>
 <p><strong>Learning Objectives:</strong></p>
 <ol type="1">
-<li>Introduction to R packages and functions that support geospatial data.</li>
+<li>Introduction to <code>sf</code> package and functions that support geospatial data.</li>
 <li>Understand geospatial file formats and coordinate reference systems.</li>
 <li>Create a simple feature (sf) dataframe.</li>
 <li>Perform geoprocessing tasks.</li>
@@ -304,11 +303,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Next, we have three geospatial and one aspatial datasets in various data file formats.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">cyclingpath</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">airbnb</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Subzone</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Cycling Path</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">Airbnb</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p><strong>Master Plan 2014 Subzone Boundary (<code>mpsz</code>)</strong></p>
-<p>The Master Plan is a forward looking guiding plan for Singapore’s development in the medium term over the next 10 to 15 years. To facilitate urban planning, the Urban Redevelopment Authority (URA) divides Singapore into regions, planning areas and subzones. Subzones are divisions within a planning area which are usually centred around a focal point such as neighbourhood centre or activity node.</p>
+<p><code>mpsz</code> is is a <strong>geospatial</strong> dataset of the Master Plan 2019, a forward looking guiding plan for Singapore’s development in the medium term over the next 10 to 15 years published in <strong>2019</strong>. Note this <code>mpsz</code> differs from that in previous chapter, <a href="https://cosmic-kitten.netlify.app/hands_on_ex/hands_on_ex01/hands_on_ex01">Data Wrangling</a>.</p>
+<p>The output indicates that the geospatial objects are <strong>multipolygon</strong> features. There are <strong>332 features</strong> and 6 fields. It is in <strong>WGS84</strong> projected coordinates system with <strong>XY</strong> dimension.</p>
 <p>Source: URA (Download <a href="https://beta.data.gov.sg/collections/1708/view">here</a>)</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -328,11 +328,11 @@ Bounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33
 Projected CRS: SVY21</code></pre>
 </div>
 </div>
-<p>The output indicates that the geospatial objects are multipolygon features. There are 323 features and 15 fields. It is in SVY21 projected coordinates system with XY dimension.</p>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <p><strong>Pre-schools Location (<code>preschool</code>)</strong></p>
-<p>The data contains the location of pre-schools, including childcare centres and kindergartens, in Singapore.</p>
+<p><code>preschool</code> is a <strong>geospatial</strong> dataset containing the location of pre-schools, including childcare centres and kindergartens, in Singapore.</p>
+<p>The output indicates that the geospatial objects are <strong>point</strong> features. There are <strong>2290 features</strong> and 2 fields. It is in <strong>WGS84</strong> projected coordinates system with <strong>XYZ</strong> dimension.</p>
 <p>Source: ECDA (Download <a href="https://beta.data.gov.sg/collections/2064/view">here</a>)</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -353,11 +353,11 @@ z_range:       zmin: 0 zmax: 0
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-<p>The output indicates that the geospatial objects are point features. There are 2290 features and 2 fields. It is in WGS84 projected coordinates system with XYZ dimension.</p>
 </div>
 <div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <p><strong>Cycling Path (<code>cyclingpath</code>)</strong></p>
-<p>The data contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.</p>
+<p><code>cyclingpath</code> is a <strong>geospatial</strong> dataset which contains an intra-town path designated for cyclists represented by line. Note the data excludes park connectors.</p>
+<p>The output indicates that the geospatial objects are <strong>multilinestring</strong> features. There are <strong>2558 features</strong> and 2 fields. It is in <strong>SVY21</strong> projected coordinates system with <strong>XY</strong> dimension.</p>
 <p>Source: LTA (Download <a href="https://datamall.lta.gov.sg/content/datamall/en/search_datasets.html">here</a>)</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -377,11 +377,11 @@ Bounding box:  xmin: 11854.32 ymin: 28347.98 xmax: 42626.09 ymax: 48948.15
 Projected CRS: SVY21</code></pre>
 </div>
 </div>
-<p>The output indicates that the geospatial objects are <strong>multilinestring</strong> features. There are <strong>2558 features</strong> and 2 fields. It is in <strong>SVY21</strong> projected coordinates system with <strong>XY</strong> dimension.</p>
 </div>
 <div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
 <p><strong>Inside Airbnb Singapore (<code>airbnb</code>)</strong></p>
 <p>Inside Airbnb is a mission driven project that provides data and advocacy about Airbnb’s impact on residential communities. The data utilizes public information compiled from the Airbnb web-site including the availabiity calendar for 365 days in the future, and the reviews for each listing. Data is verified, cleansed, analyzed and aggregated. Note the data is not associated with or endorsed by Airbnb.</p>
+<p>It is an <strong>aspatial</strong> dataset and the output indicates 3483 features and 18 fields.</p>
 <p>Inside Airbnb uses an occupancy model, the San Francisco Model, in honor of the public policy and urban planners working for that fair city who created occupancy models to quantify the impact of Airbnb on housing.</p>
 <p>Source: Inside Airbnb (Download <a href="http://insideairbnb.com/get-the-data">here</a>)</p>
 <div class="quarto-figure quarto-figure-center">
@@ -415,7 +415,6 @@ Projected CRS: SVY21</code></pre>
 #   ⁶​room_type</code></pre>
 </div>
 </div>
-<p>The output indicates 3483 features and 18 fields.</p>
 </div>
 </div>
 </div>
@@ -426,7 +425,7 @@ Projected CRS: SVY21</code></pre>
 <h2 class="anchored" data-anchor-id="st_geometry">1.4.1 st_geometry()</h2>
 <p><code>st_geometry()</code> <code>st_set_geometry()</code> <code>st_drop_geometry()</code> can get, set, replace or rename geometry from an sf object. For this exercise, we will use <code>st_geometry()</code> to display basic information of the feature class, such as type of geometry, the geographic extent of the features and the coordinate system of the data.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">cyclingpath</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Subzone</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Cycling Path</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <p><code>mpsz</code> contains a column <code>geometry</code> where it indicates the object is a multipolygon in XY dimension.</p>
@@ -497,7 +496,7 @@ First 5 geometries:</code></pre>
 <h2 class="anchored" data-anchor-id="glimpse">1.4.2 glimpse()</h2>
 <p><code>glimpse()</code> transposes the columns in a dataset and makes it possible to see the column name, data type and values in every column in a data frame.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">cyclingpath</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Subzone</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">Cycling Path</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
@@ -553,10 +552,9 @@ $ geometry   &lt;MULTILINESTRING [m]&gt; MULTILINESTRING ((39782.85 ..., MULTILI
 </section>
 <section id="head" class="level2">
 <h2 class="anchored" data-anchor-id="head">1.4.3 head()</h2>
-<p><code>head()</code> returns the first defined n rows of a vector, matrix, table, data frame or function.</p>
-<p><code>tail()</code> is the reversed function.</p>
+<p><code>head()</code> returns the first defined n rows of a vector, matrix, table, data frame or function. <code>tail()</code> is the reversed function.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false">cyclingpath</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Subzone</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false">cyclingpath</a></li></ul>
 <div class="tab-content">
 <div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
@@ -647,7 +645,7 @@ Projected CRS: SVY21
 <h2 class="anchored" data-anchor-id="plot">1.5.1 plot()</h2>
 <p><code>plot()</code> takes parameters for specifying points in the diagram. At its simplest, it can plot two numbers against each other. With datasets, it can generate maps and plot the specified columns/attributes, with default up to nine plots or maximum all plots.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">mpsz</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-3" role="tab" aria-controls="tabset-6-3" aria-selected="false">cyclingpath</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">Subzone</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">Preschool</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-3" role="tab" aria-controls="tabset-6-3" aria-selected="false">Cycling Path</a></li></ul>
 <div class="tab-content">
 <div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
 <p><code>mpsz</code> contains 15 attributes and we will generate a map for each of the attributes as shown below. Note: The column <code>geometry</code> is not considered as an attribute for <code>mpsz</code>, similar for the subsequent datasets.</p>
@@ -724,11 +722,12 @@ Projected CRS: SVY21
 </div>
 <section id="assign-epsg-code" class="level2">
 <h2 class="anchored" data-anchor-id="assign-epsg-code">1.6.1 Assign EPSG code</h2>
-<p>One of the common issues for geospatial data is the missing coordinate system of the source data or wrongly assigned during the importing process. Although&nbsp;<code>mpsz</code>&nbsp;data frame is projected in SVY21, the CRS indicates that the EPSG is 9001. This is a wrong EPSG code because the correct EPSG code for SVY21 should be 3414. More information <a href="https://epsg.io/3414">here</a>.</p>
+<p>One of the common issues for geospatial data is the missing coordinate system of the source data or wrongly assigned during the importing process. The EPSG code for SVY21 is <strong>3414</strong> and it can be performed using <code>st_set_crs()</code>. More information <a href="https://epsg.io/3414">here</a>.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Before</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">After</a></li></ul>
 <div class="tab-content">
 <div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<p>Although&nbsp;<code>mpsz</code>&nbsp;data frame is projected in SVY21, the CRS indicates that the EPSG is 9001. This is a wrong EPSG code.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(mpsz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">

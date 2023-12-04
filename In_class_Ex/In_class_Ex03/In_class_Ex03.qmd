@@ -13,6 +13,14 @@ editor: source
 
 # 1.1 Overview
 
+**Spatial interaction model** is a mathematical model that predicts the movement of people between origins and destinations by examining the distance between them. It is based on (1) their **spatial separation**; (2) their **complementarity**; and (3) other **intervening opportunities** or spatial structural elements serve to augment or diminish the expected flow.
+
+(1) **Spatial separation** is measured by cost or time involved in the interaction, and is often represented by a distance-decay function that shows diminishing interaction as distance increases.
+
+(2) **Complementarity** is an indicator of the suitability of the particular pair of places for the movement 
+
+(3) Interactions may be diverted to **intervening opportunities** with considerations on the relative location of the interacting agents vis-à-vis other places.
+
 Notes diagonals of distance matrix will be zero.
 
 # 1.2 Load packages

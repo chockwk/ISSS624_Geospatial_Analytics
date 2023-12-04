@@ -739,6 +739,9 @@ summary(knn_lw)
 # plot(passengergrid_time_total$area_hexagon_grid, border="grey")
 # plot(knn_lw, coords, pch = 19, cex = 0.1, add = TRUE, col= "darkseagreen")
 ```
+
+### Step 3c (Inverse Distance)
+
 :::
 
 # 8. Gi statistics
