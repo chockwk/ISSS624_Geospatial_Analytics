@@ -461,6 +461,11 @@ if (length(problematic_stops) > 0) {
   passengergrid_clean <- passengergrid_clean %>%
     filter(!(BUS_STOP_N %in% problematic_stops))
 }
+
+glimpse(weekday_morning_peak)
+glimpse(weekday_afternoon_peak)
+glimpse(weekend_morning_peak)
+glimpse(weekend_evening_peak)
 ```
 
 ## Step 6a (Breaks)
@@ -475,7 +480,9 @@ breaks <- c(1, 2500, 5000, 7500, 10000, 25000, 50000, Inf)
 tmap_mode("plot")
 
 # Weekday Morning Peak
-weekday_morning_peak_sf <- st_as_sf(weekday_morning_peak, coords = c("longitude", "latitude"), crs = 4326) 
+weekday_morning_peak_sf <- st_as_sf(weekday_morning_peak, 
+                                    coords = c("longitude", "latitude"), 
+                                    crs = 3414) 
 max_trips <- max(weekday_morning_peak_sf$Total_Trips, na.rm = TRUE)
 
 weekday_morning_plot <- tm_shape(weekday_morning_peak_sf) +
@@ -490,7 +497,9 @@ weekday_morning_plot <- tm_shape(weekday_morning_peak_sf) +
 
 # Weekday afternoon_peak
 
-weekday_afternoon_peak_sf <- st_as_sf(weekday_afternoon_peak, coords = c("longitude", "latitude"), crs = 4326) 
+weekday_afternoon_peak_sf <- st_as_sf(weekday_afternoon_peak, 
+                                      coords = c("longitude", "latitude"), 
+                                      crs = 3414) 
 max_trips <- max(weekday_afternoon_peak_sf$Total_Trips, na.rm = TRUE)
 
 weekday_afternoon_plot <- tm_shape(weekday_afternoon_peak_sf) +
@@ -505,7 +514,9 @@ weekday_afternoon_plot <- tm_shape(weekday_afternoon_peak_sf) +
 
 # Weekend morning peaks
 
-weekend_morning_peak_sf <- st_as_sf(weekend_morning_peak, coords = c("longitude", "latitude"), crs = 4326) 
+weekend_morning_peak_sf <- st_as_sf(weekend_morning_peak, 
+                                    coords = c("longitude", "latitude"), 
+                                    crs = 3414) 
 max_trips <- max(weekend_morning_peak_sf$Total_Trips, na.rm = TRUE)
 
 weekend_morning_plot <- tm_shape(weekend_morning_peak_sf) +
@@ -514,13 +525,15 @@ weekend_morning_plot <- tm_shape(weekend_morning_peak_sf) +
               border.col = "grey40",
               breaks = breaks) +
   tm_scale_bar()+
-  tm_layout(main.title = "Weekend/holiday Morning Peak", 
+  tm_layout(main.title = "Weekend Morning Peak", 
             main.title.position = "center", 
             frame = FALSE)
 
 # Weekend evening peaks
 
-weekend_evening_peak_sf <- st_as_sf(weekend_evening_peak, coords = c("longitude", "latitude"), crs = 4326) 
+weekend_evening_peak_sf <- st_as_sf(weekend_evening_peak, 
+                                    coords = c("longitude", "latitude"), 
+                                    crs = 3414) 
 max_trips <- max(weekend_evening_peak_sf$Total_Trips, na.rm = TRUE)
 
 weekend_evening_plot <- tm_shape(weekend_evening_peak_sf) +
@@ -532,21 +545,14 @@ weekend_evening_plot <- tm_shape(weekend_evening_peak_sf) +
   tm_layout(main.title = "Weekend Evening Peak", 
             main.title.position = "center", 
             frame = FALSE)
-```
 
+#weekday_morning_grob <- tmap_grob(weekday_morning_plot)
+#weekday_afternoon_grob <- tmap_grob(weekday_afternoon_plot)
+#weekend_morning_grob <- tmap_grob(weekend_morning_plot)
+#weekend_evening_grob <- tmap_grob(weekend_evening_plot)
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-weekday_morning_grob <- tmap_grob(weekday_morning_plot)
-weekday_afternoon_grob <- tmap_grob(weekday_afternoon_plot)
-weekend_morning_grob <- tmap_grob(weekend_morning_plot)
-weekend_evening_grob <- tmap_grob(weekend_evening_plot)
-grid.arrange(
-  weekday_morning_grob,
-  weekday_afternoon_grob,
-  weekend_morning_grob,
-  weekend_evening_grob,
+grid.arrange(weekday_morning_grob,weekday_afternoon_grob,
+  weekend_morning_grob,weekend_evening_grob,
   ncol = 2,
   nrow = 2
 )
@@ -608,35 +614,12 @@ weekend_evening_plot_q<- tm_shape(weekend_evening_peak_sf) +
   tm_layout(main.title = "Weekend Evening Peak Q", 
             main.title.position = "center", 
             frame = FALSE)
-```
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-weekday_morning_q_grob <- tmap_grob(weekday_morning_plot_q)
-```
+#weekday_morning_q_grob <- tmap_grob(weekday_morning_plot_q)
+#weekday_afternoon_q_grob <- tmap_grob(weekday_afternoon_plot_q)
+#weekend_morning_q_grob <- tmap_grob(weekend_morning_plot_q)
+#eekend_evening_q_grob <- tmap_grob(weekend_evening_plot_q)
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-weekday_afternoon_q_grob <- tmap_grob(weekday_afternoon_plot_q)
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-weekend_morning_q_grob <- tmap_grob(weekend_morning_plot_q)
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-weekend_evening_q_grob <- tmap_grob(weekend_evening_plot_q)
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
 grid.arrange(
   weekday_morning_q_grob,
   weekday_afternoon_q_grob,
@@ -648,8 +631,6 @@ grid.arrange(
 ```
 
 Binning by **quantiles** enables **relative comparison** of the passenger traffic between hexagons on the map.
-
-:::
 
 # 7. Hot Spot and Cold Spot Area Analysis
 
