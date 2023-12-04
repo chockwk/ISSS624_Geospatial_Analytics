@@ -467,7 +467,9 @@ glimpse(weekday_afternoon_peak)
 glimpse(weekend_morning_peak)
 glimpse(weekend_evening_peak)
 ```
-
+Weekday morning peak has 4,971 records, weekday afternoon peak has 4,980 records.
+Weekend morning peak has 4,956 records, weekend evening peak has 4,940 records.
+Comparing by unique bus stop codes, there are bus stops with no passenger volume on weekends.
 ## Step 6a (Breaks)
 
 Plot passenger trips traffic for each time interval using `tmap`.
@@ -477,7 +479,7 @@ Plot passenger trips traffic for each time interval using `tmap`.
 #| code-summary: "Show the code"
 breaks <- c(1, 2500, 5000, 7500, 10000, 25000, 50000, Inf)
 
-tmap_mode("plot")
+current_mode <- tmap_mode("plot")
 
 # Weekday Morning Peak
 weekday_morning_peak_sf <- st_as_sf(weekday_morning_peak, 
@@ -546,18 +548,9 @@ weekend_evening_plot <- tm_shape(weekend_evening_peak_sf) +
             main.title.position = "center", 
             frame = FALSE)
 
-#weekday_morning_grob <- tmap_grob(weekday_morning_plot)
-#weekday_afternoon_grob <- tmap_grob(weekday_afternoon_plot)
-#weekend_morning_grob <- tmap_grob(weekend_morning_plot)
-#weekend_evening_grob <- tmap_grob(weekend_evening_plot)
-
-grid.arrange(weekday_morning_grob,weekday_afternoon_grob,
-  weekend_morning_grob,weekend_evening_grob,
-  ncol = 2,
-  nrow = 2
-)
+tmap_arrange(weekday_morning_plot, weekday_afternoon_plot, weekend_morning_plot, weekend_evening_plot)
+tmap_mode(current_mode)
 ```
-
 Binning by pre=determined **breaks** allows the comparison of passenger volume during peak hours on the **same scale**. Due to underlying difference in the number of days, weekdays are likely to see more passenger volume than weekends. Comparing the **weekday morning peak** and afternoon peak, there is more passenger volume observed in the **peripheral areas** where residents are commuting from residential areas (origin) to central areas (destinations). Whereas the **weekend** morning and evening peak has **constant** passenger volume originating from the same hexagons, indicating high activity levels in these popular areas.
 
 ## Step 6b (Quantile)
@@ -565,7 +558,7 @@ Binning by pre=determined **breaks** allows the comparison of passenger volume d
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-tmap_mode("plot")
+current_mode <- tmap_mode("plot")
 
 # Weekday Morning Peak
 
@@ -615,19 +608,8 @@ weekend_evening_plot_q<- tm_shape(weekend_evening_peak_sf) +
             main.title.position = "center", 
             frame = FALSE)
 
-#weekday_morning_q_grob <- tmap_grob(weekday_morning_plot_q)
-#weekday_afternoon_q_grob <- tmap_grob(weekday_afternoon_plot_q)
-#weekend_morning_q_grob <- tmap_grob(weekend_morning_plot_q)
-#eekend_evening_q_grob <- tmap_grob(weekend_evening_plot_q)
-
-grid.arrange(
-  weekday_morning_q_grob,
-  weekday_afternoon_q_grob,
-  weekend_morning_q_grob,
-  weekend_evening_q_grob,
-  ncol = 2,
-  nrow = 2
-)
+tmap_arrange(weekday_morning_plot_q, weekday_afternoon_plot_q, weekend_morning_plot_q, weekend_evening_plot_q)
+tmap_mode(current_mode)
 ```
 
 Binning by **quantiles** enables **relative comparison** of the passenger traffic between hexagons on the map.
@@ -638,7 +620,9 @@ Binning by **quantiles** enables **relative comparison** of the passenger traffi
 
 ## Method 1: Computing Contiguity Spatial Weights
 
-### Contiguity Weight Matrix `poly2nb` defines the spatial relationship between different regions by computing **contiguity weight matrices** and build a neighbours list based on regions with contiguous boundaries.
+### Contiguity Weight Matrix 
+
+`poly2nb` defines the spatial relationship between different regions by computing **contiguity weight matrices** and build a neighbours list based on regions with contiguous boundaries.
 
 ```{r}
 #| code-fold: true
