@@ -15,9 +15,18 @@ editor: source
 
 **Spatial interaction** represent the dynamic flow or movementmof people, material, or information between locations in geographical space. Each spatial interaction is composed of **a discrete origin and destination (OD) pair** and represented as a spatial interaction matrix of **centroids** from origin and destination. The connection between origin and their destination can be visualized by **desire lines**, typically straight lines that records the the number of people travelling between locations.
 
+**Spatial Interaction Models** are mathematical models for estimating flows between spatial entities. 
+
+There are four main types of spatial interaction models:
+1. Unconstrained
+2. Production-constrained
+3. Attraction-constrained
+4. Doubly-constrained
+
 Learning Objectives 
 1. Build a spatial interaction matrix 
 2. Construct desire lines in geospatial data
+3. Compute a distance matrix
 
 # 1.2 Load packages
 
@@ -28,14 +37,20 @@ Learning Objectives
 `stplanr`analyses OD matrix.
 
 ```{r}
-pacman::p_load(tmap, sf, sp, DT, stplanr, performance, reshape2, ggpubr, units, tidyverse)
+pacman::p_load(tmap, sf, DT, stplanr, tidyverse)
 ```
 
 # 1.3 Import data
 
 ::: panel-tabset
+
 ## Passenger Volume
-`odbus` contains the number of trips by weekdays and weekends from origin to destination bus stops. This is a **September 2023** dataset in *Passenger Volume by Origin Bus Stop* from LTA Datamall and reflects the passenger trip traffic. 
+
+`odbus` is an **aspatial** dataset containing the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **September 2023** will be used. 
+
+The output indicates **5,714,196 records** and 7 fields. The bus stop codes are converted into factor for data handling.
+
+Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
 
 ```{r}
 #| code-fold: true
@@ -43,7 +58,7 @@ pacman::p_load(tmap, sf, sp, DT, stplanr, performance, reshape2, ggpubr, units, 
 odbus <- read_csv("data/aspatial/origin_destination_bus_202309.csv")
 glimpse(odbus)
 ```
-The output shows that `odbus` is an **aspatial** data containing 5,714,196 records and 7 fields. Origin and destination codes will be converted to from character to factor.
+Origin and destination codes will be converted to from character to factor.
 
 ```{r}
 odbus <- odbus %>% 
@@ -52,6 +67,7 @@ odbus <- odbus %>%
 ```
 
 ## Bus Stop
+
 `busstops` is a **geospatial** dataset that contains the detailed information for all bus stops currently serviced by buses, including bus stop code, road name, description, location coordinates. The output indicates that the geospatial objects are **point** features. There are **5161 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
 ```{r}
@@ -74,6 +90,13 @@ mpsz = st_read(dsn="data/geospatial/MPSZ-2019", layer="MPSZ-2019") %>%
   st_transform(crs=3414)
 glimpse(mpsz)
 ```
+
+`write_rds()` write sf tibble data frame into rds file.
+
+```{r}
+write_rds(mpsz, "rds/mpsz.rds")
+```
+
 :::
 
 # 1.4 Prepare data
@@ -84,30 +107,42 @@ We will focus on weekday afternoon peak hours to capture high movements and inte
 
 ## Step 1
 
-Commuting flows on **weekday** between **5pm to 8pm** are extracted and there are **226,658 records** during weekday afternoon peak hours based on bus stop code. The data table can be viewed using `datatable()` and saved to rds using `write_rds()`.
+Commuting flows on **weekday** between **6am to 9am** are extracted and there are **226,658 records** during weekday afternoon peak hours based on bus stop code. The data table can be viewed using `datatable()` and saved to rds using `write_rds()`.
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-odbus5_8 <- odbus %>%
+odbus69 <- odbus %>%
   filter(DAY_TYPE == "WEEKDAY") %>%
-  filter(TIME_PER_HOUR >= 5 & TIME_PER_HOUR <= 8) %>%
+  filter(TIME_PER_HOUR >= 6 & TIME_PER_HOUR <= 9) %>%
   group_by(ORIGIN_PT_CODE, DESTINATION_PT_CODE) %>%
   summarise(TRIPS = sum(TOTAL_TRIPS))
 
-datatable(odbus5_8)
+datatable(odbus69)
 ```
 
+::: {.callout-tip}
+## Tip
+RDS files have two main advantages over CSV files:
+1. RDS takes up less disk space.
+2. RDS format handles different types of objects, such as fitted models or statistical test results, while CSVs can only save rectangular data, such as data frames.
+:::
+
+`write_rds` exports output in rds format.
 
 ```{r}
-# save and read
-write_rds(odbus5_8, "rds/odbus5_8.rds")
-odbus5_8 <- read_rds("rds/odbus5_8.rds")
+write_rds(odbus69, "rds/odbus69.rds")
+```
+
+`read_rds` imports rds files.
+
+```{r}
+odbus69 <- read_rds("rds/odbus69.rds")
 ```
 
 ## Step 2
 
-To integrate the planning subzone codes `SUBZONE_C` of `mpsz` sf data frame into `busstop` sf data frame, `st_intersection()` is used to perform point and polygon overly and the output will be in point sf object.`select()` of dplyr package is then use to retain only `BUS_STOP_N` and `SUBZONE_C` in the `busstop_mpsz` sf data frame. There are **5,156** bus stops in the subzones.
+To integrate the planning subzone codes `SUBZONE_C` of `mpsz` sf data frame into `busstop` sf data frame, `st_intersection()` is used to perform **point and polygon overlay** and the output will be in point sf object. `select()` retain only `BUS_STOP_N` and `SUBZONE_C` in the `busstop_mpsz` sf data frame. There are **5,156** bus stops in the subzones. `st_drop_geometry`remove the geometric information from the output and return the aspatial data.
 
 ```{r}
 busstop_mpsz <- st_intersection(busstop, mpsz) %>%
@@ -119,21 +154,20 @@ datatable(busstop_mpsz)
 
 ## Step 3
 
-Append the planning subzone code from `busstop_mpsz` data frame onto `odbus5_8` data frame.
+Based on **origin** bus stop codes, append the planning subzone code from `busstop_mpsz` data frame onto `od_data` data frame using `left_join()`. There are **239,219** commuting flows records consisting of **5,020 origin bus stops**.
 
 ```{r}
-od_data <- left_join(odbus5_8, busstop_mpsz,
+od_data <- left_join(odbus69, busstop_mpsz,
             by = c("ORIGIN_PT_CODE" = "BUS_STOP_N")) %>%
   rename(ORIGIN_BS = ORIGIN_PT_CODE,
          ORIGIN_SZ = SUBZONE_C,
          DESTIN_BS = DESTINATION_PT_CODE)
 glimpse(od_data)
 ```
-There are **224,042** commuting flows with origin and destinations.
 
 ## Step 4
 
-Check for duplicate records.
+`od_data` is a large dataset and it is possible to have duplicate records. The output shows 1,154 duplicated rows.
 
 ```{r}
 duplicate <- od_data %>%
@@ -141,19 +175,20 @@ duplicate <- od_data %>%
   filter(n() > 1) %>%
   ungroup()
 
-duplicate
+dim(duplicate)
 ```
-The output shows 1,084 duplicated rows with same values across 4 fields. Duplicates are removed by `unique()`. 
+
+Duplicates are removed by retaining `unique()` records. From previous 239,219 records, 577 rows containing duplication are removed and 238,642 unique records remain in `od_data`.
 
 ```{r}
 od_data <- unique(od_data)
 glimpse(od_data)
 ```
-From previous 224,042 records, 542 duplicates are removed and 223,500 unique records remain in `od_data`.
 
 ## Step 5
 
-Append planning subzone codes to `od_data`.
+Based on **destination** bus stop codes, append the planning subzone code from `busstop_mpsz` data frame onto `od_data` data frame using `left_join()`. Summing the trips by origin and destination, there are **21,112** OD flows during **weekday morning peak hour**.
+
 ```{r}
 od_data <- left_join(od_data , busstop_mpsz,
             by = c("DESTIN_BS" = "BUS_STOP_N")) 
@@ -167,26 +202,32 @@ od_data <- od_data %>%
 
 glimpse(od_data)
 ```
-Summing the trips by origin and destination, there are **20,597** OD flows.
+
+Save `od_data` to RDS.
 
 ```{r}
-#save and read
 write_rds(od_data, "rds/od_data.rds")
-od_data <- read_rds("rds/od_data.rds")
 ```
 
-# 1.5 Plot data
+```{r}
+od_data <- read_rds("rds/od_data.rds")
+```
+:::
 
-To ensure that spatial flows are between different subzones, the intra-zonal flows within the same subzones will be removed.
-prepare a desire line by using stplanr package
+## Step 6
+
+To ensure that commuting flows are between different subzones, the *intra-zonal flows* within the same subzones will be removed.
 
 ```{r}
 od_data1 <- od_data[od_data$ORIGIN_SZ!=od_data$DESTIN_SZ,]
 ```
 
+
+# 1.5 Plot data
+
 Create desire lines
 
-`od2line()` takes a data frame and a spatial object as inputs and outputs geographic lines representing movement between origins and destinations.
+`od2line()` takes a data frame and a spatial object as inputs and outputs geographic lines, also known as **desire lines**, to represent movement between origins and destinations.
 
 ```{r}
 flowline <- od2line(flow = od_data1, 
@@ -216,3 +257,4 @@ tm_shape(mpsz) + tm_polygons() + flowline %>%
                         n = 6,
                         alpha = 0.9)
 ```
+

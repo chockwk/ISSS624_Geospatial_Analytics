@@ -1,0 +1,24 @@
+---
+title: "Geographical Accessibility"
+author: "Wan Kee"
+date: "9 December 2023"
+date modified: "9 December 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: source
+---
+
+# 1. Overview
+
+Learning Objectives
+1. Computer accessibility measure by using Hansen’s potential model and Spatial Accessibility Measure (SAM)
+2. Visualise the accessibility measures 
+
+# 2. Load packages
+
+# 3. Import data
+
+# 4. 

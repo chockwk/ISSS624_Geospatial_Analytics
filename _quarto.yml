@@ -38,6 +38,7 @@ website:
           - text: Spatial Interaction Models
             href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
           - text: In-class Ex04
+            href: In_class_Ex/In_class_Ex04/In_class_Ex04.html
           - text: In-class Ex05
       - text: "{{< fa-solid fa-earth-asia >}} Take-home Ex"
         menu:

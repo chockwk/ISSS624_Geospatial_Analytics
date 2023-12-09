@@ -1,0 +1,28 @@
+---
+title: "In-class Ex04"
+author: "Wan Kee"
+date: "9 December 2023"
+date modified: "9 December 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: source
+---
+
+# 1. Overview
+
+Learning Objectives
+1. Perform geocoding using data downloaded from data.gov.sg
+2. Calibrate Geospatially Weighted Poisson Regression
+
+# 2. Load packages
+
+```{r}
+pacman::p_load(tidyverse, sf, httr, tmap)
+```
+
+# 3. Import data
+
+# 4. 
