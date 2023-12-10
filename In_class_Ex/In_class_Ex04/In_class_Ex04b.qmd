@@ -11,6 +11,19 @@ execute:
 editor: source
 ---
 
+The analysis involves the following packages:
+
+-   `sf` imports and handles geospatial data
+-   `DT` enables R data objects (matrices or data frames) to be displayed as tables on HTML pages.
+-   `tidyverse` performs aspatial data import, wrangling and visualization
+-   `spdep` compute spatial weights and spatially lagged variables
+-   `spfep` compute spatial autocorrelation
+-   `mapview` and `tmap` supports data visualisation
+
+```{r}
+pacman::p_load(sf, sp, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse)
+```
+
 ```{r}
 flow_data <- read_rds("data/rds/flow_data_tidy.rds")
 glimpse(flow_data)

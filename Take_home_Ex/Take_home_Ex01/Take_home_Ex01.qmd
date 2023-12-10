@@ -130,11 +130,7 @@ The output indicates that the geospatial objects are **polygon** features. There
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-area_hexagon_grid <- st_make_grid(odbusstop, 
-                                 cellsize = 500, 
-                                 crs = 3414,
-                                 what = "polygons",
-                                 square = FALSE)
+area_hexagon_grid = st_make_grid(busstop, cellsize = 500, what = "polygons", square = FALSE)
 area_hexagon_grid
 ```
 
@@ -212,7 +208,7 @@ The map below shows the overview of all bus stops in Singapore. Each dot represe
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-mapview(odbusstop, cex = 3, alpha = 0.5, popup = NULL, col.regions = "darkseagreen")
+mapview(busstop, cex = 3, alpha = 0.5, popup = NULL, col.regions = "darkseagreen")
 ```
 
 ## Bus Stop Density and Malls
@@ -574,6 +570,8 @@ weekend_evening_plot <- tm_shape(weekend_evening_peak_sf) +
             frame = FALSE)
 
 tmap_arrange(weekday_morning_plot, weekday_afternoon_plot, weekend_morning_plot, weekend_evening_plot)
+
+tmap_mode(current_mode)
 ```
 
 ::: {.callout-note}
@@ -647,66 +645,53 @@ current_mode <- tmap_mode("plot")
 
 # Weekday Morning Peak
 
-weekday_morning_plot_q <- tm_shape(hexagon_count_tmap) +
-  tm_polygons("WEEKDAY MORNING PEAK", 
+weekday_morning_plot_q <- tm_shape(weekday_morning_peak_sf) +
+  tm_polygons("Total_Trips", 
               palette = "Blues", 
               border.col = "grey40",
               style = "quantile") + 
   tm_scale_bar() +
-  tm_layout(main.title = "Weekday Morning Peak", 
+  tm_layout(main.title = "Weekday Morning Peak Q", 
             main.title.position = "center",
-            frame = FALSE,
-            legend.outside = TRUE,
-            legend.outside.position = "right",
-            legend.text.size = 0.4)
+            frame = FALSE)
 
 # Weekday afternoon_peak
 
-weekday_afternoon_plot_q <- tm_shape(hexagon_count_tmap) +
-  tm_polygons("WEEKDAY AFTERNOON PEAK", 
+weekday_afternoon_plot_q <- tm_shape(weekday_afternoon_peak_sf) +
+  tm_polygons("Total_Trips", 
               palette = "Blues", 
               border.col = "grey40",
               style = "quantile") +
   tm_scale_bar()+
-  tm_layout(main.title = "Weekday Afternoon Peak", 
+  tm_layout(main.title = "Weekday Afternoon Peak Q", 
             main.title.position = "center", 
-            frame = FALSE,
-            legend.outside = TRUE,
-            legend.outside.position = "right",
-            legend.text.size = 0.4)
+            frame = FALSE)
 
 # Weekend morning peaks
 
-weekend_morning_plot_q <- tm_shape(hexagon_count_tmap) +
-  tm_polygons("WEEKEND HOLIDAY MORNING PEAK", 
+weekend_morning_plot_q <- tm_shape(weekend_morning_peak_sf) +
+  tm_polygons("Total_Trips", 
               palette = "Purples", 
               border.col = "grey40",
               style = "quantile") +
   tm_scale_bar()+
-  tm_layout(main.title = "Weekend Morning Peak", 
+  tm_layout(main.title = "Weekend/holiday Morning Peak Q", 
             main.title.position = "center", 
-            frame = FALSE,
-            legend.outside = TRUE,
-            legend.outside.position = "right",
-            legend.text.size = 0.4)
+            frame = FALSE)
 
 # Weekend evening peaks
 
-weekend_evening_plot_q <- tm_shape(hexagon_count_tmap) +
-  tm_polygons("WEEKEND HOLIDAY EVENING PEAK", 
+weekend_evening_plot_q<- tm_shape(weekend_evening_peak_sf) +
+  tm_polygons("Total_Trips", 
               palette = "Purples", 
               border.col = "grey40",
               style = "quantile") +
   tm_scale_bar()+
-  tm_layout(main.title = "Weekend Evening Peak", 
+  tm_layout(main.title = "Weekend Evening Peak Q", 
             main.title.position = "center", 
-            frame = FALSE,
-            legend.outside = TRUE,
-            legend.outside.position = "right",
-            legend.text.size = 0.4)
+            frame = FALSE)
 
 tmap_arrange(weekday_morning_plot_q, weekday_afternoon_plot_q, weekend_morning_plot_q, weekend_evening_plot_q)
-tmap_mode(current_mode)
 ```
 
 ::: {.callout-note}

@@ -965,6 +965,7 @@ ggplot(data = gi_weekend_evening,
         panel.grid.minor = element_blank(),
         axis.line = element_line(colour = "grey"))
 ```
+:::
 
 # 9. Emerging Hot Spot Analysis (EHSA)
 
@@ -1307,8 +1308,8 @@ Step 2: `cbind()` joins the Gi values calculated from fixed distance weight matr
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
-passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.fixed)) %>%
-  rename(gstat_fixed = as.matrix.gi.fixed.)
+#passengergrid_time_total.gi <- cbind(passengergrid_time_total, as.matrix(gi.fixed)) %>%
+#  rename(gstat_fixed = as.matrix.gi.fixed.)
 ```
 
 Step 3: Map the Gi values calculated from fixed distance weight matrix.
