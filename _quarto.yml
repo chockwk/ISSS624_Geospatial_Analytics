@@ -37,14 +37,14 @@ website:
             href: In_class_Ex/In_class_Ex02/In_class_Ex02.html
           - text: Spatial Interaction Models
             href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
-          - text: In-class Ex04
+          - text: Geospatially Weighted Poisson Regression
             href: In_class_Ex/In_class_Ex04/In_class_Ex04.html
           - text: In-class Ex05
       - text: "{{< fa-solid fa-earth-asia >}} Take-home Ex"
         menu:
           - text: Dynamic Patterns of Public Transport Usage
             href: Take_home_Ex/Take_home_Ex01/Take_home_Ex01.html
-          - text: Regionalisation of Water Points
+          - text: Spatial Interaction Model of Public Transport Usage
             href: Take_home_Ex/Take_home_Ex02/Take_home_Ex02.html
     
   page-navigation: true

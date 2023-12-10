@@ -9,7 +9,7 @@
 <meta name="author" content="Wan Kee">
 <meta name="dcterms.date" content="2023-12-09">
 
-<title>Geospatial Analytics - In-class Ex04</title>
+<title>Geospatial Analytics - Geospatially Weighted Poisson Regression</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -179,7 +179,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
         <li>
     <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex04/In_class_Ex04.html" rel="" target="">
- <span class="dropdown-text">In-class Ex04</span></a>
+ <span class="dropdown-text">Geospatially Weighted Poisson Regression</span></a>
   </li>  
         <li class="dropdown-header">In-class Ex05</li>
     </ul>
@@ -195,7 +195,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
         <li>
     <a class="dropdown-item" href="../../Take_home_Ex/Take_home_Ex02/Take_home_Ex02.html" rel="" target="">
- <span class="dropdown-text">Regionalisation of Water Points</span></a>
+ <span class="dropdown-text">Spatial Interaction Model of Public Transport Usage</span></a>
   </li>  
     </ul>
   </li>
@@ -217,8 +217,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1. Overview</a></li>
   <li><a href="#load-packages" id="toc-load-packages" class="nav-link" data-scroll-target="#load-packages">2. Load packages</a></li>
-  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">3. Import data</a></li>
-  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section">4.</a></li>
+  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">3. Import data</a>
+  <ul class="collapse">
+  <li><a href="#school" id="toc-school" class="nav-link" data-scroll-target="#school">School</a></li>
+  <li><a href="#mpsz" id="toc-mpsz" class="nav-link" data-scroll-target="#mpsz">mpsz</a></li>
+  <li><a href="#business" id="toc-business" class="nav-link" data-scroll-target="#business">Business</a></li>
+  </ul></li>
+  <li><a href="#prepare-date" id="toc-prepare-date" class="nav-link" data-scroll-target="#prepare-date">4. Prepare date</a></li>
+  <li><a href="#model-calibration" id="toc-model-calibration" class="nav-link" data-scroll-target="#model-calibration">4. Model Calibration</a></li>
   </ul>
 </nav>
     </div>
@@ -227,7 +233,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">In-class Ex04</h1>
+<h1 class="title">Geospatially Weighted Poisson Regression</h1>
 </div>
 
 
@@ -266,9 +272,189 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="import-data" class="level1">
 <h1>3. Import data</h1>
+<section id="school" class="level2">
+<h2 class="anchored" data-anchor-id="school">School</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://www.onemap.gov.sg/api/common/elastic/search"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>csv <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/Generalinformationofschools.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(csv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 346
+Columns: 31
+$ school_name        &lt;chr&gt; "ADMIRALTY PRIMARY SCHOOL", "ADMIRALTY SECONDARY SC…
+$ url_address        &lt;chr&gt; "https://admiraltypri.moe.edu.sg/", "http://www.adm…
+$ address            &lt;chr&gt; "11   WOODLANDS CIRCLE", "31   WOODLANDS CRESCENT",…
+$ postal_code        &lt;chr&gt; "738907", "737916", "768643", "768928", "579646", "…
+$ telephone_no       &lt;chr&gt; "63620598", "63651733", "67592906", "67585384", "64…
+$ telephone_no_2     &lt;chr&gt; "na", "63654596", "na", "na", "na", "na", "na", "na…
+$ fax_no             &lt;chr&gt; "63627512", "63652774", "67592927", "67557778", "64…
+$ fax_no_2           &lt;chr&gt; "na", "na", "na", "na", "na", "na", "na", "na", "na…
+$ email_address      &lt;chr&gt; "ADMIRALTY_PS@MOE.EDU.SG", "Admiralty_SS@moe.edu.sg…
+$ mrt_desc           &lt;chr&gt; "Admiralty Station", "ADMIRALTY MRT", "Yishun", "CA…
+$ bus_desc           &lt;chr&gt; "TIBS 965, 964, 913", "904", "Yishun Ring Road - 81…
+$ principal_name     &lt;chr&gt; "MR PEK WEE HAUR", "MR LAM YUI- P'NG", "MISS ONG LE…
+$ first_vp_name      &lt;chr&gt; "MDM CHUA MUI LING", "MR NG SONG LIM STEVEN", "MADA…
+$ second_vp_name     &lt;chr&gt; "MDM NUR SABARIAH BTE MOHD IBRAHIM", "MR SHEIK ALAU…
+$ third_vp_name      &lt;chr&gt; "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NU…
+$ fourth_vp_name     &lt;chr&gt; "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NU…
+$ fifth_vp_name      &lt;chr&gt; "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NU…
+$ sixth_vp_name      &lt;chr&gt; "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NU…
+$ dgp_code           &lt;chr&gt; "WOODLANDS", "WOODLANDS", "YISHUN", "YISHUN", "BISH…
+$ zone_code          &lt;chr&gt; "NORTH", "NORTH", "NORTH", "NORTH", "SOUTH", "SOUTH…
+$ type_code          &lt;chr&gt; "GOVERNMENT SCHOOL", "GOVERNMENT SCHOOL", "GOVERNME…
+$ nature_code        &lt;chr&gt; "CO-ED SCHOOL", "CO-ED SCHOOL", "CO-ED SCHOOL", "CO…
+$ session_code       &lt;chr&gt; "FULL DAY", "SINGLE SESSION", "SINGLE SESSION", "SI…
+$ mainlevel_code     &lt;chr&gt; "PRIMARY", "SECONDARY", "PRIMARY", "SECONDARY", "PR…
+$ sap_ind            &lt;chr&gt; "No", "No", "No", "No", "Yes", "No", "No", "No", "N…
+$ autonomous_ind     &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No", "Ye…
+$ gifted_ind         &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No", "No…
+$ ip_ind             &lt;chr&gt; "No", "No", "No", "No", "No", "No", "No", "No", "No…
+$ mothertongue1_code &lt;chr&gt; "Chinese", "Chinese", "Chinese", "Chinese", "Chines…
+$ mothertongue2_code &lt;chr&gt; "Malay", "Malay", "Malay", "Malay", "na", "Malay", …
+$ mothertongue3_code &lt;chr&gt; "Tamil", "Tamil", "Tamil", "Tamil", "na", "Tamil", …</code></pre>
+</div>
+</div>
 </section>
-<section id="section" class="level1">
-<h1>4.</h1>
+<section id="mpsz" class="level2">
+<h2 class="anchored" data-anchor-id="mpsz">mpsz</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"MPSZ-2019"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `MPSZ-2019' from data source 
+  `/Users/chockwankee/Documents/chockwk/ISSS624_Geospatial_Analytics/In_class_Ex/In_class_Ex04/data/geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 332 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</section>
+<section id="business" class="level2">
+<h2 class="anchored" data-anchor-id="business">Business</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>business <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"Business"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `Business' from data source 
+  `/Users/chockwankee/Documents/chockwk/ISSS624_Geospatial_Analytics/In_class_Ex/In_class_Ex04/data/geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 6550 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 3669.148 ymin: 25408.41 xmax: 47034.83 ymax: 50148.54
+Projected CRS: SVY21 / Singapore TM</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="prepare-date" class="level1">
+<h1>4. Prepare date</h1>
+<p>Step 1: Pick postal code from csv into a list and read into api for efficiency.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>postcodes <span class="ot">&lt;-</span> csv<span class="sc">$</span>postal_code</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>found <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>not_found <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 2: Obtain results from OneMap API, namely BLK_NO, ROAD_NAME, BUILDING, ADDRESS, POSTAL, X, Y, LATITUDE, LONGITUDE.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (postcode <span class="cf">in</span> postcodes){</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  query <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"searchVal"</span> <span class="ot">=</span> postcode,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                <span class="st">"returnGeom"</span> <span class="ot">=</span> <span class="st">"Y"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">"getAddrDetails"</span> <span class="ot">=</span> <span class="st">"Y"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                <span class="st">"pageNum"</span> <span class="ot">=</span> <span class="st">"1"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">GET</span>(url , <span class="at">query =</span> query)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>((<span class="fu">content</span>(res)<span class="sc">$</span>found) <span class="sc">!=</span> <span class="dv">0</span>){</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    found <span class="ot">&lt;-</span> <span class="fu">rbind</span>(found, <span class="fu">data.frame</span>(<span class="fu">content</span>(res))[<span class="dv">4</span><span class="sc">:</span><span class="dv">13</span>])</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    not_found <span class="ot">=</span> <span class="fu">data.frame</span>(postcode)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(found)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 345
+Columns: 10
+$ results.SEARCHVAL &lt;chr&gt; "THE LEARNING HARBOUR @ ADMIRALTY PRIMARY SCHOOL", "…
+$ results.BLK_NO    &lt;chr&gt; "11", "31", "10", "751", "100", "2A", "31", "19", "1…
+$ results.ROAD_NAME &lt;chr&gt; "WOODLANDS CIRCLE", "WOODLANDS CRESCENT", "YISHUN ST…
+$ results.BUILDING  &lt;chr&gt; "THE LEARNING HARBOUR @ ADMIRALTY PRIMARY SCHOOL", "…
+$ results.ADDRESS   &lt;chr&gt; "11 WOODLANDS CIRCLE THE LEARNING HARBOUR @ ADMIRALT…
+$ results.POSTAL    &lt;chr&gt; "738907", "737916", "768643", "768928", "579646", "1…
+$ results.X         &lt;chr&gt; "24315.9398124339", "24559.0472937012", "27958.13714…
+$ results.Y         &lt;chr&gt; "47135.3542042952", "47504.7873554379", "46096.26276…
+$ results.LATITUDE  &lt;chr&gt; "1.44254963931583", "1.44589068910993", "1.433152715…
+$ results.LONGITUDE &lt;chr&gt; "103.800213682734", "103.802398196596", "103.8329424…</code></pre>
+</div>
+</div>
+<p>Step 3: Merge school information with geospatial data from OneMap API.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>merged <span class="ot">=</span> <span class="fu">merge</span>(csv, found, <span class="at">by.x =</span> <span class="st">"postal_code"</span>, <span class="at">by.y =</span> <span class="st">"results.POSTAL"</span>, <span class="at">all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(merged, <span class="at">file =</span> <span class="st">"data/aspatial/schools.csv"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(not_found, <span class="at">file =</span> <span class="st">"data/aspatial/not_found.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 4: Manually add Zhenghua Secondary School longitude and latitude into school.csv Google search output 1.3887°N 103.7652°E</p>
+<p>Step 5: Import schools and rename columns</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>schools <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/schools.csv"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">latitude =</span> results.LATITUDE,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">longitude =</span> results.LONGITUDE) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(postal_code, school_name, latitude, longitude)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(schools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 350
+Columns: 4
+$ postal_code &lt;chr&gt; "088256", "099138", "099757", "099840", "109100", "127368"…
+$ school_name &lt;chr&gt; "CANTONMENT PRIMARY SCHOOL", "CHIJ ST. THERESA'S CONVENT",…
+$ latitude    &lt;dbl&gt; 1.275465, 1.275352, 1.274740, 1.274958, 1.276128, 1.301228…
+$ longitude   &lt;dbl&gt; 103.8400, 103.8224, 103.8280, 103.8242, 103.8086, 103.7649…</code></pre>
+</div>
+</div>
+<p>Step 6: Convert aspatial data to sf tibble data frame Convert WGS84 (crs=4326) to SVY21 (crs=3414).</p>
+<p>The output indicates <strong>point</strong> spatial object in <strong>XY</strong> dimension. There are 350 records. The projected CRS is <strong>SVY21</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#schools_sf &lt;- st_as_sf(schools,</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#                       coords = c("longitude", "latitude"),</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                       crs = 4326)%&gt;% </span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#  st_transform(crs = 3414)</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#head(schools_sf, n=5)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Step 7: Plot a point simple feature layer</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#tmap_mode("view")</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#tm_shape(schools_sf)+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  tm_dots()+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#tm_view(set.zoom.limits = c(11,14))</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">#tmap_mode("plot") # release resources</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Count the number of schools within each planning subzone.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mpsz$"SCHOOL_COUNT" &lt;- lengths(</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  st_intersects(</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#    mpsz, schools_sf</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#  )</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(mpsz$SCHOOL_COUNT)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot polygon then dot as the layers overlap</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#tmap_options(check.and.fix = TRUE)</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#tm_shape(mpsz)+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#  tm_polygons()+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#tm_shape(business_sf)+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#  tm_dots()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Check for variables with zero values</p>
+<p>log0 is infinity, recode 0 to 0 to 1, cannot be 0 or 1 as log1 has a value</p>
+</section>
+<section id="model-calibration" class="level1">
+<h1>4. Model Calibration</h1>
 
 
 </section>

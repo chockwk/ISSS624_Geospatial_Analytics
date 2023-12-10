@@ -1,0 +1,53 @@
+---
+title: "SIMs"
+author: "Wan Kee"
+date: "9 December 2023"
+date modified: "9 December 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: source
+---
+
+```{r}
+flow_data <- read_rds("data/rds/flow_data_tidy.rds")
+glimpse(flow_data)
+```
+
+```{r}
+flow_data$FlowNoIntra <- ifelse(
+  flow_data$ORIGIN_SZ == flow_data$DESTIN_SZ,
+  0,
+  flow_data$MORNING_PEAK)
+
+flow_data$offset <- ifelse(
+  flow_data$ORIGIN_SZ == flow_data$DESTIN_SZ,
+  0.000001,
+  1)
+```
+
+
+```{r}
+inter_zonal_flow <- flow_data %>% 
+  filter(FlowNoIntra>0)
+```
+
+log(DIST) must be negative where people are not willing to travel to show distance decay.
+log(SCHOOL_COUNT) and log(RETAIL_COUNT) should be positive and p-value less than 0.05 to be statistically significant.
+
+Goodness-of-fit
+
+Define a function to calculate R2.
+
+```{r}
+CalcRSquared = function(observed, estimated){
+  r = cor(observed, estimated)
+  R2 = r^2
+  R2
+}
+```
+
+
+Doubly constrained does not have -1 for log(DIST) where there is no interaction.
