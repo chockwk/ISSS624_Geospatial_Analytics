@@ -37,9 +37,10 @@ website:
             href: In_class_Ex/In_class_Ex02/In_class_Ex02.html
           - text: Spatial Interaction Models
             href: In_class_Ex/In_class_Ex03/In_class_Ex03.html
-          - text: Geospatially Weighted Poisson Regression
+          - text: Geocoding using API
             href: In_class_Ex/In_class_Ex04/In_class_Ex04.html
-          - text: In-class Ex05
+          - text: Calibrate Spatial Interaction Models
+            href: In_class_Ex/In_class_Ex04/In_class_Ex04b.html
       - text: "{{< fa-solid fa-earth-asia >}} Take-home Ex"
         menu:
           - text: Dynamic Patterns of Public Transport Usage
