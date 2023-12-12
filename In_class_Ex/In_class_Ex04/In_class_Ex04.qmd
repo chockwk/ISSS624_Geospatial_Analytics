@@ -13,11 +13,16 @@ editor: source
 
 # 1. Overview
 
-Learning Objectives
-1.  Perform geocoding using data downloaded from data.gov.sg
-2.  Calibrate Geospatially Weighted Poisson Regression
+Learning Objectives 1. Perform geocoding by using SLA OneMap API 2. Convert an aspatial data into a simple feature tibble data.frame 3. Perform point-in-polygon count analysis 4. Append the propulsiveness and attractiveness variables onto a flow data.
 
 # 2. Load packages
+
+The analysis involves the following packages:
+
+-   `sf` imports and handles geospatial data
+-   `httr` provide a wrapper for the curl package, customised to the demands of modern web APIs.
+-   `tidyverse` performs aspatial data import, wrangling and visualization
+-   `tmap` supports data visualisation
 
 ```{r}
 pacman::p_load(tidyverse, sf, httr, tmap)
@@ -25,39 +30,73 @@ pacman::p_load(tidyverse, sf, httr, tmap)
 
 # 3. Import data
 
+::: panel-tabset
 ## School
 
+`school` is an **aspatial** dataset where all the school directory and information is available for download [here](https://beta.data.gov.sg/collections/457/datasets/d_9aba12b5527843afb0b2e8e4ed6ac6bd/view). 
+The output indicates that there are **346 features** and 31 fields.
+
 ```{r}
-url <- "https://www.onemap.gov.sg/api/common/elastic/search"
-csv <- read_csv("data/aspatial/Generalinformationofschools.csv")
-glimpse(csv)
+school <- read_csv("data/aspatial/Generalinformationofschools.csv")
+glimpse(school)
 ```
 
 ## mpsz
 
+`mpsz` is is a **geospatial** dataset of the Master Plan 2019, a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years published in **2019**.
+
+The output indicates that the geospatial objects are **multipolygon** features. There are **332 features** and 6 fields. It is in **WGS84** projected coordinates system with **XY** dimension.
+
+Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
+
 ```{r}
 mpsz = st_read(dsn="data/geospatial", layer="MPSZ-2019")
+
+mpsz <- st_transform(mpsz, crs = 3414)
+```
+```{r}
+st_crs(mpsz)
 ```
 
 ## Business
+
+`business` is is a **geospatial** dataset prepared by Prof Kam.
+
+The output indicates that the geospatial objects are **point** features. There are **6,650 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
 
 ```{r}
 business = st_read(dsn="data/geospatial", layer="Business")
 ```
 
-# 4. Prepare date
-
-Step 1: Pick postal code from csv into a list and read into api for efficiency.
 ```{r}
-postcodes <- csv$postal_code
+glimpse(business)
+```
+:::
 
+# 4. Geocoding
+
+**Address geocoding** or **geocoding** is the process of identifying a **aspatial** description of a location on the Earth surface through its address, postcode, geographic coordinates or latitude/longitude pair.
+
+Singapore Land Authority (SLA) supports an online geocoding service called [OneMap API](https://www.onemap.gov.sg/apidocs/#onemap-rest-apis). The Search API looks up the address or 6-digit postal code for an entered value and returns both latitude, longitude and x,y coordinates of the searched location. 
+
+Step 1: The input `school` is a csv. Select the postal code from into a list, which reads into the API efficiently. 
+
+```{r}
+postcodes <- school$postal_code
+```
+
+Step 2: Two tibble data frames are created, `found` contains all records geocoded correctly and `not_found` contains postal that failed to be geocoded.
+
+```{r}
 found <- data.frame()
 not_found <- data.frame()
 ```
 
-Step 2: Obtain results from OneMap API, namely BLK_NO, ROAD_NAME, BUILDING, ADDRESS, POSTAL, X, Y, LATITUDE, LONGITUDE.
+Step 3: A collection of http call functions of `httr`, such as `GET()` will pass the records to the geocoding server at OneMap. Obtain results from OneMap API, namely BLK_NO, ROAD_NAME, BUILDING, ADDRESS, POSTAL, X, Y, LATITUDE, LONGITUDE.
 
 ```{r}
+url <- "https://www.onemap.gov.sg/api/common/elastic/search"
+
 for (postcode in postcodes){
   query <- list("searchVal" = postcode,
                 "returnGeom" = "Y",
@@ -80,74 +119,120 @@ glimpse(found)
 Step 3: Merge school information with geospatial data from OneMap API.
 
 ```{r}
-merged = merge(csv, found, by.x = "postal_code", by.y = "results.POSTAL", all = TRUE)
+merged = merge(school, found, 
+               by.x = "postal_code", 
+               by.y = "results.POSTAL", 
+               all = TRUE)
+
 write_csv(merged, file = "data/aspatial/schools.csv")
 write_csv(not_found, file = "data/aspatial/not_found.csv")
+
+glimpse(merged)
 ```
 
-Step 4: Manually add Zhenghua Secondary School longitude and latitude into school.csv
-Google search output 1.3887°N 103.7652°E
+Step 4: Manually add Zhenghua Secondary School longitude and latitude into school.csv Google search output 1.3887°N 103.7652°E
+
+```{r}
+find_na <- function(data) {
+  na_rows <- which(is.na(data$results.LATITUDE) | is.na(data$results.LONGITUDE))
+  na_schools <- data$school_name[na_rows]
+  return(na_schools)
+}
+
+# Usage:
+na_schools <- find_na(merged)
+print(na_schools)
+```
+
 
 Step 5: Import schools and rename columns
 
 ```{r}
-schools <- read_csv("data/aspatial/schools.csv") %>% 
+school2 <- read_csv("data/aspatial/school_longlatadded.csv") %>% 
   rename(latitude = results.LATITUDE,
          longitude = results.LONGITUDE) %>% 
   select(postal_code, school_name, latitude, longitude)
-glimpse(schools)
+
+glimpse(school2)
 ```
-Step 6: Convert aspatial data to sf tibble data frame
-Convert WGS84 (crs=4326) to SVY21 (crs=3414).
+
+Step 6: Convert aspatial data to sf tibble data frame Convert WGS84 (crs=4326) to SVY21 (crs=3414).
 
 The output indicates **point** spatial object in **XY** dimension. There are 350 records. The projected CRS is **SVY21**.
 
 ```{r}
-#schools_sf <- st_as_sf(schools,
-#                       coords = c("longitude", "latitude"),
-#                       crs = 4326)%>% 
-#  st_transform(crs = 3414)
-#head(schools_sf, n=5)
+school_sf <- st_as_sf(school2,
+                       coords = c("longitude", "latitude"),
+                       crs = 4326)%>% 
+  st_transform(crs = 3414)
+
+head(school_sf, n=5)
 ```
 
-Step 7: Plot a point simple feature layer
+# 5. Plot data
+
+::: panel-tabset
+
+## mpsz
+
+Plot a point simple feature layer using `school_sf`.
+Note: school_sf consists of spatial points, so it cannot accept tm_fill/tm_borders/tm_polygons.
 
 ```{r}
 #tmap_mode("view")
-#tm_shape(schools_sf)+
-#  tm_dots()+
-#tm_view(set.zoom.limits = c(11,14))
-#tmap_mode("plot") # release resources
-```
+tmap_options(check.and.fix = TRUE)
 
-Count the number of schools within each planning subzone.
+tm_shape(mpsz)+
+  tm_polygons()+
+  tm_shape(school_sf)+
+  tm_dots()+
+  tm_view(set.zoom.limits = c(11,12))+
+  tm_layout(title = "Location of School in Subzones", 
+            title.position = c("right", "bottom"))
+
+tmap_mode("plot") # release resources
+```
+## business
 
 ```{r}
-#mpsz$"SCHOOL_COUNT" <- lengths(
-#  st_intersects(
-#    mpsz, schools_sf
-#  )
-#)
+tmap_options(check.and.fix = TRUE)
+
+tm_shape(mpsz) +
+  tm_polygons() +
+tm_shape(business) +
+  tm_dots()+
+  tm_layout(title = "Location of Business in Subzones", 
+            title.position = c("right", "bottom"))
 ```
+
+# 5. Explore data
+
+## Count the number of schools within each planning subzone.
 
 ```{r}
-#summary(mpsz$SCHOOL_COUNT)
+mpsz$"SCHOOL_COUNT" <- lengths(
+  st_intersects(mpsz, school_sf)
+  )
+
+summary(mpsz$SCHOOL_COUNT)
 ```
+
+The summary statistics above reveals that there are excessive 0 values in SCHOOL_COUNT field. If log() is going to use to transform this field, additional step is required to ensure that all 0 will be replaced with a value between 0 and 1 because log0 is infinity and log1 has a value.
+
+## Count the number of schools within each planning subzone.
 
 ```{r}
-# plot polygon then dot as the layers overlap
-#tmap_options(check.and.fix = TRUE)
+mpsz$"BUSINESS_COUNT" <- lengths(
+  st_intersects(mpsz, business)
+  )
 
-#tm_shape(mpsz)+
-#  tm_polygons()+
-#tm_shape(business_sf)+
-#  tm_dots()
+summary(mpsz$BUSINESS_COUNT)
 ```
 
-Check for variables with zero values
+# 4. Integrate data
 
-log0 is infinity, recode 0 to 0 to 1, cannot be 0 or 1 as log1 has a value
-
-# 4. Model Calibration
-
+```{r}
+#flow_data <- read_rds("data/rds/flow_data.rds")
+#flow_data
+```
 
