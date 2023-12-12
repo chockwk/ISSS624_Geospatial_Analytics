@@ -1,8 +1,8 @@
 ---
-title: "Spatial Interaction Models"
+title: "Calibrate Spatial Interaction Models"
 author: "Wan Kee"
 date: "21 November 2023"
-date modified: "21 November 2023"
+date modified: "12 December 2023"
 format: html
 execute: 
   echo: true
@@ -11,9 +11,11 @@ execute:
 editor: source
 ---
 
-# 1.1 Overview
+# 1. Overview
 
-**Spatial interaction model** is a mathematical model that predicts the movement of people between origins and destinations by examining the distance between them. It is based on (1) their **spatial separation**; (2) their **complementarity**; and (3) other **intervening opportunities** or spatial structural elements serve to augment or diminish the expected flow.
+## Spatial Interaction Models
+
+**Spatial interaction model** is a broad mathematical model that **predicts** the movement of people between origins and destinations by examining the distance between them. These models are used to understand how the **quantity of interaction** between two locations can be influenced by the characteristics of the locations themselves (such as population size or economic activity), the distance between them, and other intervening factors. It is based on (1) their **spatial separation**; (2) their **complementarity**; and (3) other **intervening opportunities** or spatial structural elements serve to augment or diminish the expected flow.
 
 (1) **Complementarity** is an indicator of the suitability of the particular pair of places for the movement 
 
@@ -23,20 +25,22 @@ editor: source
 
 Notes diagonals of distance matrix will be zero.
 
-# 1.2 Load packages
+# 2. Load packages
 
 `sf` and `sp` performs geospatial data import, integration, processing and transformation.
 `DT` enables R data objects (matrices or data frames) to be displayed as tables on HTML pages.
-`tidyverse` performs data import, integration, wrangling and visualisation. 
+`tidyverse` performs data import, integration, wrangling and visualization. 
 `tmap` creates thematic maps. 
 `stplanr`analyses OD matrix.
-`reshape2` restructuresa nd aggregates data.
+`reshape2` restructures and aggregates data.
+`performance`contains utilities for computing measures to assess model quality.
+`ggpubr` arrange and annotate multiple plots.
 
 ```{r}
-pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2)
+pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2, performance, ggpubr)
 ```
 
-# 1.3 Import data
+# 3. Import data
 
 :::panel-tabset
 
@@ -78,10 +82,9 @@ Source: Department of Statistics ([Link](https://www.singstat.gov.sg/-/media/fil
 pop <- read_csv("data/aspatial/pop.csv")
 glimpse(pop)
 ```
-
 :::
 
-# 1.4 Calibrate Spatial Interaction Model
+# 4. Calibrate Spatial Interaction Model
 
 In spatial interaction, a distance matrix is a table that shows the distance between pairs of locations.
 two ways to compute the required distance matrix:
@@ -247,21 +250,52 @@ pop <- pop %>%
          SZ = SUBZONE_C)
 glimpse(pop)
 ```
+Join population attribute from `pop` to origin subzone in passenger volume `flow_data`.
+
+```{r}
+flow_data1 <- flow_data1 %>%
+  left_join(pop,
+            by = c(ORIGIN_SZ = "SZ")) %>%
+  rename(ORIGIN_AGE7_12 = AGE7_12,
+         ORIGIN_AGE13_24 = AGE13_24,
+         ORIGIN_AGE25_64 = AGE25_64) %>%
+  select(-c(PA, SZ_NAME))
+
+glimpse(flow_data1)
+```
+Join population attribute from `pop` to destination subzone in passenger volume `flow_data`.
+
+```{r}
+flow_data1 <- flow_data1 %>%
+  left_join(pop,
+            by = c(DESTIN_SZ = "SZ")) %>%
+  rename(DESTIN_AGE7_12 = AGE7_12,
+         DESTIN_AGE13_24 = AGE13_24,
+         DESTIN_AGE25_64 = AGE25_64) %>%
+  select(-c(PA, SZ_NAME))
+
+glimpse(flow_data1)
+```
+Save to RDS
+
+```{r}
+write_rds(flow_data1, "data/rds/flow_data1.rds")
+```
+
+`flow_data1` is similar to `SIM_data`.
 
 ```{r}
 SIM_data <- read_rds("data/rds/SIM_data.rds")
 glimpse(SIM_data)
 ```
 
-# 1.4 Explore data
+# 5. Plot data
 
-# 1.5 Plot data
+:::panel-tabset
 
-Calibrating Spatial Interaction Models
+## Trips
 
-Visualising the dependent variable
-
-plot the distribution of the dependent variable (i.e. TRIPS) by using histogram
+Plot the distribution of the dependent variable `TRIPS` using histogram.
 
 ```{r}
 ggplot(data = SIM_data, aes(x = TRIPS)) +
@@ -272,7 +306,9 @@ ggplot(data = SIM_data, aes(x = TRIPS)) +
   )
 ```
 
-isualise the relation between the dependent variable and one of the key independent variable in Spatial Interaction Model, namely distance.
+## Trips and Distance
+
+Visualize the relation between the dependent variable `TRIPS` and one of the key independent variable `dist`.
 
 ```{r}
 ggplot(data = SIM_data,
@@ -285,7 +321,10 @@ ggplot(data = SIM_data,
   )
 ```
 
-plot the scatter plot by using the log transformed version of both variables, we can see that their relationship is more resemble linear relationship.
+## log(trips) and log(dist)
+
+Plot the scatter plot by using the log transformed variables. 
+Their relationship resembles a negative linear relationship.
 
 ```{r}
 ggplot(data = SIM_data,
@@ -298,13 +337,18 @@ ggplot(data = SIM_data,
     panel.background = element_blank()
   )
 ```
-Checking for variables with zero values
+
+# 6. Prepare data
+
+## Imputation
+
+Check for variables with zero values using `summary()` of Base R to compute the summary statistics of all variables in SIM_data data frame.
 
 ```{r}
 summary(SIM_data)
 ```
 
-replace zero values to 0.99
+Replace zero values with 0.99.
 
 ```{r}
 SIM_data$DESTIN_AGE7_12 <- ifelse(
@@ -328,24 +372,36 @@ SIM_data$ORIGIN_AGE25_64 <- ifelse(
 
 summary(SIM_data)
 ```
+# 7. Calibrate Spatial Interaction Model
 
+## Gravity Models
 
-Unconstrained Spatial Interaction Model
+**Gravity Models** are a specific type of **spatial interaction model**. They are named for their analogy to **Newton's law of gravity**; just as the gravitational force between two objects is proportional to their masses and inversely proportional to the square of the distance between them, the gravity model posits that the **interaction between two locations** (such as trade or travel) is **directly proportional** to their **economic mass** (usually population, GDP, etc.) and inversely proportional to some function of the distance between them. 
+
+**Generalized linear model** is a generalization of linear regression that allows for response variables that have **error distribution models** instead of a normal distribution like Gaussian distribution. `glm()` is used to fit generalized linear models.
+
+**Poisson regression** is useful when predicting an outcome variable representing counts from a set of continuous predictor variables.
+
+fit <- glm(count ~ x1+x2+x3, data=mydata, family=poisson()) where x1, x2, x3 are continuous predictors.
+
+:::panel-tabset
+### Unconstrained SIM
+
+The glm model predicts trips based on the log transformed age demographics (population aged 25 to 64) and the distance between the origin and destination.
 
 ```{r}
-uncSIM <- glm(formula = TRIPS ~ 
-                log(ORIGIN_AGE25_64) + 
-                log(DESTIN_AGE25_64) +
-                log(dist),
+uncSIM <- glm(formula = TRIPS ~ log(ORIGIN_AGE25_64) + log(DESTIN_AGE25_64) + log(dist),
               family = poisson(link = "log"),
               data = SIM_data,
               na.action = na.exclude)
-uncSIM
+summary(uncSIM)
 ```
+All three predictors are significant with p < 0.05. The `log(ORIGIN_AGE25_64)` coefficient of 0.2100150 suggests that the log(trips) increases by approximately 0.21 with every unit of `log(ORIGIN_AGE25_64)`. The `log(DESTIN_AGE25_64)` coefficient of 0.0128911 indicates an inverse relationship, which aligns with the gravity model theory that the interaction decreases with increasing distance.
 
 
-R-squared function
+Compute the R-squared of the unconstrained SIM
 
+Measure how much variation of the trips can be accounted by the model.
 
 ```{r}
 CalcRSquared <- function(observed,estimated){
@@ -355,69 +411,202 @@ CalcRSquared <- function(observed,estimated){
 }
 ```
 
-compute the R-squared of the unconstrained SIM
-
 ```{r}
 CalcRSquared(uncSIM$data$TRIPS, uncSIM$fitted.values)
 ```
+The r^2 of `uncSIM` is 0.1694734.
 
+`r2_mcfadden` calculates McFadden's pseudo R2.
 
 ```{r}
-#r2_mcfadden(uncSIM)
+r2_mcfadden(uncSIM)
 ```
 
-Origin (Production) constrained SIM
+::: {.callout-tip}
+#### Tip with Title
+`r^2` is a measure of the goodness of fit of a model. In regression, the R2 coefficient of determination is a statistical measure of how well the regression predictions approximate the real data points. An R2 of 1 indicates that the regression predictions perfectly fit the data.
+
+`r2_mcfadden` calculates McFadden's pseudo R2 where a value from 0.2 to 0.4 indicates very good model fit.
+:::
+
+### Origin (Production) Constrained SIM
+
+The glm model predicts trips based on the ORIGIN_SZ, log transformed age demographics (population aged 25 to 64) of destination and the distance between the origin and destination.
 
 ```{r}
-#orcSIM <- glm(formula = TRIPS ~ 
-#                 ORIGIN_SZ +
-#                 log(DESTIN_AGE25_64) +
-#                 log(dist),
-#              family = poisson(link = "log"),
-#              data = SIM_data,
-#              na.action = na.exclude)
-#summary(orcSIM)
-```
+orcSIM <- glm(formula = TRIPS ~ ORIGIN_SZ + log(DESTIN_AGE25_64) + log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
 
-examine how the constraints hold for destinations this time.
-
-```{r}
-#CalcRSquared(orcSIM$data$TRIPS, orcSIM$fitted.values)
-```
-
-Destination constrained
-
-```{r}
-#decSIM <- glm(formula = TRIPS ~ 
-#                DESTIN_SZ + 
-#                log(ORIGIN_AGE25_64) + 
-#                log(dist),
-#              family = poisson(link = "log"),
-#              data = SIM_data,
-#              na.action = na.exclude)
-#summary(decSIM)
-```
-
-
-```{r}
-#CalcRSquared(decSIM$data$TRIPS, decSIM$fitted.values)
-```
-
-
-Doubly constrained
-
-```{r}
-#dbcSIM <- glm(formula = TRIPS ~ 
-#                ORIGIN_SZ + 
-#                DESTIN_SZ + 
-#               log(dist),
-#              family = poisson(link = "log"),
-#              data = SIM_data,
-#              na.action = na.exclude)
-#summary(dbcSIM)
+summary(orcSIM)
 ```
 
 ```{r}
-#CalcRSquared(dbcSIM$data$TRIPS, dbcSIM$fitted.values)
+CalcRSquared(orcSIM$data$TRIPS, orcSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(orcSIM)
+```
+
+### Destination (Attraction) Constrained SIM
+
+The glm model predicts trips based on the ORIGIN_SZ, log transformed age demographics (population aged 25 to 64) of origin and the distance between the origin and destination.
+
+```{r}
+decSIM <- glm(formula = TRIPS ~ DESTIN_SZ + log(ORIGIN_AGE25_64) + log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+
+summary(decSIM)
+```
+
+```{r}
+CalcRSquared(decSIM$data$TRIPS, decSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(decSIM)
+```
+
+### Doubly Constrained SIM
+
+```{r}
+dbcSIM <- glm(formula = TRIPS ~ ORIGIN_SZ + DESTIN_SZ + log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(dbcSIM)
+```
+
+```{r}
+CalcRSquared(dbcSIM$data$TRIPS, dbcSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(dbcSIM)
+```
+
+:::
+
+# 8. Model Comparison
+
+## r2 and r2_mcfadden
+
+Based on r2 and r2_mcfadden, the **doubly constrained SIM is the best model** among all the four SIMs because it has the **highest r2 and r2 mcfadden** value of 0.6883675 and 0.774.
+
+## RMSE
+
+Another useful model performance measure for continuous dependent variable is **Root Mean Squared Error**. 
+
+```{r}
+model_list <- list(unconstrained=uncSIM,
+                   originConstrained=orcSIM,
+                   destinationConstrained=decSIM,
+                   doublyConstrained=dbcSIM)
+```
+
+Compute the RMSE of all the models in `model_list` using `compare_performance()`.
+
+```{r}
+compare_performance(model_list,
+                    metrics = "RMSE")
+```
+The output reveals that **doubly constrained SIM is the best model** among all the four SIMs because it has the **smallest RMSE** value of 1487.111.
+
+# 9. Visualise the observed values and the fitted values
+
+Extract the fitted values from each model and join the values to SIM_data data frame.
+
+::: panel-tabset
+
+## Unconstrained SIM
+
+```{r}
+df <- as.data.frame(uncSIM$fitted.values) %>%
+  round(digits = 0)
+
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(uncTRIPS = "uncSIM$fitted.values")
+```
+
+## Origin (Production) Constrained SIM
+
+```{r}
+df <- as.data.frame(orcSIM$fitted.values) %>%
+  round(digits = 0)
+
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(orcTRIPS = "orcSIM$fitted.values")
+```
+
+## Destination (Attraction) Constrained SIM
+
+```{r}
+df <- as.data.frame(decSIM$fitted.values) %>%
+  round(digits = 0)
+
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(decTRIPS = "decSIM$fitted.values")
+```
+
+## Doubly Constrained SIM
+
+```{r}
+df <- as.data.frame(dbcSIM$fitted.values) %>%
+  round(digits = 0)
+
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(dbcTRIPS = "dbcSIM$fitted.values")
+```
+
+:::
+
+```{r}
+unc_p <- ggplot(data = SIM_data,
+                aes(x = uncTRIPS,
+                    y = TRIPS)) +
+  geom_point(size = 1, colour = "lightblue") +
+  geom_smooth(method = lm)+
+  theme(
+    panel.background = element_blank()
+  )
+
+orc_p <- ggplot(data = SIM_data,
+                aes(x = orcTRIPS,
+                    y = TRIPS)) +
+  geom_point(size = 1, colour = "lightblue") +
+  geom_smooth(method = lm)+
+  theme(
+    panel.background = element_blank()
+  )
+
+dec_p <- ggplot(data = SIM_data,
+                aes(x = decTRIPS,
+                    y = TRIPS)) +
+  geom_point(size = 1, colour = "lightblue") +
+  geom_smooth(method = lm)+
+  theme(
+    panel.background = element_blank()
+  )
+
+dbc_p <- ggplot(data = SIM_data,
+                aes(x = dbcTRIPS,
+                    y = TRIPS)) +
+  geom_point(size = 1, colour = "lightblue") +
+  geom_smooth(method = lm)+
+  theme(
+    panel.background = element_blank()
+  )
+
+ggarrange(unc_p, orc_p, dec_p, dbc_p,
+          ncol = 2,
+          nrow = 2)
 ```
 

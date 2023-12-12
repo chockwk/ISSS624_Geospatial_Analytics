@@ -2,7 +2,7 @@
 title: "Geospatially Weighted Poisson Regression"
 author: "Wan Kee"
 date: "9 December 2023"
-date modified: "9 December 2023"
+date modified: "12 December 2023"
 format: html
 execute: 
   echo: true
@@ -144,11 +144,23 @@ na_schools <- find_na(merged)
 print(na_schools)
 ```
 
+```{r}
+# Find the index of ZHENGHUA SECONDARY SCHOOL
+index <- which(merged$school_name == "ZHENGHUA SECONDARY SCHOOL")
+
+# Add the specified values to the LATITUDE and LONGITUDE for this school
+merged$results.LATITUDE[index] <- 1.3887
+merged$results.LONGITUDE[index] <- 103.7652
+
+# Print the record for ZHENGHUA SECONDARY SCHOOL after the addition
+print(merged[index, ])
+```
+
 
 Step 5: Import schools and rename columns
 
 ```{r}
-school2 <- read_csv("data/aspatial/school_longlatadded.csv") %>% 
+school2 <- merged%>% 
   rename(latitude = results.LATITUDE,
          longitude = results.LONGITUDE) %>% 
   select(postal_code, school_name, latitude, longitude)
@@ -231,8 +243,52 @@ summary(mpsz$BUSINESS_COUNT)
 
 # 4. Integrate data
 
+`flow_data` is an sf tibble data.frame and the features are polylines linking the centroid of origins and destination planning subzone.
+
 ```{r}
-#flow_data <- read_rds("data/rds/flow_data.rds")
-#flow_data
+flow_data <- read_rds("data/rds/flow_data_tidy.rds")
+flow_data
 ```
+
+Select the columns from `mpsz` to be appended to `flow_data`
+
+```{r}
+mpsz_tidy <- mpsz %>%
+  st_drop_geometry() %>%
+  select(SUBZONE_C, SCHOOL_COUNT, BUSINESS_COUNT)
+```
+
+Append SCHOOL_COUNT and BUSINESS_COUNT fields from mpsz_tidy data.frame into flow_data sf tibble data.frame
+
+```{r}
+flow_data <- flow_data %>%
+  left_join(mpsz_tidy,
+            by = c("DESTIN_SZ" = "SUBZONE_C")) %>%
+  rename(TRIPS = MORNING_PEAK,
+         DIST = dist)
+```
+
+Checking for variables with zero values
+
+Since Poisson Regression is based of log and log 0 is undefined, it is important for us to ensure that no 0 values in the explanatory variables. `summary()` of Base R is used to compute the summary statistics of all variables in wd_od data frame.
+
+```{r}
+summary(flow_data)
+```
+The output shows that variables SCHOOL_COUNT and BUSINESS_COUNT consist of 0 values.
+
+```{r}
+#flow_data$SCHOOL_COUNT <- ifelse(
+#  flow_data$SCHOOL_COUNT == 0,
+#  0.99, flow_data$SCHOOL_COUNT)
+#flow_data$BUSINESS_COUNT <- ifelse(
+#  flow_data$BUSINESS_COUNT == 0,
+# 0.99, flow_data$BUSINESS_COUNT)
+```
+```{r}
+# write_rds(flow_data, "data/rds/flow_data_tidy.rds")
+```
+
+
+
 
