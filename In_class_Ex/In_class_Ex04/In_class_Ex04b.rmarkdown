@@ -11,6 +11,7 @@ execute:
 editor: source
 ---
 
+
 # 1. Overview
 
 Learning Objectives:
@@ -30,30 +31,37 @@ The analysis involves the following packages:
 -   `performance` for computing model comparison matrices such as rmse
 -   `ggpubr` for creating publication quality statistical graphics
 
+
 ```{r}
 pacman::p_load(sf, sp, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse, performance, ggpubr)
 ```
+
 
 # 3. Import data
 
 `flow_data_tidy.rds` contains weekday morning peak passenger flows at planning subzone level.
 
+
 ```{r}
 flow_data <- read_rds("data/rds/flow_data_tidy.rds")
 glimpse(flow_data)
 ```
+
 Display the first five columns and rows of `flow_data`:
 The table shows intra-zonal flow.
+
 
 ```{r}
 kable(head(flow_data[, 1:5], n = 5))
 ```
+
 
 # 4. Prepare data
 
 Remove intra-zonal flow from `flow_data`
 
 Create two new columns `FlowNoIntra` and `offset` where all intra-zonal flow will be given a value of 0 or else the original flow values will be inserted.
+
 ```{r}
 flow_data$FlowNoIntra <- ifelse(
   flow_data$ORIGIN_SZ == flow_data$DESTIN_SZ,
@@ -66,12 +74,15 @@ flow_data$offset <- ifelse(
   1)
 ```
 
+
 Inter-zonal flow will be selected from flow_data and save into a new output data.frame `inter_zonal_flow` where `FlowNoIntra` is more than 0. 
+
 
 ```{r}
 inter_zonal_flow <- flow_data %>% 
   filter(FlowNoIntra>0)
 ```
+
 
 # 5. Calibrate Spatial Interaction Models
 
@@ -82,6 +93,7 @@ For origin-constrained model, only explanatory variables representing the attrac
 ORIGIN_SZ is used to model 𝜇𝑖 . It must be in categorical data type.
 
 It is important to note that -1 is added in the equation after the distance variable. The -1 serves the purpose of removing the intercept that by default, glm will insert into the model.
+
 
 ```{r}
 orcSIM_Poisson <- glm(formula = MORNING_PEAK ~ 
@@ -94,6 +106,7 @@ orcSIM_Poisson <- glm(formula = MORNING_PEAK ~
               na.action = na.exclude)
 summary(orcSIM_Poisson)
 ```
+
 The output shows that the ⍺1 and ⍺2 of SCHOOL_COUNT and BUSINESS_COUNT are 0.4755516 and 0.1796905 respectively and the distance decay parameter 𝛽 is -1.6929522.
 
 log(DIST) must be negative where people are not willing to travel to show distance decay.
@@ -102,6 +115,7 @@ log(SCHOOL_COUNT) and log(RETAIL_COUNT) should be positive and p-value less than
 Goodness-of-fit
 
 Define a function to calculate R2.
+
 
 ```{r}
 CalcRSquared = function(observed, estimated){
@@ -114,9 +128,11 @@ CalcRSquared = function(observed, estimated){
 ```{r}
 CalcRSquared(orcSIM_Poisson$data$MORNING_PEAK, orcSIM_Poisson$fitted.values)
 ```
+
 With reference to the R-Squared above, we can conclude that the model accounts for about **44% of the variation of flows** in the systems. 
 
 ## Doubly Constrained Model
+
 
 ```{r}
 dbcSIM_Poisson <- glm(formula = MORNING_PEAK ~ ORIGIN_SZ + DESTIN_SZ + log(dist),
@@ -126,13 +142,17 @@ dbcSIM_Poisson <- glm(formula = MORNING_PEAK ~ ORIGIN_SZ + DESTIN_SZ + log(dist)
 summary(dbcSIM_Poisson)
 ```
 
+
 Doubly constrained does not have -1 for log(DIST) where there is no interaction. The log(dist) -1 which means that an intercept will appear in the model again. This is not because I want an intercept as it makes the origin and destination coefficients harder to interpret, rather the -1 cheat for removing the intercept only works with one factor level but in double-constrained model we have two factor levels, namely: origins and destinations.
+
 
 ```{r}
 CalcRSquared(dbcSIM_Poisson$data$MORNING_PEAK, dbcSIM_Poisson$fitted.values)
 ```
 
+
 6. Model Comparison
+
 
 ```{r}
 model_list2 <- list(
@@ -144,6 +164,7 @@ model_list2 <- list(
 compare_performance(model_list2,
                     metrics = "RMSE")
 ```
+
 The output reveals that **doubly constrained SIM is the best model** among the two SIMs because it has the smallest RMSE value of 1906.694.
 
 # 6. Visualising fitted values
@@ -153,6 +174,7 @@ Extract the fitted values from SIM and append the fitted values into inter_zonal
 :::panel-tabset
 
 ## Origin (Production) Constrained Model
+
 ```{r}
 df <- as.data.frame(orcSIM_Poisson$fitted.values) %>%
   round(digits = 0)
@@ -162,7 +184,9 @@ inter_zonal_flow <- inter_zonal_flow %>%
   rename(orcTRIPS = "orcSIM_Poisson.fitted.values")
 ```
 
+
 ## Doubly Constrained Model
+
 ```{r}
 df <- as.data.frame(dbcSIM_Poisson$fitted.values) %>%
   round(digits = 0)
@@ -172,9 +196,11 @@ inter_zonal_flow <- inter_zonal_flow %>%
   rename(dbcTRIPS = "dbcSIM_Poisson.fitted.values")
 ```
 
+
 :::
 
 Plot the observed values and the fitted values.
+
 
 ```{r}
 orc_p <- ggplot(data = inter_zonal_flow,

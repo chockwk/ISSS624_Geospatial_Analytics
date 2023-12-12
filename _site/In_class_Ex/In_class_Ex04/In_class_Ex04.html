@@ -9,7 +9,7 @@
 <meta name="author" content="Wan Kee">
 <meta name="dcterms.date" content="2023-12-09">
 
-<title>Geospatial Analytics - Geospatially Weighted Poisson Regression</title>
+<title>Geospatial Analytics - Geocoding using API</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -238,7 +238,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Geospatially Weighted Poisson Regression</h1>
+<h1 class="title">Geocoding using API</h1>
 </div>
 
 
@@ -267,7 +267,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level1">
 <h1>1. Overview</h1>
-<p>Learning Objectives 1. Perform geocoding by using SLA OneMap API 2. Convert an aspatial data into a simple feature tibble data.frame 3. Perform point-in-polygon count analysis 4. Append the propulsiveness and attractiveness variables onto a flow data.</p>
+<p>Learning Objectives</p>
+<ol type="1">
+<li>Perform geocoding by using SLA OneMap API</li>
+<li>Convert an aspatial data into a simple feature tibble data.frame</li>
+<li>Perform point-in-polygon count analysis</li>
+<li>Append the propulsiveness and attractiveness variables onto a flow data.</li>
+</ol>
 </section>
 <section id="load-packages" class="level1">
 <h1>2. Load packages</h1>
@@ -537,9 +543,8 @@ $ results.LONGITUDE  &lt;chr&gt; "103.840041087946", "103.822440701642", "103.82
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(na_schools)</span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage:</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>na_schools <span class="ot">&lt;-</span> <span class="fu">find_na</span>(merged)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(na_schools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>na_schools <span class="ot">&lt;-</span> <span class="fu">find_na</span>(merged)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(na_schools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "ZHENGHUA SECONDARY SCHOOL"</code></pre>
 </div>
@@ -692,48 +697,27 @@ Projected CRS: SVY21 / Singapore TM
 <h1>4. Integrate data</h1>
 <p><code>flow_data</code> is an sf tibble data.frame and the features are polylines linking the centroid of origins and destination planning subzone.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>flow_data <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/rds/flow_data_tidy.rds"</span>)</span>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>flow_data <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/rds/SIM_data.rds"</span>)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>flow_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Simple feature collection with 14734 features and 12 fields
-Geometry type: LINESTRING
-Dimension:     XY
-Bounding box:  xmin: 5105.594 ymin: 25813.33 xmax: 49483.22 ymax: 49552.79
-Projected CRS: SVY21 / Singapore TM
-First 10 features:
-   ORIGIN_SZ DESTIN_SZ MORNING_PEAK      dist ORIGIN_AGE7_12 ORIGIN_AGE13_24
-1     AMSZ01    AMSZ01         1998   50.0000            310             710
-2     AMSZ01    AMSZ02         8289  810.4491            310             710
-3     AMSZ01    AMSZ03         8971 1360.9294            310             710
-4     AMSZ01    AMSZ04         2252  840.4432            310             710
-5     AMSZ01    AMSZ05         6136 1076.7916            310             710
-6     AMSZ01    AMSZ06         2148  805.2979            310             710
-7     AMSZ01    AMSZ07         1620 1798.7526            310             710
-8     AMSZ01    AMSZ08         1925 2576.0199            310             710
-9     AMSZ01    AMSZ09         1773 1204.2846            310             710
-10    AMSZ01    AMSZ10           63 1417.8035            310             710
-   ORIGIN_AGE25_64 DESTIN_AGE7_12 DESTIN_AGE13_24 DESTIN_AGE25_64 SCHOOL_COUNT
-1             2780         310.00          710.00         2780.00         0.99
-2             2780        1140.00         2770.00        15700.00         2.00
-3             2780        1010.00         2650.00        14240.00         2.00
-4             2780         980.00         2000.00        11320.00         1.00
-5             2780         810.00         1920.00         9650.00         3.00
-6             2780        1050.00         2390.00        12460.00         2.00
-7             2780         420.00         1120.00         3620.00         0.99
-8             2780         390.00         1150.00         4350.00         0.99
-9             2780        1190.00         3260.00        13350.00         3.00
-10            2780           0.99            0.99            0.99         1.00
-   RETAIL_COUNT                       geometry
-1          1.00 LINESTRING (29501.77 39419....
-2          0.99 LINESTRING (29501.77 39419....
-3          6.00 LINESTRING (29501.77 39419....
-4          0.99 LINESTRING (29501.77 39419....
-5          0.99 LINESTRING (29501.77 39419....
-6          0.99 LINESTRING (29501.77 39419....
-7          1.00 LINESTRING (29501.77 39419....
-8        117.00 LINESTRING (29501.77 39419....
-9          0.99 LINESTRING (29501.77 39419....
-10        20.00 LINESTRING (29501.77 39419....</code></pre>
+<pre><code># A tibble: 14,274 × 12
+# Groups:   ORIGIN_SZ [279]
+   ORIGIN_SZ DESTIN…¹ TRIPS FlowN…² offset  dist ORIGI…³ ORIGI…⁴ ORIGI…⁵ DESTI…⁶
+   &lt;chr&gt;     &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 AMSZ01    AMSZ02    6790    6790      1  810.     310     710    2780    1140
+ 2 AMSZ01    AMSZ03    7242    7242      1 1361.     310     710    2780    1010
+ 3 AMSZ01    AMSZ04    2048    2048      1  840.     310     710    2780     980
+ 4 AMSZ01    AMSZ05    4594    4594      1 1077.     310     710    2780     810
+ 5 AMSZ01    AMSZ06    1767    1767      1  805.     310     710    2780    1050
+ 6 AMSZ01    AMSZ07    1136    1136      1 1799.     310     710    2780     420
+ 7 AMSZ01    AMSZ08    1703    1703      1 2576.     310     710    2780     390
+ 8 AMSZ01    AMSZ09    1494    1494      1 1204.     310     710    2780    1190
+ 9 AMSZ01    AMSZ10      41      41      1 1418.     310     710    2780       0
+10 AMSZ01    AMSZ11     393     393      1 2314.     310     710    2780       0
+# … with 14,264 more rows, 2 more variables: DESTIN_AGE13_24 &lt;dbl&gt;,
+#   DESTIN_AGE25_64 &lt;dbl&gt;, and abbreviated variable names ¹​DESTIN_SZ,
+#   ²​FlowNoIntra, ³​ORIGIN_AGE7_12, ⁴​ORIGIN_AGE13_24, ⁵​ORIGIN_AGE25_64,
+#   ⁶​DESTIN_AGE7_12</code></pre>
 </div>
 </div>
 <p>Select the columns from <code>mpsz</code> to be appended to <code>flow_data</code></p>
@@ -746,56 +730,75 @@ First 10 features:
 <div class="cell">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>flow_data <span class="ot">&lt;-</span> flow_data <span class="sc">%&gt;%</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mpsz_tidy,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"DESTIN_SZ"</span> <span class="ot">=</span> <span class="st">"SUBZONE_C"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">TRIPS =</span> MORNING_PEAK,</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">DIST =</span> dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"DESTIN_SZ"</span> <span class="ot">=</span> <span class="st">"SUBZONE_C"</span>))</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(flow_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 14,274
+Columns: 14
+Groups: ORIGIN_SZ [279]
+$ ORIGIN_SZ       &lt;chr&gt; "AMSZ01", "AMSZ01", "AMSZ01", "AMSZ01", "AMSZ01", "AMS…
+$ DESTIN_SZ       &lt;chr&gt; "AMSZ02", "AMSZ03", "AMSZ04", "AMSZ05", "AMSZ06", "AMS…
+$ TRIPS           &lt;dbl&gt; 6790, 7242, 2048, 4594, 1767, 1136, 1703, 1494, 41, 39…
+$ FlowNoIntra     &lt;dbl&gt; 6790, 7242, 2048, 4594, 1767, 1136, 1703, 1494, 41, 39…
+$ offset          &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ dist            &lt;dbl&gt; 810.4491, 1360.9294, 840.4432, 1076.7916, 805.2979, 17…
+$ ORIGIN_AGE7_12  &lt;dbl&gt; 310, 310, 310, 310, 310, 310, 310, 310, 310, 310, 310,…
+$ ORIGIN_AGE13_24 &lt;dbl&gt; 710, 710, 710, 710, 710, 710, 710, 710, 710, 710, 710,…
+$ ORIGIN_AGE25_64 &lt;dbl&gt; 2780, 2780, 2780, 2780, 2780, 2780, 2780, 2780, 2780, …
+$ DESTIN_AGE7_12  &lt;dbl&gt; 1140, 1010, 980, 810, 1050, 420, 390, 1190, 0, 0, 260,…
+$ DESTIN_AGE13_24 &lt;dbl&gt; 2770, 2650, 2000, 1920, 2390, 1120, 1150, 3260, 0, 0, …
+$ DESTIN_AGE25_64 &lt;dbl&gt; 15700, 14240, 11320, 9650, 12460, 3620, 4350, 13350, 0…
+$ SCHOOL_COUNT    &lt;int&gt; 2, 2, 1, 3, 2, 0, 0, 3, 1, 0, 0, 1, 1, 7, 4, 5, 1, 3, …
+$ BUSINESS_COUNT  &lt;int&gt; 0, 6, 0, 0, 0, 1, 117, 0, 20, 0, 0, 207, 13, 5, 31, 0,…</code></pre>
+</div>
 </div>
 <p>Checking for variables with zero values</p>
 <p>Since Poisson Regression is based of log and log 0 is undefined, it is important for us to ensure that no 0 values in the explanatory variables. <code>summary()</code> of Base R is used to compute the summary statistics of all variables in wd_od data frame.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(flow_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(flow_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  ORIGIN_SZ          DESTIN_SZ             TRIPS             DIST      
- Length:14734       Length:14734       Min.   :     1   Min.   :   50  
- Class :character   Class :character   1st Qu.:    14   1st Qu.: 3346  
- Mode  :character   Mode  :character   Median :    76   Median : 6067  
-                                       Mean   :  1021   Mean   : 6880  
-                                       3rd Qu.:   426   3rd Qu.: 9729  
-                                       Max.   :232187   Max.   :26136  
- ORIGIN_AGE7_12    ORIGIN_AGE13_24    ORIGIN_AGE25_64    DESTIN_AGE7_12   
- Min.   :   0.99   Min.   :    0.99   Min.   :    0.99   Min.   :   0.99  
- 1st Qu.: 240.00   1st Qu.:  440.00   1st Qu.: 2200.00   1st Qu.: 240.00  
- Median : 700.00   Median : 1350.00   Median : 6810.00   Median : 720.00  
- Mean   :1031.86   Mean   : 2268.84   Mean   :10487.62   Mean   :1033.40  
- 3rd Qu.:1480.00   3rd Qu.: 3260.00   3rd Qu.:15770.00   3rd Qu.:1500.00  
- Max.   :6340.00   Max.   :16380.00   Max.   :74610.00   Max.   :6340.00  
- DESTIN_AGE13_24    DESTIN_AGE25_64    SCHOOL_COUNT.x    RETAIL_COUNT   
- Min.   :    0.99   Min.   :    0.99   Min.   : 0.990   Min.   :  0.99  
- 1st Qu.:  460.00   1st Qu.: 2200.00   1st Qu.: 0.990   1st Qu.:  0.99  
- Median : 1420.00   Median : 7030.00   Median : 1.000   Median :  3.00  
- Mean   : 2290.35   Mean   :10574.46   Mean   : 1.987   Mean   : 16.47  
- 3rd Qu.: 3260.00   3rd Qu.:15830.00   3rd Qu.: 2.000   3rd Qu.: 12.00  
- Max.   :16380.00   Max.   :74610.00   Max.   :12.000   Max.   :307.00  
- SCHOOL_COUNT.y   BUSINESS_COUNT            geometry    
- Min.   : 0.000   Min.   :  0.00   LINESTRING   :14734  
- 1st Qu.: 0.000   1st Qu.:  0.00   epsg:3414    :    0  
- Median : 1.000   Median :  3.00   +proj=tmer...:    0  
- Mean   : 1.583   Mean   : 16.17                        
- 3rd Qu.: 2.000   3rd Qu.: 12.00                        
- Max.   :12.000   Max.   :307.00                        </code></pre>
+<pre><code>  ORIGIN_SZ          DESTIN_SZ             TRIPS           FlowNoIntra      
+ Length:14274       Length:14274       Min.   :     1.0   Min.   :     1.0  
+ Class :character   Class :character   1st Qu.:    11.0   1st Qu.:    11.0  
+ Mode  :character   Mode  :character   Median :    56.0   Median :    56.0  
+                                       Mean   :   664.3   Mean   :   664.3  
+                                       3rd Qu.:   296.0   3rd Qu.:   296.0  
+                                       Max.   :104167.0   Max.   :104167.0  
+     offset       dist         ORIGIN_AGE7_12 ORIGIN_AGE13_24 ORIGIN_AGE25_64
+ Min.   :1   Min.   :  173.8   Min.   :   0   Min.   :    0   Min.   :    0  
+ 1st Qu.:1   1st Qu.: 3465.4   1st Qu.: 240   1st Qu.:  460   1st Qu.: 2210  
+ Median :1   Median : 6121.0   Median : 710   Median : 1400   Median : 7030  
+ Mean   :1   Mean   : 6951.8   Mean   :1037   Mean   : 2278   Mean   :10536  
+ 3rd Qu.:1   3rd Qu.: 9725.1   3rd Qu.:1500   3rd Qu.: 3282   3rd Qu.:15830  
+ Max.   :1   Max.   :26135.8   Max.   :6340   Max.   :16380   Max.   :74610  
+ DESTIN_AGE7_12 DESTIN_AGE13_24 DESTIN_AGE25_64  SCHOOL_COUNT   
+ Min.   :   0   Min.   :    0   Min.   :    0   Min.   : 0.000  
+ 1st Qu.: 250   1st Qu.:  460   1st Qu.: 2210   1st Qu.: 0.000  
+ Median : 720   Median : 1430   Median : 7120   Median : 1.000  
+ Mean   :1040   Mean   : 2305   Mean   :10648   Mean   : 1.593  
+ 3rd Qu.:1500   3rd Qu.: 3290   3rd Qu.:15830   3rd Qu.: 2.000  
+ Max.   :6340   Max.   :16380   Max.   :74610   Max.   :12.000  
+ BUSINESS_COUNT  
+ Min.   :  0.00  
+ 1st Qu.:  0.00  
+ Median :  3.00  
+ Mean   : 16.05  
+ 3rd Qu.: 12.00  
+ Max.   :307.00  </code></pre>
 </div>
 </div>
-<p>The output shows that variables SCHOOL_COUNT and BUSINESS_COUNT consist of 0 values.</p>
+<p>The output shows that variables <code>ORIGIN_AGE7_12</code>, <code>ORIGIN_AGE13_24</code>, <code>ORIGIN_AGE25_64</code>, <code>DESTIN_AGE7_12</code>, <code>DESTIN_AGE13_24</code>, <code>DESTIN_AGE25_64</code>, <code>SCHOOL_COUNT</code> and <code>BUSINESS_COUNT</code> consist of 0 values.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#flow_data$SCHOOL_COUNT &lt;- ifelse(</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  flow_data$SCHOOL_COUNT == 0,</span></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  0.99, flow_data$SCHOOL_COUNT)</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co">#flow_data$BUSINESS_COUNT &lt;- ifelse(</span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co">#  flow_data$BUSINESS_COUNT == 0,</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 0.99, flow_data$BUSINESS_COUNT)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>flow_data<span class="sc">$</span>SCHOOL_COUNT <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  flow_data<span class="sc">$</span>SCHOOL_COUNT <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">0.99</span>, flow_data<span class="sc">$</span>SCHOOL_COUNT)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>flow_data<span class="sc">$</span>BUSINESS_COUNT <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  flow_data<span class="sc">$</span>BUSINESS_COUNT <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a> <span class="fl">0.99</span>, flow_data<span class="sc">$</span>BUSINESS_COUNT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># write_rds(flow_data, "data/rds/flow_data_tidy.rds")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(flow_data, <span class="st">"data/rds/flow_data1_tidy.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

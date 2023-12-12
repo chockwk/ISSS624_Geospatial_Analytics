@@ -1,5 +1,5 @@
 ---
-title: "Geospatially Weighted Poisson Regression"
+title: "Geocoding using API"
 author: "Wan Kee"
 date: "9 December 2023"
 date modified: "12 December 2023"
@@ -13,7 +13,12 @@ editor: source
 
 # 1. Overview
 
-Learning Objectives 1. Perform geocoding by using SLA OneMap API 2. Convert an aspatial data into a simple feature tibble data.frame 3. Perform point-in-polygon count analysis 4. Append the propulsiveness and attractiveness variables onto a flow data.
+Learning Objectives
+
+1.  Perform geocoding by using SLA OneMap API
+2.  Convert an aspatial data into a simple feature tibble data.frame
+3.  Perform point-in-polygon count analysis
+4.  Append the propulsiveness and attractiveness variables onto a flow data.
 
 # 2. Load packages
 
@@ -33,8 +38,7 @@ pacman::p_load(tidyverse, sf, httr, tmap)
 ::: panel-tabset
 ## School
 
-`school` is an **aspatial** dataset where all the school directory and information is available for download [here](https://beta.data.gov.sg/collections/457/datasets/d_9aba12b5527843afb0b2e8e4ed6ac6bd/view). 
-The output indicates that there are **346 features** and 31 fields.
+`school` is an **aspatial** dataset where all the school directory and information is available for download [here](https://beta.data.gov.sg/collections/457/datasets/d_9aba12b5527843afb0b2e8e4ed6ac6bd/view). The output indicates that there are **346 features** and 31 fields.
 
 ```{r}
 school <- read_csv("data/aspatial/Generalinformationofschools.csv")
@@ -54,6 +58,7 @@ mpsz = st_read(dsn="data/geospatial", layer="MPSZ-2019")
 
 mpsz <- st_transform(mpsz, crs = 3414)
 ```
+
 ```{r}
 st_crs(mpsz)
 ```
@@ -77,9 +82,9 @@ glimpse(business)
 
 **Address geocoding** or **geocoding** is the process of identifying a **aspatial** description of a location on the Earth surface through its address, postcode, geographic coordinates or latitude/longitude pair.
 
-Singapore Land Authority (SLA) supports an online geocoding service called [OneMap API](https://www.onemap.gov.sg/apidocs/#onemap-rest-apis). The Search API looks up the address or 6-digit postal code for an entered value and returns both latitude, longitude and x,y coordinates of the searched location. 
+Singapore Land Authority (SLA) supports an online geocoding service called [OneMap API](https://www.onemap.gov.sg/apidocs/#onemap-rest-apis). The Search API looks up the address or 6-digit postal code for an entered value and returns both latitude, longitude and x,y coordinates of the searched location.
 
-Step 1: The input `school` is a csv. Select the postal code from into a list, which reads into the API efficiently. 
+Step 1: The input `school` is a csv. Select the postal code from into a list, which reads into the API efficiently.
 
 ```{r}
 postcodes <- school$postal_code
@@ -139,7 +144,6 @@ find_na <- function(data) {
   return(na_schools)
 }
 
-# Usage:
 na_schools <- find_na(merged)
 print(na_schools)
 ```
@@ -155,7 +159,6 @@ merged$results.LONGITUDE[index] <- 103.7652
 # Print the record for ZHENGHUA SECONDARY SCHOOL after the addition
 print(merged[index, ])
 ```
-
 
 Step 5: Import schools and rename columns
 
@@ -187,8 +190,7 @@ head(school_sf, n=5)
 
 ## mpsz
 
-Plot a point simple feature layer using `school_sf`.
-Note: school_sf consists of spatial points, so it cannot accept tm_fill/tm_borders/tm_polygons.
+Plot a point simple feature layer using `school_sf`. Note: school_sf consists of spatial points, so it cannot accept tm_fill/tm_borders/tm_polygons.
 
 ```{r}
 #tmap_mode("view")
@@ -204,6 +206,7 @@ tm_shape(mpsz)+
 
 tmap_mode("plot") # release resources
 ```
+
 ## business
 
 ```{r}
@@ -246,7 +249,7 @@ summary(mpsz$BUSINESS_COUNT)
 `flow_data` is an sf tibble data.frame and the features are polylines linking the centroid of origins and destination planning subzone.
 
 ```{r}
-flow_data <- read_rds("data/rds/flow_data_tidy.rds")
+flow_data <- read_rds("data/rds/SIM_data.rds")
 flow_data
 ```
 
@@ -263,9 +266,9 @@ Append SCHOOL_COUNT and BUSINESS_COUNT fields from mpsz_tidy data.frame into flo
 ```{r}
 flow_data <- flow_data %>%
   left_join(mpsz_tidy,
-            by = c("DESTIN_SZ" = "SUBZONE_C")) %>%
-  rename(TRIPS = MORNING_PEAK,
-         DIST = dist)
+            by = c("DESTIN_SZ" = "SUBZONE_C"))
+
+glimpse(flow_data)
 ```
 
 Checking for variables with zero values
@@ -275,18 +278,20 @@ Since Poisson Regression is based of log and log 0 is undefined, it is important
 ```{r}
 summary(flow_data)
 ```
-The output shows that variables SCHOOL_COUNT and BUSINESS_COUNT consist of 0 values.
+
+The output shows that variables `ORIGIN_AGE7_12`, `ORIGIN_AGE13_24`, `ORIGIN_AGE25_64`, `DESTIN_AGE7_12`, `DESTIN_AGE13_24`, `DESTIN_AGE25_64`, `SCHOOL_COUNT` and `BUSINESS_COUNT` consist of 0 values.
 
 ```{r}
-#flow_data$SCHOOL_COUNT <- ifelse(
-#  flow_data$SCHOOL_COUNT == 0,
-#  0.99, flow_data$SCHOOL_COUNT)
-#flow_data$BUSINESS_COUNT <- ifelse(
-#  flow_data$BUSINESS_COUNT == 0,
-# 0.99, flow_data$BUSINESS_COUNT)
+flow_data$SCHOOL_COUNT <- ifelse(
+  flow_data$SCHOOL_COUNT == 0,
+  0.99, flow_data$SCHOOL_COUNT)
+flow_data$BUSINESS_COUNT <- ifelse(
+  flow_data$BUSINESS_COUNT == 0,
+ 0.99, flow_data$BUSINESS_COUNT)
 ```
+
 ```{r}
-# write_rds(flow_data, "data/rds/flow_data_tidy.rds")
+write_rds(flow_data, "data/rds/flow_data1_tidy.rds")
 ```
 
 
