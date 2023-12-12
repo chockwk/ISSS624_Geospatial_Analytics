@@ -385,6 +385,7 @@ ggplot(data = SIM_data,
   )
 ```
 
+:::
 
 # 6. Prepare data
 
@@ -535,6 +536,8 @@ r2_mcfadden(decSIM)
 
 ### Doubly Constrained SIM
 
+The glm model predicts trips based on the ORIGIN_SZ, DESTIN_SZ and the distance between the origin and destination.
+
 
 ```{r}
 dbcSIM <- glm(formula = TRIPS ~ ORIGIN_SZ + DESTIN_SZ + log(dist),
@@ -643,6 +646,8 @@ SIM_data <- SIM_data %>%
 
 
 :::
+
+Plot the four SIM models.
 
 
 ```{r}
