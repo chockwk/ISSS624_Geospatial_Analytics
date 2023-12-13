@@ -1,0 +1,116 @@
+---
+title: "Geographically weighted regression"
+author: "Wan Kee"
+date: "30 November 2023"
+date modified: "13 December 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: source
+---
+
+# 1. Overview
+
+**Geographically weighted regression** is a spatial statistical technique that takes non-stationary variables into consideration (e.g., climate; demographic factors; physical environment characteristics) and models the local relationships between these independent variables and an outcome of interest (also known as dependent variable). 
+
+Learning Objectives:
+1. Build hedonic pricing models
+2. Calibrate hedonic pricing models by using GWR methods
+
+# 2. Load packages
+
+The R packages needed for this exercise are as follows:
+
+`olsrr` builds OLS and performing diagnostics tests.
+`GWmodel` calibrate geographical weighted family of models.
+`corrplot` enables multivariate data visualisation and analysis.
+`sf` handles spatial data.
+`tidyverse` handles attribute data.
+`tmap` plots choropleth maps.
+
+```{r}
+pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary)
+```
+
+::: {.callout-note}
+GWmodel package provides a collection of localised spatial statistical methods, namely: GW summary statistics, GW principal components analysis, GW discriminant analysis and various forms of GW regression; some of which are provided in basic and robust (outlier resistant) forms. Commonly, outputs or parameters of the GWmodel are mapped to provide a useful exploratory tool, which can often precede (and direct) a more traditional or sophisticated statistical analysis.
+:::
+
+# 3. Import data
+
+:::panel-tabset
+## Subzone
+
+`mpsz` is is a **geospatial** dataset of the Master Plan 2014, a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years published in **2014**.
+
+The output indicates that the geospatial objects are **multipolygon** features. There are **323 features** and 6 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+Source: URA (Download [here](https://beta.data.gov.sg/collections/1708/view))
+
+```{r}
+mpsz = st_read(dsn="data/geospatial", layer="MP14_SUBZONE_WEB_PL")
+```
+## Condo
+
+```{r}
+condo_resale <- read_csv("data/aspatial/Condo_resale_2015.csv")
+glimpse(condo_resale)
+```
+:::
+
+# 4. Prepare data
+
+:::panel-tabset
+
+## mpsz
+
+Update `mpsz` with the correct ESPG code 3414
+
+```{r}
+mpsz_svy21 <- st_transform(mpsz, 3414)
+```
+
+Verify ESPG code of `mpsz`
+
+```{r}
+st_crs(mpsz_svy21)
+```
+
+
+```{r}
+st_bbox(mpsz_svy21)
+```
+
+## Condo
+
+Convert `condo_resale` data frame into a simple feature data frame by using st_as_sf() of sf package
+
+`st_transform()` of sf package converts the coordinates from WGS84 (crs:4326) to SVY21 (crs=3414).
+
+```{r}
+condo_resale.sf <- st_as_sf(condo_resale,
+                            coords = c("LONGITUDE", "LATITUDE"),
+                            crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+```{r}
+head(condo_resale.sf)
+```
+
+:::
+
+# 4. Explore data
+
+Plot the distribution of SELLING_PRICE
+
+```{r}
+ggplot(data=condo_resale.sf, aes(x=`SELLING_PRICE`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+```
+
+
+# 5. Plot data
+

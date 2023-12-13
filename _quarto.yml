@@ -27,7 +27,8 @@ website:
             href: Hands_on_Ex/Hands_on_Ex02/Hands_on_Ex02b.html
           - text: Spatial Interactions
             href: Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html
-          - text: Hands-on Ex04
+          - text: Geographically Weighted Regression
+            href: Hands_on_Ex/Hands_on_Ex04/Hands_on_Ex04.html
           - text: Hands-on Ex05
       - text: "{{< fa-solid fa-earth-africa >}} In-class Ex"
         menu: 
