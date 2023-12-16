@@ -348,3 +348,262 @@ tm_shape(mpsz) +
             frame = FALSE)
 ```
 
+# 6. Assemble propulsive and attractiveness variables
+
+::: panel-tabset
+
+## Business
+
+Source: Prof Kam
+
+The output indicates that the geospatial objects are **point** features. There are **6550 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+```{r}
+business <- st_read(dsn = "data/geospatial", layer = "Business") %>%
+  st_transform(crs = 3414)
+
+glimpse(business)
+```
+```{r}
+hexagon_busstop$BUSINESS_COUNT <- lengths(st_intersects(hexagon_busstop, business))
+summary(hexagon_busstop$BUSINESS_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(business) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Business in Regions",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+
+## Food
+
+Source: Prof Kam
+
+The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+```{r}
+food <- st_read(dsn = "data/geospatial", layer = "F&B") %>%
+  st_transform(crs = 3414)
+
+glimpse(food)
+```
+```{r}
+hexagon_busstop$FOOD_COUNT <- lengths(st_intersects(hexagon_busstop, food))
+summary(hexagon_busstop$FOOD_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(food) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Food in Regions",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+
+## Retail
+
+Source: Prof Kam
+
+The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+```{r}
+retails <- st_read(dsn = "data/geospatial", layer = "Retails") %>%
+  st_transform(crs = 3414)
+
+glimpse(retails)
+```
+
+```{r}
+hexagon_busstop$RETAIL_COUNT <- lengths(st_intersects(hexagon_busstop, retails))
+summary(hexagon_busstop$RETAIL_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(retails) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Distribution of Retails",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+## Train
+
+Source: LTA DataMall
+
+The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+```{r}
+train <- st_read(dsn = "data/geospatial", layer = "Train_Station_Exit_Layer") %>%
+  st_transform(crs = 3414)
+
+glimpse(train)
+```
+
+```{r}
+hexagon_busstop$TRAIN_COUNT <- lengths(st_intersects(hexagon_busstop, train))
+summary(hexagon_busstop$TRAIN_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(train) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Distribution of Train Stations",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+
+## School
+
+Source: LTA DataMall
+
+The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+```{r}
+school <- st_read(dsn = "data/geospatial", layer = "SCHOOLZONE") %>%
+  st_transform(crs = 3414)
+
+glimpse(school)
+```
+
+```{r}
+hexagon_busstop$SCHOOL_COUNT <- lengths(st_intersects(hexagon_busstop, school))
+summary(hexagon_busstop$SCHOOL_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(school) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Distribution of Schools",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+## HDB
+
+```{r}
+hdb <- read.csv("data/aspatial/hdb.csv")
+str(hdb)
+```
+
+```{r}
+# Create a SpatialPoints object
+#coordinates <- hdb[, c("long", "lat")]
+#spatial_points <- SpatialPoints(coords = coordinates)
+
+# Define the current CRS (WGS84 - EPSG:4326)
+#proj4string(spatial_points) <- CRS("+proj=longlat +datum=WGS84")
+
+# Convert SpatialPoints to an sf object
+#sf_points <- st_as_sf(spatial_points)
+
+# Define EPSG:3414 CRS
+#epsg_3414_crs <- st_crs(3414)
+
+# Transform the sf object to EPSG:3414
+#sf_points_3414 <- st_transform(sf_points, crs = epsg_3414_crs)
+
+# Convert back to SpatialPoints
+#spatial_points_3414 <- as(sf_points_3414, "Spatial")
+```
+
+```{r}
+hdb_sf <- st_as_sf(hdb,
+                   coords = c("lat","lng"),
+                   crs = 4326,
+                   remove = F) %>% 
+  st_transform(crs = 3414)
+```
+
+```{r}
+#hexagon_busstop$HDB_COUNT <- lengths(st_intersects(hexagon_busstop, hdb_sf))
+#summary(hexagon_busstop$HDB_COUNT)
+```
+
+```{r}
+#tm_shape(mpsz) +
+#  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+#tm_shape(hexagon_busstop) +
+#  tm_polygons(col = "white", alpha = 0.1) +
+  
+#tm_shape(school) +
+#  tm_dots(col = "black") +
+  
+#  tm_layout(main.title = "Distribution of Schools",
+#            main.title.position = "center",
+#            main.title.size = 1,
+#            legend.position = c("right", "bottom"),
+#            legend.outside = FALSE,
+#            legend.text.size = 0.6,
+#            frame = FALSE)
+```
+:::
+
+# 7. Compute distance matrix
+
+```{r}
+hexagon_busstop_sp <- as(hexagon_busstop, "Spatial")
+hexagon_busstop_sp
+```
+
+```{r}
+dist <- spDists(hexagon_busstop_sp, 
+                longlat = FALSE)
+head(dist, n=c(5, 5))
+```
+

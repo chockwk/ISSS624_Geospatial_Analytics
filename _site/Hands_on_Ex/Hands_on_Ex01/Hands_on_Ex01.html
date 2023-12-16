@@ -156,7 +156,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html" rel="" target="">
  <span class="dropdown-text">Spatial Interactions</span></a>
   </li>  
-        <li class="dropdown-header">Hands-on Ex04</li>
+        <li>
+    <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex04/Hands_on_Ex04.html" rel="" target="">
+ <span class="dropdown-text">Geographically Weighted Regression</span></a>
+  </li>  
         <li class="dropdown-header">Hands-on Ex05</li>
     </ul>
   </li>
@@ -177,8 +180,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex03/In_class_Ex03.html" rel="" target="">
  <span class="dropdown-text">Spatial Interaction Models</span></a>
   </li>  
-        <li class="dropdown-header">In-class Ex04</li>
-        <li class="dropdown-header">In-class Ex05</li>
+        <li>
+    <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex04/In_class_Ex04.html" rel="" target="">
+ <span class="dropdown-text">Geocoding using API</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex04/In_class_Ex04b.html" rel="" target="">
+ <span class="dropdown-text">Calibrate Spatial Interaction Models</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -187,10 +196,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-fa-solid-fa-earth-asia--take-home-ex">    
         <li>
-    <a class="dropdown-item" href="../../Take_home_Ex/Take_home_Ex01/Take_home_Ex01.html" rel="" target="">
+    <a class="dropdown-item" href="../../Take_home_Ex/Take_home_Ex01/Take_home_Ex01b.html" rel="" target="">
  <span class="dropdown-text">Dynamic Patterns of Public Transport Usage</span></a>
   </li>  
-        <li class="dropdown-header">xx</li>
+        <li>
+    <a class="dropdown-item" href="../../Take_home_Ex/Take_home_Ex02/Take_home_Ex02.html" rel="" target="">
+ <span class="dropdown-text">Spatial Interaction Model of Public Transport Usage</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -395,24 +407,23 @@ Projected CRS: SVY21</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 # A tibble: 3,483 × 18
-       id name     host_id host_…¹ neigh…² neigh…³ latit…⁴ longi…⁵ room_…⁶ price
-    &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;
- 1  71609 Villa i…  367042 Belinda East R… Tampin…    1.35    104. Privat…   150
- 2  71896 Home in…  367042 Belinda East R… Tampin…    1.35    104. Privat…    80
- 3  71903 Home in…  367042 Belinda East R… Tampin…    1.35    104. Privat…    80
- 4 275343 Rental … 1439258 Kay     Centra… Bukit …    1.29    104. Privat…    55
- 5 275344 Rental … 1439258 Kay     Centra… Bukit …    1.29    104. Privat…    69
- 6 289234 Home in…  367042 Belinda East R… Tampin…    1.34    104. Privat…   220
- 7 294281 Rental … 1521514 Elizab… Centra… Newton     1.31    104. Privat…    85
- 8 324945 Rental … 1439258 Kay     Centra… Bukit …    1.29    104. Privat…    75
- 9 330095 Rental … 1439258 Kay     Centra… Bukit …    1.29    104. Privat…    45
-10 369141 Place t… 1521514 Elizab… Centra… Newton     1.31    104. Privat…    79
-# … with 3,473 more rows, 8 more variables: minimum_nights &lt;dbl&gt;,
-#   number_of_reviews &lt;dbl&gt;, last_review &lt;date&gt;, reviews_per_month &lt;dbl&gt;,
-#   calculated_host_listings_count &lt;dbl&gt;, availability_365 &lt;dbl&gt;,
-#   number_of_reviews_ltm &lt;dbl&gt;, license &lt;chr&gt;, and abbreviated variable names
-#   ¹​host_name, ²​neighbourhood_group, ³​neighbourhood, ⁴​latitude, ⁵​longitude,
-#   ⁶​room_type</code></pre>
+       id name      host_id host_name neighbourhood_group neighbourhood latitude
+    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;               &lt;chr&gt;            &lt;dbl&gt;
+ 1  71609 Villa in…  367042 Belinda   East Region         Tampines          1.35
+ 2  71896 Home in …  367042 Belinda   East Region         Tampines          1.35
+ 3  71903 Home in …  367042 Belinda   East Region         Tampines          1.35
+ 4 275343 Rental u… 1439258 Kay       Central Region      Bukit Merah       1.29
+ 5 275344 Rental u… 1439258 Kay       Central Region      Bukit Merah       1.29
+ 6 289234 Home in …  367042 Belinda   East Region         Tampines          1.34
+ 7 294281 Rental u… 1521514 Elizabeth Central Region      Newton            1.31
+ 8 324945 Rental u… 1439258 Kay       Central Region      Bukit Merah       1.29
+ 9 330095 Rental u… 1439258 Kay       Central Region      Bukit Merah       1.29
+10 369141 Place to… 1521514 Elizabeth Central Region      Newton            1.31
+# ℹ 3,473 more rows
+# ℹ 11 more variables: longitude &lt;dbl&gt;, room_type &lt;chr&gt;, price &lt;dbl&gt;,
+#   minimum_nights &lt;dbl&gt;, number_of_reviews &lt;dbl&gt;, last_review &lt;date&gt;,
+#   reviews_per_month &lt;dbl&gt;, calculated_host_listings_count &lt;dbl&gt;,
+#   availability_365 &lt;dbl&gt;, number_of_reviews_ltm &lt;dbl&gt;, license &lt;chr&gt;</code></pre>
 </div>
 </div>
 </div>

@@ -1,0 +1,103 @@
+---
+title: "In_class_Ex05"
+author: "Wan Kee"
+date: "16 December 2023"
+date modified: "13 December 2023"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+editor: source
+---
+
+# 1 Overview
+
+Learning Objectives:
+
+# 2 Load packages
+
+`spflow` is an estimation of spatial econometric models of origin-destination flows.
+
+We will install the development version of `spflow` from github. Go to `Packages` and check the version number is 0.1.0.9010.
+
+```{r}
+# devtools::install_github("LukeCe/spflow")
+```
+
+`sf` handles spatial data.
+`tidyverse` handles attribute data.
+`knitr` creates html tables.
+
+```{r}
+pacman:::p_load(sf, sp, spdep, tmap, tidyverse, Matrix, knitr)
+```
+
+Note: `MASS` is replaced by `Matrix` to speed up computations.
+
+# 3 Prepare data
+
+Three datasets are required to calibrate Spatial Econometric Interaction Models:
+1. Spatial weights
+2. Tibble data.frame of origins, destination, flows and distance between orign and destination
+3. Tibble data.frame of explanatory variables
+(Compared to SIM, SEIM does not require OD specification.)
+
+# 3 Import data
+
+:::panel-tabset
+
+# Subzone
+
+Build geographical area
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial", layer = "MPSZ-2019") %>% 
+  st_transform(crs=3414)
+
+glimpse(mpsz)
+```
+
+
+```{r}
+#mpsz$BUSSTOP_COUNT <- mpsz %>% 
+#  st_interacts(mpsz, busstop)
+```
+
+
+```{r}
+#busstop_mpsz <- st_intersection(busstop, mpsz) %>%
+#  select(BUS_STOP_N, SUBZONE_C) 
+
+#glimpse(busstop_mpsz)
+```
+
+
+```{r}
+#mpsz_busstop <- mpsz %>% 
+#  filter()
+```
+
+:::
+
+```{r}
+#centroids <- suppressWarnings({
+#  st_point_on_surface(st_geometry(mpsz_busstop))
+#})
+```
+
+
+Create a list of spatial weight matrix.
+
+Error in poly2nb(busstop_mpsz) : Polygon geometries required
+```{r}
+#mpsz_nb <- list(
+#  "by_contiguity" = poly2nb(mpsz_busstop),
+#  "by_distance" = dnearneigh(centroids,
+#                             d1 = 0,
+#                             d2 = 5000),
+#  "by_knn" = knn2nb(knearneigh(centroids, 3))
+#)
+```
+
+

@@ -156,7 +156,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex03/Hands_on_Ex03.html" rel="" target="">
  <span class="dropdown-text">Spatial Interactions</span></a>
   </li>  
-        <li class="dropdown-header">Hands-on Ex04</li>
+        <li>
+    <a class="dropdown-item" href="../../Hands_on_Ex/Hands_on_Ex04/Hands_on_Ex04.html" rel="" target="">
+ <span class="dropdown-text">Geographically Weighted Regression</span></a>
+  </li>  
         <li class="dropdown-header">Hands-on Ex05</li>
     </ul>
   </li>
@@ -179,9 +182,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
         <li>
     <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex04/In_class_Ex04.html" rel="" target="">
- <span class="dropdown-text">Geospatially Weighted Poisson Regression</span></a>
+ <span class="dropdown-text">Geocoding using API</span></a>
   </li>  
-        <li class="dropdown-header">In-class Ex05</li>
+        <li>
+    <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex04/In_class_Ex04b.html" rel="" target="">
+ <span class="dropdown-text">Calibrate Spatial Interaction Models</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -702,22 +708,21 @@ Projected CRS: SVY21 / Singapore TM
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 14,274 × 12
 # Groups:   ORIGIN_SZ [279]
-   ORIGIN_SZ DESTIN…¹ TRIPS FlowN…² offset  dist ORIGI…³ ORIGI…⁴ ORIGI…⁵ DESTI…⁶
-   &lt;chr&gt;     &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
- 1 AMSZ01    AMSZ02    6790    6790      1  810.     310     710    2780    1140
- 2 AMSZ01    AMSZ03    7242    7242      1 1361.     310     710    2780    1010
- 3 AMSZ01    AMSZ04    2048    2048      1  840.     310     710    2780     980
- 4 AMSZ01    AMSZ05    4594    4594      1 1077.     310     710    2780     810
- 5 AMSZ01    AMSZ06    1767    1767      1  805.     310     710    2780    1050
- 6 AMSZ01    AMSZ07    1136    1136      1 1799.     310     710    2780     420
- 7 AMSZ01    AMSZ08    1703    1703      1 2576.     310     710    2780     390
- 8 AMSZ01    AMSZ09    1494    1494      1 1204.     310     710    2780    1190
- 9 AMSZ01    AMSZ10      41      41      1 1418.     310     710    2780       0
-10 AMSZ01    AMSZ11     393     393      1 2314.     310     710    2780       0
-# … with 14,264 more rows, 2 more variables: DESTIN_AGE13_24 &lt;dbl&gt;,
-#   DESTIN_AGE25_64 &lt;dbl&gt;, and abbreviated variable names ¹​DESTIN_SZ,
-#   ²​FlowNoIntra, ³​ORIGIN_AGE7_12, ⁴​ORIGIN_AGE13_24, ⁵​ORIGIN_AGE25_64,
-#   ⁶​DESTIN_AGE7_12</code></pre>
+   ORIGIN_SZ DESTIN_SZ TRIPS FlowNoIntra offset  dist ORIGIN_AGE7_12
+   &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;          &lt;dbl&gt;
+ 1 AMSZ01    AMSZ02     6790        6790      1  810.            310
+ 2 AMSZ01    AMSZ03     7242        7242      1 1361.            310
+ 3 AMSZ01    AMSZ04     2048        2048      1  840.            310
+ 4 AMSZ01    AMSZ05     4594        4594      1 1077.            310
+ 5 AMSZ01    AMSZ06     1767        1767      1  805.            310
+ 6 AMSZ01    AMSZ07     1136        1136      1 1799.            310
+ 7 AMSZ01    AMSZ08     1703        1703      1 2576.            310
+ 8 AMSZ01    AMSZ09     1494        1494      1 1204.            310
+ 9 AMSZ01    AMSZ10       41          41      1 1418.            310
+10 AMSZ01    AMSZ11      393         393      1 2314.            310
+# ℹ 14,264 more rows
+# ℹ 5 more variables: ORIGIN_AGE13_24 &lt;dbl&gt;, ORIGIN_AGE25_64 &lt;dbl&gt;,
+#   DESTIN_AGE7_12 &lt;dbl&gt;, DESTIN_AGE13_24 &lt;dbl&gt;, DESTIN_AGE25_64 &lt;dbl&gt;</code></pre>
 </div>
 </div>
 <p>Select the columns from <code>mpsz</code> to be appended to <code>flow_data</code></p>
