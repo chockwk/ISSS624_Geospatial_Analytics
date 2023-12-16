@@ -188,7 +188,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex04/In_class_Ex04b.html" rel="" target="">
  <span class="dropdown-text">Calibrate Spatial Interaction Models</span></a>
   </li>  
-        <li class="dropdown-header">Spatial Econometric Interaction Models</li>
+        <li>
+    <a class="dropdown-item" href="../../In_class_Ex/In_class_Ex04/In_class_Ex05.html" rel="" target="">
+ <span class="dropdown-text">Spatial Econometric Interaction Models</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -288,15 +291,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(odbus, <span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 7
-  YEAR_MONTH DAY_TYPE         TIME_PER_HOUR PT_TYPE ORIGIN_PT_…¹ DESTI…² TOTAL…³
-  &lt;chr&gt;      &lt;chr&gt;                    &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;chr&gt;     &lt;dbl&gt;
-1 2023-08    WEEKDAY                     16 BUS     04168        10051         7
-2 2023-08    WEEKENDS/HOLIDAY            16 BUS     04168        10051         2
-3 2023-08    WEEKENDS/HOLIDAY            14 BUS     80119        90079         3
-4 2023-08    WEEKDAY                     14 BUS     80119        90079        10
-5 2023-08    WEEKENDS/HOLIDAY            17 BUS     44069        17229         5
-# … with abbreviated variable names ¹​ORIGIN_PT_CODE, ²​DESTINATION_PT_CODE,
-#   ³​TOTAL_TRIPS</code></pre>
+  YEAR_MONTH DAY_TYPE   TIME_PER_HOUR PT_TYPE ORIGIN_PT_CODE DESTINATION_PT_CODE
+  &lt;chr&gt;      &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;chr&gt;              
+1 2023-08    WEEKDAY               16 BUS     04168          10051              
+2 2023-08    WEEKENDS/…            16 BUS     04168          10051              
+3 2023-08    WEEKENDS/…            14 BUS     80119          90079              
+4 2023-08    WEEKDAY               14 BUS     80119          90079              
+5 2023-08    WEEKENDS/…            17 BUS     44069          17229              
+# ℹ 1 more variable: TOTAL_TRIPS &lt;dbl&gt;</code></pre>
 </div>
 </div>
 <p>Rows: 5709512 Columns: 7</p>
