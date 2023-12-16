@@ -63,7 +63,7 @@ The analysis involves the following packages:
 `tmap` plots choropleth maps.
 
 ```{r}
-pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2, performance, ggpubr, olsrr, corrplot, GWmodel, gtsummary)
+pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2, performance, ggpubr, olsrr, corrplot, GWmodel, gtsummary, knitr)
 ```
 
 # 3. Import data
@@ -221,7 +221,6 @@ hexagon_busstop <- st_join(hexagon_grid_sf, busstop,
 glimpse(hexagon_busstop)
 ```
 
-
 ```{r}
 od <- st_join(hexagon_grid_sf, busstop_mpsz, 
             by = c("geometry" = "geometry"))
@@ -289,7 +288,9 @@ od1_data <- od1 %>%
   drop_na() %>%
   group_by(ORIGIN_INDEX, DESTIN_INDEX) %>%
   summarise(MORNING_PEAK = sum(TRIPS))
-glimpse(od1_data)
+
+
+summary(od1_data)
 ```
 
 :::
@@ -379,7 +380,7 @@ tm_shape(hexagon_busstop) +
 tm_shape(business) +
   tm_dots(col = "black") +
   
-  tm_layout(main.title = "Business in Regions",
+  tm_layout(main.title = "Distribution of Business",
             main.title.position = "center",
             main.title.size = 1,
             legend.position = c("right", "bottom"),
@@ -575,8 +576,73 @@ tm_shape(hdb_sf) +
             frame = FALSE)
 ```
 :::
+# 7. Compute flow
 
-# 7. Compute distance matrix
+```{r}
+summary(hexagon_busstop)
+```
+```{r}
+hexagon_busstop_tidy <- hexagon_busstop %>% 
+  st_drop_geometry() %>% 
+  select(index, BUS_STOP_N, BUSINESS_COUNT, FOOD_COUNT, RETAIL_COUNT, TRAIN_COUNT, HDB_COUNT, SCHOOL_COUNT)
+```
+
+```{r}
+flow_data <- suppressWarnings(
+  od1_data %>% 
+  left_join(hexagon_busstop_tidy,
+            by = c("DESTIN_INDEX" = "index"))
+)
+
+
+summary(flow_data)
+```
+
+```{r}
+flow_data$BUSINESS_COUNT <- ifelse(
+  flow_data$BUSINESS_COUNT == 0,
+  0.99, flow_data$BUSINESS_COUNT)
+
+flow_data$FOOD_COUNT <- ifelse(
+  flow_data$FOOD_COUNT == 0,
+  0.99, flow_data$FOOD_COUNT)
+
+flow_data$RETAIL_COUNT <- ifelse(
+  flow_data$RETAIL_COUNT == 0,
+  0.99, flow_data$RETAIL_COUNT)
+
+flow_data$TRAIN_COUNT <- ifelse(
+  flow_data$TRAIN_COUNT == 0,
+  0.99, flow_data$TRAIN_COUNT)
+
+flow_data$HDB_COUNT <- ifelse(
+  flow_data$HDB_COUNT == 0,
+  0.99, flow_data$HDB_COUNT)
+
+flow_data$SCHOOL_COUNT <- ifelse(
+  flow_data$SCHOOL_COUNT == 0,
+  0.99, flow_data$SCHOOL_COUNT)
+```
+
+The output indicates 2484 observations
+```{r}
+duplicate <- flow_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+```
+
+flow data 500205 to 498963
+```{r}
+flow_data <- unique(flow_data)
+```
+
+
+```{r}
+write_rds(flow_data, "data/rds/flow_data.rds")
+```
+
+# 8. Compute distance matrix 
 
 ```{r}
 hexagon_busstop_sp <- as(hexagon_busstop, "Spatial")
@@ -588,4 +654,262 @@ dist <- spDists(hexagon_busstop_sp,
                 longlat = FALSE)
 head(dist, n=c(5, 5))
 ```
+```{r}
+index <- hexagon_busstop$index
+
+colnames(dist) <- paste0(index)
+rownames(dist) <- paste0(index)
+```
+
+
+```{r}
+distPair <- melt(dist) %>%
+  rename(dist = value)
+
+head(distPair, 10)
+```
+```{r}
+distPair %>%
+  filter(dist > 0) %>%
+  summary()
+```
+
+```{r}
+distPair$dist <- ifelse(distPair$dist == 0,
+                        375, 
+                        distPair$dist)
+
+distPair <- distPair %>%
+  rename(ORIGIN_INDEX = Var1,
+         DESTIN_INDEX = Var2)
+
+summary(distPair)
+```
+```{r}
+distPair$ORIGIN_INDEX <- as.character(distPair$ORIGIN_INDEX)
+distPair$DESTIN_INDEX <- as.character(distPair$DESTIN_INDEX)
+glimpse(distPair)
+```
+
+# 9. Create Spatial Interaction Model
+
+Error : level sets of factors are different
+  
+```{r}
+# Convert factors to characters for comparison
+flow_data$ORIGIN_INDEX <- as.character(flow_data$ORIGIN_INDEX)
+flow_data$DESTIN_INDEX <- as.character(flow_data$DESTIN_INDEX)
+
+# Create FlowNoIntra with conditional assignment
+flow_data$FlowNoIntra <- ifelse(flow_data$ORIGIN_INDEX == flow_data$DESTIN_INDEX,
+                                0, 
+                                flow_data$MORNING_PEAK)
+
+# Create offset with conditional assignment
+flow_data$offset <- ifelse(flow_data$ORIGIN_INDEX == flow_data$DESTIN_INDEX,
+                           0.000001, 
+                           1)
+```
+
+
+```{r}
+inter_zonal_flow <- flow_data %>% 
+  filter(FlowNoIntra >0) %>% 
+  select(-BUS_STOP_N)
+
+duplicate <- inter_zonal_flow %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+
+inter_zonal_flow <- unique(inter_zonal_flow)
+
+glimpse(inter_zonal_flow)
+```
+
+```{r}
+SIM_data <- inter_zonal_flow %>%
+  left_join (distPair,
+             by = c("ORIGIN_INDEX" = "ORIGIN_INDEX",
+                    "DESTIN_INDEX" = "DESTIN_INDEX"))
+```
+
+```{r}
+duplicate <- SIM_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+
+SIM_data <- unique(SIM_data)
+```
+
+```{r}
+head(SIM_data) %>% 
+  kable()
+```
+```{r}
+write_rds(SIM_data, "data/rds/SIM_data.rds")
+```
+
+```{r}
+ggplot(data = SIM_data, aes(x = MORNING_PEAK)) +
+  geom_histogram(fill = "lightblue", color = "black",
+                 binwidth = 2500) +
+  theme(
+    panel.background = element_blank()
+  )
+```
+
+```{r}
+ggplot(data = SIM_data,
+       aes(x = dist,
+           y = MORNING_PEAK)) +
+  geom_point(size = 1, colour = "lightblue") +
+  geom_smooth(method = lm) +
+  theme(
+    panel.background = element_blank()
+  )
+```
+
+```{r}
+ggplot(data = SIM_data,
+       aes(x = log(dist),
+           y = log(MORNING_PEAK))) +
+  geom_point(size = 1, colour = "lightblue") +
+  labs(title = "Trips by Distance") +
+  geom_smooth(method = lm) + 
+  theme(
+    panel.background = element_blank()
+  )
+```
+
+```{r}
+summary(SIM_data)
+```
+```{r}
+glimpse(SIM_data)
+```
+
+```{r}
+vars.cor = cor(SIM_data[,4:9])
+corrplot.mixed(vars.cor,
+         lower = "ellipse", 
+               upper = "number",
+               tl.pos = "lt",
+               diag = "l",
+               tl.col = "black")
+```
+# 10. Unconstrained Spatial Interaction Model
+
+```{r}
+uncSIM <- glm(formula = MORNING_PEAK ~ 
+                log(BUSINESS_COUNT)+
+                log(RETAIL_COUNT)+
+                log(TRAIN_COUNT)+
+                log(HDB_COUNT)+
+                log(SCHOOL_COUNT)+
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(uncSIM)
+```
+
+```{r}
+CalcRSquared <- function(observed,estimated){
+  r <- cor(observed,estimated)
+  R2 <- r^2
+  R2
+}
+```
+
+```{r}
+CalcRSquared(uncSIM$data$MORNING_PEAK, uncSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(uncSIM)
+```
+
+# 11. Origin (Production) Constrained SIM 
+
+```{r}
+orcSIM <- glm(formula = MORNING_PEAK ~ 
+                ORIGIN_INDEX +
+                log(BUSINESS_COUNT)+
+                log(RETAIL_COUNT)+
+                log(TRAIN_COUNT)+
+                log(HDB_COUNT)+
+                log(SCHOOL_COUNT)+
+                log(dist) - 1,
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(orcSIM)
+```
+
+
+```{r}
+CalcRSquared(orcSIM$data$MORNING_PEAK, orcSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(orcSIM)
+```
+
+
+# 12. Destination (Attraction) Constrained SIM
+
+```{r}
+decSIM <- glm(formula = MORNING_PEAK ~ 
+                DESTIN_INDEX +
+                log(BUSINESS_COUNT)+
+                log(RETAIL_COUNT)+
+                log(TRAIN_COUNT)+
+                log(HDB_COUNT)+
+                log(SCHOOL_COUNT)+
+                log(dist) - 1,
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(decSIM)
+```
+
+
+```{r}
+CalcRSquared(decSIM$data$MORNING_PEAK, decSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(decSIM)
+```
+
+
+# 13. Doubly Constrained SIM
+
+```{r}
+dbcSIM <- glm(formula = MORNING_PEAK ~ 
+                ORIGIN_INDEX +
+                DESTIN_INDEX +
+                log(BUSINESS_COUNT)+
+                log(RETAIL_COUNT)+
+                log(TRAIN_COUNT)+
+                log(HDB_COUNT)+
+                log(SCHOOL_COUNT)+
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(dbcSIM)
+```
+
+
+```{r}
+CalcRSquared(dbcSIM$data$MORNING_PEAK, dbcSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(dbcSIM)
+```
+
 
