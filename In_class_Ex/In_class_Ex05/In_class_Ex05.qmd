@@ -30,7 +30,7 @@ We will install the development version of `spflow` from github. Go to `Packages
 `knitr` creates html tables.
 
 ```{r}
-pacman:::p_load(sf, sp, spdep, tmap, tidyverse, Matrix, knitr)
+pacman:::p_load(spflow, sf, sp, spdep, tmap, tidyverse, Matrix, knitr)
 ```
 
 Note: `MASS` is replaced by `Matrix` to speed up computations.
@@ -43,19 +43,17 @@ Three datasets are required to calibrate Spatial Econometric Interaction Models:
 3. Tibble data.frame of explanatory variables
 (Compared to SIM, SEIM does not require OD specification.)
 
-# 3 Import data
 
-:::panel-tabset
 
 # Subzone
 
 Build geographical area
 
 ```{r}
-mpsz <- st_read(dsn = "data/geospatial", layer = "MPSZ-2019") %>% 
-  st_transform(crs=3414)
+#mpsz <- st_read(dsn = "data/geospatial", layer = "MPSZ-2019") %>% 
+#  st_transform(crs=3414)
 
-glimpse(mpsz)
+#glimpse(mpsz)
 ```
 
 
@@ -98,6 +96,90 @@ Error in poly2nb(busstop_mpsz) : Polygon geometries required
 #                             d2 = 5000),
 #  "by_knn" = knn2nb(knearneigh(centroids, 3))
 #)
+```
+```{r}
+#| eval: false
+```
+
+# 3 Import data
+
+## odbus6_9
+
+```{r}
+odbus6_9 <- read_rds("data/rds/odbus6_9.rds")
+glimpse(odbus6_9)
+```
+## mpsz_nb (weight)
+
+```{r}
+mpsz_nb <- read_rds("data/rds/mpsz_nb.rds")
+head(mpsz_nb, n=5)
+```
+
+## mpsz_flow (OD matrix)
+
+```{r}
+mpsz_flow <- read_rds("data/rds/mpsz_flow.rds")
+glimpse(mpsz_flow)
+```
+
+## mpsz_var (explanatory variables)
+
+```{r}
+mpsz_var <- read_rds("data/rds/mpsz_var.rds")
+glimpse(mpsz_var)
+```
+# 4 Create spflow network class object
+
+```{r}
+mpsz_net <- spflow_network(
+  id_net = "sg",
+  node_neighborhood = nb2mat(mpsz_nb$by_contiguity),
+  node_data = mpsz_var,
+  node_key_column = "SZ_CODE"
+)
+
+mpsz_net
+```
+
+```{r}
+mpsz_net_pairs <- spflow_network_pair(
+  id_orig_net = "sg",
+  id_dest_net = "sg",
+  pair_data = mpsz_flow,
+  orig_key_column = "ORIGIN_SZ",
+  dest_key_column = "DESTIN_SZ",
+)
+
+mpsz_net_pairs
+```
+
+
+```{r}
+mpsz_multi_net <- spflow_network_multi(mpsz_net, mpsz_net_pairs)
+
+mpsz_multi_net
+```
+
+
+```{r}
+#cor_formula <- log(1 + TRIPS) ~
+#  BUSSTOP_COUNT +
+```
+
+
+
+```{r}
+#cor_mat <- pair_cor(
+#  mpsz_multi_net,
+#  spflow_formula = cor_formula,
+#  add_lags_x = FALSE
+#)
+```
+
+
+```{r}
+
 ```
 
 

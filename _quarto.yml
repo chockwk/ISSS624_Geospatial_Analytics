@@ -43,6 +43,7 @@ website:
           - text: Calibrate Spatial Interaction Models
             href: In_class_Ex/In_class_Ex04/In_class_Ex04b.html
           - text: Spatial Econometric Interaction Models
+            href: In_class_Ex/In_class_Ex04/In_class_Ex05.html
       - text: "{{< fa-solid fa-earth-asia >}} Take-home Ex"
         menu:
           - text: Dynamic Patterns of Public Transport Usage
