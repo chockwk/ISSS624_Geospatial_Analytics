@@ -178,8 +178,143 @@ mpsz_multi_net
 ```
 
 
-```{r}
+# 5 Base Model
 
+```{r}
+base_model <- spflow(spflow_formula = log(1 + TRIPS) ~
+                       O_(BUSSTOP_COUNT + AGE25_64) +
+                       D_(SCHOOL_COUNT + BUSINESS_COUNT + RETAILS_COUNT + FINSERV_COUNT) +
+                       P_(log(DISTANCE + 1)),
+                     spflow_networks = mpsz_multi_net)
+
+base_model
+```
+
+Note: log(DISTANCE + 1) adds a small value to distance, similar to +50 in previous exercises.
+
+
+Spatial interaction model estimated by: MLE (default)
+Spatial correlation structure: SDM (model_9, the unrestricted model with 9 matrices)
+Dependent variable: log(1 + TRIPS)
+R2_corr: 0.6942946  The model accounts for more than 69% of variation.
+Observations: 97969  
+Model coherence: Validated
+
+rho_d is destination constraint
+rho_o is origin constraint
+rho_w is OD constraint
+high t-stat and low p-value
+
+D_SCHOOL_COUNT is significant within its 
+D_SCHOOL_COUNT.lag1 is not significant; the neighbour school does not affect the attractiveness of its neighbours.
+
+D_RETAILS_COUNT and D_RETAILS_COUNT.lag1 is not significant for morning peak.
+
+D_FINSERV_COUNT.lag1 is significant; financial services improves the attractiveness of its neighbours, eg. Shenton way financial region covers three subzones.
+
+P_log(DISTANCE + 1) does not have lag.
+
+spflow model shows the influence of each variable on OD flow.
+
+# 6 Residual Diagnostics: Moran
+
+Moran Scatterplot to visualize spatial autocorrelation.
+Diagonals close to zero indicates little autocorrelation.
+
+```{r}
+old_par <- par(mfrow = c(1,3),
+               mar = c(2,2,2,2))
+
+spflow_moran_plots(base_model)
+```
+
+# 7 Residual Diagnostics: Colinearity
+
+```{r}
+corr_residual <- pair_cor(base_model)
+colnames(corr_residual) <- substr(colnames(corr_residual),1,3)
+cor_image(corr_residual)
+```
+No violation of colinearity and contributes to the model.
+
+`pair_cor` is a function that goes through `base model` and access all parameters to find the fitted values.
+
+# 8 Model Control
+
+
+```{r}
+spflow_formula <- log(1 + TRIPS) ~
+  O_(BUSSTOP_COUNT + AGE25_64) +
+  D_(SCHOOL_COUNT + BUSINESS_COUNT + RETAILS_COUNT + FINSERV_COUNT) +
+  P_(log(DISTANCE + 1))
+```
+
+## Model 1
+
+The estimation_method argument must be one of c("s2sls", "mle", "mcmc", "ols")
+
+```{r}
+model_control_1 <- spflow_control(
+  estimation_method = "mle",
+  model = "model_1"
+)
+
+mle_model_1 <- spflow(
+  spflow_formula,
+  spflow_networks = mpsz_multi_net,
+  estimation_control = model_control_1
+)
+
+mle_model_1
+```
+
+## Model 8
+
+```{r}
+model_control_8 <- spflow_control(
+  estimation_method = "mle",
+  model = "model_8"
+)
+
+mle_model_8 <- spflow(
+  spflow_formula,
+  spflow_networks = mpsz_multi_net,
+  estimation_control = model_control_8
+)
+
+mle_model_8
+```
+
+```{r}
+old_par <- par(mfrow = c(1,3),
+               mar = c(2,2,2,2))
+
+spflow_moran_plots(mle_model_8)
+```
+
+
+## Model 9
+
+```{r}
+model_control_9 <- spflow_control(
+  estimation_method = "mle",
+  model = "model_9"
+)
+
+mle_model_9 <- spflow(
+  spflow_formula,
+  spflow_networks = mpsz_multi_net,
+  estimation_control = model_control_9
+)
+
+mle_model_9
+```
+
+```{r}
+old_par <- par(mfrow = c(1,3),
+               mar = c(2,2,2,2))
+
+spflow_moran_plots(mle_model_9)
 ```
 
 

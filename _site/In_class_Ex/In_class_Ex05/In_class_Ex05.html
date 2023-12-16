@@ -237,6 +237,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mpsz_var-explanatory-variables" id="toc-mpsz_var-explanatory-variables" class="nav-link" data-scroll-target="#mpsz_var-explanatory-variables">mpsz_var (explanatory variables)</a></li>
   </ul></li>
   <li><a href="#create-spflow-network-class-object" id="toc-create-spflow-network-class-object" class="nav-link" data-scroll-target="#create-spflow-network-class-object">4 Create spflow network class object</a></li>
+  <li><a href="#base-model" id="toc-base-model" class="nav-link" data-scroll-target="#base-model">5 Base Model</a></li>
+  <li><a href="#residual-diagnostics-moran" id="toc-residual-diagnostics-moran" class="nav-link" data-scroll-target="#residual-diagnostics-moran">6 Residual Diagnostics: Moran</a></li>
+  <li><a href="#residual-diagnostics-colinearity" id="toc-residual-diagnostics-colinearity" class="nav-link" data-scroll-target="#residual-diagnostics-colinearity">7 Residual Diagnostics: Colinearity</a></li>
+  <li><a href="#model-control" id="toc-model-control" class="nav-link" data-scroll-target="#model-control">8 Model Control</a>
+  <ul class="collapse">
+  <li><a href="#model-1" id="toc-model-1" class="nav-link" data-scroll-target="#model-1">Model 1</a></li>
+  <li><a href="#model-8" id="toc-model-8" class="nav-link" data-scroll-target="#model-8">Model 8</a></li>
+  <li><a href="#model-9" id="toc-model-9" class="nav-link" data-scroll-target="#model-9">Model 9</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -552,8 +561,263 @@ Availability of origin-destination pair information:
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#  add_lags_x = FALSE</span></span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">#)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="base-model" class="level1">
+<h1>5 Base Model</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>base_model <span class="ot">&lt;-</span> <span class="fu">spflow</span>(<span class="at">spflow_formula =</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">+</span> TRIPS) <span class="sc">~</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">O_</span>(BUSSTOP_COUNT <span class="sc">+</span> AGE25_64) <span class="sc">+</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">D_</span>(SCHOOL_COUNT <span class="sc">+</span> BUSINESS_COUNT <span class="sc">+</span> RETAILS_COUNT <span class="sc">+</span> FINSERV_COUNT) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">P_</span>(<span class="fu">log</span>(DISTANCE <span class="sc">+</span> <span class="dv">1</span>)),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">spflow_networks =</span> mpsz_multi_net)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>base_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------------
+Spatial interaction model estimated by: MLE  
+Spatial correlation structure: SDM (model_9)
+Dependent variable: log(1 + TRIPS)
+
+--------------------------------------------------
+Coefficients:
+                          est     sd   t.stat  p.val
+rho_d                   0.680  0.004  192.554  0.000
+rho_o                   0.678  0.004  187.732  0.000
+rho_w                  -0.396  0.006  -65.591  0.000
+(Intercept)             0.410  0.065    6.266  0.000
+(Intra)                 1.313  0.081   16.263  0.000
+D_SCHOOL_COUNT          0.017  0.002    7.885  0.000
+D_SCHOOL_COUNT.lag1     0.002  0.004    0.551  0.581
+D_BUSINESS_COUNT        0.000  0.000    3.015  0.003
+D_BUSINESS_COUNT.lag1   0.000  0.000   -0.249  0.804
+D_RETAILS_COUNT         0.000  0.000   -0.306  0.759
+D_RETAILS_COUNT.lag1    0.000  0.000    0.152  0.880
+D_FINSERV_COUNT         0.002  0.000    6.787  0.000
+D_FINSERV_COUNT.lag1   -0.002  0.001   -3.767  0.000
+O_BUSSTOP_COUNT         0.002  0.000    6.806  0.000
+O_BUSSTOP_COUNT.lag1   -0.001  0.000   -2.364  0.018
+O_AGE25_64              0.000  0.000    7.336  0.000
+O_AGE25_64.lag1         0.000  0.000   -2.797  0.005
+P_log(DISTANCE + 1)    -0.050  0.007   -6.793  0.000
+
+--------------------------------------------------
+R2_corr: 0.6942944  
+Observations: 97969  
+Model coherence: Validated</code></pre>
+</div>
+</div>
+<p>Note: log(DISTANCE + 1) adds a small value to distance, similar to +50 in previous exercises.</p>
+<p>Spatial interaction model estimated by: MLE (default) Spatial correlation structure: SDM (model_9, the unrestricted model with 9 matrices) Dependent variable: log(1 + TRIPS) R2_corr: 0.6942946 The model accounts for more than 69% of variation. Observations: 97969<br>
+Model coherence: Validated</p>
+<p>rho_d is destination constraint rho_o is origin constraint rho_w is OD constraint high t-stat and low p-value</p>
+<p>D_SCHOOL_COUNT is significant within its D_SCHOOL_COUNT.lag1 is not significant; the neighbour school does not affect the attractiveness of its neighbours.</p>
+<p>D_RETAILS_COUNT and D_RETAILS_COUNT.lag1 is not significant for morning peak.</p>
+<p>D_FINSERV_COUNT.lag1 is significant; financial services improves the attractiveness of its neighbours, eg. Shenton way financial region covers three subzones.</p>
+<p>P_log(DISTANCE + 1) does not have lag.</p>
+<p>spflow model shows the influence of each variable on OD flow.</p>
+</section>
+<section id="residual-diagnostics-moran" class="level1">
+<h1>6 Residual Diagnostics: Moran</h1>
+<p>Moran Scatterplot to visualize spatial autocorrelation. Diagonals close to zero indicates little autocorrelation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(base_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="residual-diagnostics-colinearity" class="level1">
+<h1>7 Residual Diagnostics: Colinearity</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>corr_residual <span class="ot">&lt;-</span> <span class="fu">pair_cor</span>(base_model)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(corr_residual) <span class="ot">&lt;-</span> <span class="fu">substr</span>(<span class="fu">colnames</span>(corr_residual),<span class="dv">1</span>,<span class="dv">3</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cor_image</span>(corr_residual)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>No violation of colinearity and contributes to the model.</p>
+<p><code>pair_cor</code> is a function that goes through <code>base model</code> and access all parameters to find the fitted values.</p>
+</section>
+<section id="model-control" class="level1">
+<h1>8 Model Control</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>spflow_formula <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">+</span> TRIPS) <span class="sc">~</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">O_</span>(BUSSTOP_COUNT <span class="sc">+</span> AGE25_64) <span class="sc">+</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">D_</span>(SCHOOL_COUNT <span class="sc">+</span> BUSINESS_COUNT <span class="sc">+</span> RETAILS_COUNT <span class="sc">+</span> FINSERV_COUNT) <span class="sc">+</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">P_</span>(<span class="fu">log</span>(DISTANCE <span class="sc">+</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="model-1" class="level2">
+<h2 class="anchored" data-anchor-id="model-1">Model 1</h2>
+<p>The estimation_method argument must be one of c(“s2sls”, “mle”, “mcmc”, “ols”)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>model_control_1 <span class="ot">&lt;-</span> <span class="fu">spflow_control</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_method =</span> <span class="st">"mle"</span>,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"model_1"</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>mle_model_1 <span class="ot">&lt;-</span> <span class="fu">spflow</span>(</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  spflow_formula,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spflow_networks =</span> mpsz_multi_net,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_control =</span> model_control_1</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>mle_model_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------------
+Spatial interaction model estimated by: OLS  
+Spatial correlation structure: SLX (model_1)
+Dependent variable: log(1 + TRIPS)
+
+--------------------------------------------------
+Coefficients:
+                          est     sd    t.stat  p.val
+(Intercept)            11.384  0.069   164.255  0.000
+(Intra)                -6.006  0.112   -53.393  0.000
+D_SCHOOL_COUNT          0.093  0.003    28.599  0.000
+D_SCHOOL_COUNT.lag1     0.255  0.006    44.905  0.000
+D_BUSINESS_COUNT        0.001  0.000    10.036  0.000
+D_BUSINESS_COUNT.lag1   0.003  0.000    18.274  0.000
+D_RETAILS_COUNT         0.000  0.000    -1.940  0.052
+D_RETAILS_COUNT.lag1    0.000  0.000    -2.581  0.010
+D_FINSERV_COUNT         0.005  0.000    10.979  0.000
+D_FINSERV_COUNT.lag1   -0.016  0.001   -17.134  0.000
+O_BUSSTOP_COUNT         0.014  0.001    25.865  0.000
+O_BUSSTOP_COUNT.lag1    0.015  0.001    21.728  0.000
+O_AGE25_64              0.000  0.000    14.479  0.000
+O_AGE25_64.lag1         0.000  0.000    14.452  0.000
+P_log(DISTANCE + 1)    -1.281  0.008  -165.327  0.000
+
+--------------------------------------------------
+R2_corr: 0.2831458  
+Observations: 97969  
+Model coherence: Validated</code></pre>
+</div>
+</div>
+</section>
+<section id="model-8" class="level2">
+<h2 class="anchored" data-anchor-id="model-8">Model 8</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>model_control_8 <span class="ot">&lt;-</span> <span class="fu">spflow_control</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_method =</span> <span class="st">"mle"</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"model_8"</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>mle_model_8 <span class="ot">&lt;-</span> <span class="fu">spflow</span>(</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  spflow_formula,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spflow_networks =</span> mpsz_multi_net,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_control =</span> model_control_8</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>mle_model_8</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------------
+Spatial interaction model estimated by: MLE  
+Spatial correlation structure: SDM (model_8)
+Dependent variable: log(1 + TRIPS)
+
+--------------------------------------------------
+Coefficients:
+                          est     sd    t.stat  p.val
+rho_d                   0.689  0.003   196.832  0.000
+rho_o                   0.687  0.004   192.214  0.000
+rho_w                  -0.473  0.003  -142.469  0.000
+(Intercept)             1.086  0.049    22.275  0.000
+(Intra)                 0.840  0.075    11.255  0.000
+D_SCHOOL_COUNT          0.019  0.002     8.896  0.000
+D_SCHOOL_COUNT.lag1     0.019  0.004     5.130  0.000
+D_BUSINESS_COUNT        0.000  0.000     3.328  0.001
+D_BUSINESS_COUNT.lag1   0.000  0.000     1.664  0.096
+D_RETAILS_COUNT         0.000  0.000    -0.414  0.679
+D_RETAILS_COUNT.lag1    0.000  0.000    -0.171  0.864
+D_FINSERV_COUNT         0.002  0.000     6.150  0.000
+D_FINSERV_COUNT.lag1   -0.003  0.001    -4.601  0.000
+O_BUSSTOP_COUNT         0.003  0.000     7.676  0.000
+O_BUSSTOP_COUNT.lag1    0.000  0.000     0.552  0.581
+O_AGE25_64              0.000  0.000     6.870  0.000
+O_AGE25_64.lag1         0.000  0.000    -0.462  0.644
+P_log(DISTANCE + 1)    -0.125  0.005   -22.865  0.000
+
+--------------------------------------------------
+R2_corr: 0.6965974  
+Observations: 97969  
+Model coherence: Validated</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(mle_model_8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="model-9" class="level2">
+<h2 class="anchored" data-anchor-id="model-9">Model 9</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>model_control_9 <span class="ot">&lt;-</span> <span class="fu">spflow_control</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_method =</span> <span class="st">"mle"</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"model_9"</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>mle_model_9 <span class="ot">&lt;-</span> <span class="fu">spflow</span>(</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  spflow_formula,</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spflow_networks =</span> mpsz_multi_net,</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_control =</span> model_control_9</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>mle_model_9</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>--------------------------------------------------
+Spatial interaction model estimated by: MLE  
+Spatial correlation structure: SDM (model_9)
+Dependent variable: log(1 + TRIPS)
+
+--------------------------------------------------
+Coefficients:
+                          est     sd   t.stat  p.val
+rho_d                   0.680  0.004  192.555  0.000
+rho_o                   0.678  0.004  187.730  0.000
+rho_w                  -0.396  0.006  -65.590  0.000
+(Intercept)             0.410  0.065    6.266  0.000
+(Intra)                 1.313  0.081   16.263  0.000
+D_SCHOOL_COUNT          0.017  0.002    7.885  0.000
+D_SCHOOL_COUNT.lag1     0.002  0.004    0.551  0.582
+D_BUSINESS_COUNT        0.000  0.000    3.015  0.003
+D_BUSINESS_COUNT.lag1   0.000  0.000   -0.249  0.803
+D_RETAILS_COUNT         0.000  0.000   -0.306  0.759
+D_RETAILS_COUNT.lag1    0.000  0.000    0.152  0.879
+D_FINSERV_COUNT         0.002  0.000    6.787  0.000
+D_FINSERV_COUNT.lag1   -0.002  0.001   -3.767  0.000
+O_BUSSTOP_COUNT         0.002  0.000    6.806  0.000
+O_BUSSTOP_COUNT.lag1   -0.001  0.000   -2.364  0.018
+O_AGE25_64              0.000  0.000    7.336  0.000
+O_AGE25_64.lag1         0.000  0.000   -2.797  0.005
+P_log(DISTANCE + 1)    -0.050  0.007   -6.792  0.000
+
+--------------------------------------------------
+R2_corr: 0.6942942  
+Observations: 97969  
+Model coherence: Validated</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(mle_model_9)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
