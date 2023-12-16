@@ -536,61 +536,43 @@ tm_shape(school) +
 ## HDB
 
 ```{r}
-hdb <- read.csv("data/aspatial/hdb.csv")
+hdb <- read.csv("data/aspatial/hdb.csv") %>% 
+  filter(residential == "Y") %>% 
+  select(blk_no, street, building, postal, total_dwelling_units, lat, lng)
+
 str(hdb)
 ```
 
 ```{r}
-# Create a SpatialPoints object
-#coordinates <- hdb[, c("long", "lat")]
-#spatial_points <- SpatialPoints(coords = coordinates)
-
-# Define the current CRS (WGS84 - EPSG:4326)
-#proj4string(spatial_points) <- CRS("+proj=longlat +datum=WGS84")
-
-# Convert SpatialPoints to an sf object
-#sf_points <- st_as_sf(spatial_points)
-
-# Define EPSG:3414 CRS
-#epsg_3414_crs <- st_crs(3414)
-
-# Transform the sf object to EPSG:3414
-#sf_points_3414 <- st_transform(sf_points, crs = epsg_3414_crs)
-
-# Convert back to SpatialPoints
-#spatial_points_3414 <- as(sf_points_3414, "Spatial")
-```
-
-```{r}
 hdb_sf <- st_as_sf(hdb,
-                   coords = c("lat","lng"),
+                   coords = c("lng","lat"),
                    crs = 4326,
                    remove = F) %>% 
   st_transform(crs = 3414)
 ```
 
 ```{r}
-#hexagon_busstop$HDB_COUNT <- lengths(st_intersects(hexagon_busstop, hdb_sf))
-#summary(hexagon_busstop$HDB_COUNT)
+hexagon_busstop$HDB_COUNT <- lengths(st_intersects(hexagon_busstop, hdb_sf))
+summary(hexagon_busstop$HDB_COUNT)
 ```
 
 ```{r}
-#tm_shape(mpsz) +
-#  tm_polygons(col = "REGION_N", palette = "Set2") +
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
   
-#tm_shape(hexagon_busstop) +
-#  tm_polygons(col = "white", alpha = 0.1) +
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
   
-#tm_shape(school) +
-#  tm_dots(col = "black") +
+tm_shape(hdb_sf) +
+  tm_dots(col = "black") +
   
-#  tm_layout(main.title = "Distribution of Schools",
-#            main.title.position = "center",
-#            main.title.size = 1,
-#            legend.position = c("right", "bottom"),
-#            legend.outside = FALSE,
-#            legend.text.size = 0.6,
-#            frame = FALSE)
+  tm_layout(main.title = "Distribution of HDB",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
 ```
 :::
 

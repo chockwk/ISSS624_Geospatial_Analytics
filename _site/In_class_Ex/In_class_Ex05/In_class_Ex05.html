@@ -584,24 +584,24 @@ Coefficients:
 rho_d                   0.680  0.004  192.554  0.000
 rho_o                   0.678  0.004  187.732  0.000
 rho_w                  -0.396  0.006  -65.591  0.000
-(Intercept)             0.410  0.065    6.267  0.000
-(Intra)                 1.313  0.081   16.262  0.000
+(Intercept)             0.410  0.065    6.266  0.000
+(Intra)                 1.313  0.081   16.263  0.000
 D_SCHOOL_COUNT          0.017  0.002    7.885  0.000
-D_SCHOOL_COUNT.lag1     0.002  0.004    0.552  0.581
+D_SCHOOL_COUNT.lag1     0.002  0.004    0.551  0.581
 D_BUSINESS_COUNT        0.000  0.000    3.015  0.003
 D_BUSINESS_COUNT.lag1   0.000  0.000   -0.249  0.804
 D_RETAILS_COUNT         0.000  0.000   -0.306  0.759
 D_RETAILS_COUNT.lag1    0.000  0.000    0.152  0.880
 D_FINSERV_COUNT         0.002  0.000    6.787  0.000
 D_FINSERV_COUNT.lag1   -0.002  0.001   -3.767  0.000
-O_BUSSTOP_COUNT         0.002  0.000    6.807  0.000
+O_BUSSTOP_COUNT         0.002  0.000    6.806  0.000
 O_BUSSTOP_COUNT.lag1   -0.001  0.000   -2.364  0.018
 O_AGE25_64              0.000  0.000    7.336  0.000
 O_AGE25_64.lag1         0.000  0.000   -2.797  0.005
 P_log(DISTANCE + 1)    -0.050  0.007   -6.793  0.000
 
 --------------------------------------------------
-R2_corr: 0.6942946  
+R2_corr: 0.6942944  
 Observations: 97969  
 Model coherence: Validated</code></pre>
 </div>
@@ -697,22 +697,31 @@ Observations: 97969
 Model coherence: Validated</code></pre>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(mle_model_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="model-8" class="level2">
 <h2 class="anchored" data-anchor-id="model-8">Model 8</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>model_control_8 <span class="ot">&lt;-</span> <span class="fu">spflow_control</span>(</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_method =</span> <span class="st">"mle"</span>,</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"model_8"</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>mle_model_8 <span class="ot">&lt;-</span> <span class="fu">spflow</span>(</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  spflow_formula,</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spflow_networks =</span> mpsz_multi_net,</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_control =</span> model_control_8</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>mle_model_8</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>model_control_8 <span class="ot">&lt;-</span> <span class="fu">spflow_control</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_method =</span> <span class="st">"mle"</span>,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"model_8"</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>mle_model_8 <span class="ot">&lt;-</span> <span class="fu">spflow</span>(</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  spflow_formula,</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spflow_networks =</span> mpsz_multi_net,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_control =</span> model_control_8</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>mle_model_8</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--------------------------------------------------
 Spatial interaction model estimated by: MLE  
@@ -724,9 +733,9 @@ Coefficients:
                           est     sd    t.stat  p.val
 rho_d                   0.689  0.003   196.831  0.000
 rho_o                   0.687  0.004   192.214  0.000
-rho_w                  -0.473  0.003  -142.469  0.000
+rho_w                  -0.473  0.003  -142.468  0.000
 (Intercept)             1.086  0.049    22.275  0.000
-(Intra)                 0.840  0.075    11.255  0.000
+(Intra)                 0.840  0.075    11.254  0.000
 D_SCHOOL_COUNT          0.019  0.002     8.896  0.000
 D_SCHOOL_COUNT.lag1     0.019  0.004     5.130  0.000
 D_BUSINESS_COUNT        0.000  0.000     3.328  0.001
@@ -748,30 +757,30 @@ Model coherence: Validated</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(mle_model_8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(mle_model_8)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="model-9" class="level2">
 <h2 class="anchored" data-anchor-id="model-9">Model 9</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>model_control_9 <span class="ot">&lt;-</span> <span class="fu">spflow_control</span>(</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_method =</span> <span class="st">"mle"</span>,</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"model_9"</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>mle_model_9 <span class="ot">&lt;-</span> <span class="fu">spflow</span>(</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  spflow_formula,</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spflow_networks =</span> mpsz_multi_net,</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_control =</span> model_control_9</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>mle_model_9</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>model_control_9 <span class="ot">&lt;-</span> <span class="fu">spflow_control</span>(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_method =</span> <span class="st">"mle"</span>,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"model_9"</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>mle_model_9 <span class="ot">&lt;-</span> <span class="fu">spflow</span>(</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  spflow_formula,</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spflow_networks =</span> mpsz_multi_net,</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimation_control =</span> model_control_9</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>mle_model_9</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>--------------------------------------------------
 Spatial interaction model estimated by: MLE  
@@ -807,12 +816,12 @@ Model coherence: Validated</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(mle_model_9)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="fu">spflow_moran_plots</span>(mle_model_9)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+<p><img src="In_class_Ex05_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 
