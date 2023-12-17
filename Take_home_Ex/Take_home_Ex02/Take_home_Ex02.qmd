@@ -15,15 +15,18 @@ editor: source
 
 # 1. Overview
 
-Urban mobility and public transport service planning are critical challenges for transport operators and urban planners. Questions on the residents commute patterns and the bus service demands are traditionally explored through commuter surveys. Despite providing valuable insights, these surveys are costly, time-consuming, and the data require extensive cleaning and analysis, often rendering the findings outdated by the time they are ready for use.
+Urban mobility and public transport service planning are critical challenges for transport operators and urban planners. Questions on the **commute patterns** and bus **service demands** are traditionally explored through commuter surveys. Despite providing valuable insights, these surveys are costly, time-consuming, and the data require extensive cleaning and analysis, often rendering the findings outdated by the time they are ready for use.
 
-In contrast, the digitization of urban infrastructure, such as public buses, trains, and roads, offers a wealth of data that can capture movement patterns over time and space. The advent of pervasive computing technologies like GPS and smart cards for transport has led to an explosion of geospatial data. However, the capability to effectively analyze this data and extract valuable information is not in the same pace, leading to suboptimal returns on investment in data collection and management.
+In contrast, the **digitization** of urban infrastructure, such as public buses, trains, and roads, offers a wealth of data that can capture movement patterns over time and space. The advent of pervasive computing technologies like GPS and smart cards for transport has led to an explosion of geospatial data.
 
-This exercise is propelled by two key motivators: the utilization of open data for policy-making, and the scarcity of practical research demonstrating the use of geospatial data science and analysis (GDSA) in decision-making processes.
+This exercise is propelled by two key motivators: the utilization of open data for policy-making, and the demonstration of practical research using geospatial data science and analysis in decision-making processes.
 
 # 2. Methods
 
-**Geospatial Data Science**
+![](images/Screenshot%202023-12-17%20at%207.00.50%E2%80%AFPM.png){fig-align="left" width="700"}
+
+::: panel-tabset
+## Task 1: Geospatial Data Science
 
 1.  Derive an analytical hexagon data of 375m to represent the traffic analysis zone.
 
@@ -42,18 +45,19 @@ This exercise is propelled by two key motivators: the utilization of open data f
 
 6.  Compute a distance matrix by using the analytical hexagon data.
 
-**Spatial Interaction Modelling**
+## Task 2: Spatial Interaction Modelling
 
-1.  Create four log-based Poisson spatial interactive models to determine propulsiveness and attractiveness factors affecting urban commuting flows at the selected time interval.
+7.  Create four log-based Poisson spatial interactive models to determine propulsiveness and attractiveness factors affecting urban commuting flows at the selected time interval.
 
     a.  Unconstrained Model
     b.  Origin (production) constrained model
     c.  Destination (attraction) constrained model
     d.  Doubly constrained model
 
-2.  Calibrate spatial interactive models using propulsiveness and attractiveness factors.
+8.  Calibrate spatial interactive models using propulsiveness and attractiveness factors.
 
-3.  Compare the modelling results of the four spatial interactive models.
+9.  Compare the modelling results of the four spatial interactive models.
+:::
 
 # 3. Load packages
 
@@ -62,7 +66,17 @@ This exercise is propelled by two key motivators: the utilization of open data f
 
 The analysis involves the following packages:
 
-`sf` handles spatial data. `tidyverse` handles attribute data. `DT` enables R data objects (matrices or data frames) to be displayed as tables on HTML pages. `stplanr` analyses OD matrix. `reshape2` restructures and aggregates data. `performance` contains utilities for computing measures to assess model quality. `ggpubr` arrange and annotate multiple plots. `olsrr` builds OLS and performing diagnostics tests. `GWmodel` calibrate geographical weighted family of models. `corrplot` enables multivariate data visualisation and analysis. `tmap` plots choropleth maps.
+-   `sf` handles spatial data.
+-   `tidyverse` handles attribute data.
+-   `DT` enables R data objects (matrices or data frames) to be displayed as tables on HTML pages.
+-   `stplanr` analyses OD matrix.
+-   `reshape2` restructures and aggregates data.
+-   `performance` contains utilities for computing measures to assess model quality.
+-   `ggpubr` arrange and annotate multiple plots.
+-   `olsrr` builds OLS and performing diagnostics tests.
+-   `GWmodel` calibrate geographical weighted family of models.
+-   `corrplot` enables multivariate data visualisation and analysis.
+-   `tmap` plots choropleth maps.
 :::
 
 ```{r}
@@ -71,10 +85,10 @@ pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2, performance, ggpu
 
 # 3. Import data
 
-We will be using the following **geospatial** (`busstop`, `mpsz`) and **aspatial** (`odbus`) datasets.
+The analysis will leverage on real world data, broadly categorized as **geospatial** and **aspatial** data. For all geospatial data, we will use the same coordinate reference system, **SVY21**.
 
 ::: panel-tabset
-## Bus Stop
+### Bus Stop
 
 `busstop` is a **geospatial** dataset containing the detailed information for all bus stops currently serviced by buses, including bus stop code, road name, description, location coordinates.
 
@@ -87,11 +101,9 @@ Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataserv
 #| code-summary: "Show the code"
 busstop <- st_read(dsn = "data/geospatial", layer = "BusStop") %>%
   st_transform(crs = 3414)
-
-glimpse(busstop)
 ```
 
-## Subzone
+### Subzone
 
 `mpsz` is is a **geospatial** dataset of the Master Plan 2019, a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years published in **2019**.
 
@@ -104,10 +116,9 @@ Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 #| code-summary: "Show the code"
 mpsz <- st_read(dsn = "data/geospatial", layer = "MPSZ-2019") %>% 
   st_transform(crs=3414)
-glimpse(mpsz)
 ```
 
-## Passenger Volume
+### Passenger Volume
 
 `odbus` is an **aspatial** dataset containing the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used.
 
@@ -119,19 +130,17 @@ Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataserv
 #| code-fold: true
 #| code-summary: "Show the code"
 odbus = read_csv("data/aspatial/origin_destination_bus_202310.csv")
-
-glimpse(odbus)
 ```
 :::
 
 # 4. Create Analytical Hexagons
 
 ::: panel-tabset
-
 ## Create spatial grids
 
 According to Statista, the average walking distance on a commute trip in Singapore is 396 meters.
-![](images/Screenshot%202023-12-17%20at%2012.02.23%E2%80%AFPM.png){fig-align="left" width="300"}
+
+![](images/Screenshot%202023-12-17%20at%2012.02.23%E2%80%AFPM.png){fig-align="left" width="500"}
 
 As an estimation, the maximum walking distance is 792m and the `cellsize` of analytical hexagon grid is set to 750m.
 
@@ -153,6 +162,8 @@ area_hexagon_grid
 
 ## Assign hexagon index
 
+The hexagon grids will be indexed by row number and is an important reference for downstream analysis.
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -164,7 +175,7 @@ hexagon_grid_sf = st_sf(area_hexagon_grid) %>%
 glimpse(hexagon_grid_sf)
 ```
 
-## Create bus stop hexagon grids
+Two datasets will be created with hexagon grids. First, `hexagon_busstop` is a fused dataset with bus stops allocated to each hexagon grid. Second, `od` is a fused dataset with bus stops in subzone information allocated to each hexagon grid, a foundation dataset for commute flow. Both datasets will be saved in rds.
 
 ```{r}
 #| code-fold: true
@@ -173,30 +184,28 @@ hexagon_busstop <- st_join(hexagon_grid_sf, busstop,
                            by = c("geometry" = "geometry")) %>% 
   drop_na()
 
-glimpse(hexagon_busstop)
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
 od <- st_join(hexagon_grid_sf, busstop_mpsz, 
             by = c("geometry" = "geometry"))
 
 glimpse(od)
 ```
+:::
+
+::: {.callout-note collapse="true"}
+## Save rds
 
 ```{r}
 write_rds(hexagon_busstop, "data/rds/hexagon_busstop.rds")
 write_rds(od, "data/rds/od.rds")
 ```
-
 :::
 
 # 5. Prepare OD Matrix
 
-## Weekday Morning
+::: panel-tabset
+## Step 1: Extract selected commute flow
 
-The selected time interval is weekday morning peak from 6am to 9am.
+The selected time interval is **weekday morning peak** from **6am to 9am** where majority of Singaporeans are active for a wide repetoire of purposes.
 
 ```{r}
 #| code-fold: true
@@ -247,7 +256,9 @@ od1 <- unique(od1)
 glimpse(od1)
 ```
 
-## Remove intra-zonal flow
+## Step 2: Remove intra-zonal flow
+
+Intra-zonal flow refers to the commute flows within the same subzone where `ORIGIN_SZ` = `DESTIN_SZ`. Travelling to and fro the same subzone neither generate any distance nor reflect real world scenarios. Hence, intra-zonal flow is removed.
 
 ```{r}
 #| code-fold: true
@@ -261,29 +272,43 @@ od1_data <- od1 %>%
 
 summary(od1_data)
 ```
+:::
+
+::: {.callout-note collapse="true"}
+## Save rds
 
 ```{r}
 write_rds(od1, "data/rds/od1.rds")
 write_rds(od1_data, "data/rds/od1_data.rds")
 ```
-
 :::
 
 # 6. Create flowline
 
+**Flow lines** represent movement between origins and destinations. To visualize major commute flows, the threshold for morning peak hour trips is set to 10,000.
+
+::: {.callout-note collapse="true"}
+## Load rds
+
 ```{r}
 od1 <- readRDS("data/rds/od1_data.rds")
 ```
+:::
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 flowLine <- od1_data %>% 
   od2line(od, zone_code = "index")
 ```
 
+## Weekday morning peak by region
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tmap_mode("plot")
 
-# Plot the base layer with mpsz areas filled with colors based on PLN_AREA_N
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -306,7 +331,11 @@ tm_shape(mpsz) +
 
 ```
 
+## Weekday morning peak by planning area
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tmap_mode("plot")
 
 tm_shape(mpsz) +
@@ -328,32 +357,50 @@ tm_shape(mpsz) +
             frame = FALSE)
 ```
 
-# 6. Assemble propulsive and attractiveness variables
+:::
+
+::: callout-tip
+## Insight
+
+The highest commute flow is at Lim Chu Kang. Visualizing the weekday morning peak commute flow by **region** shows that the major flows occur within the region and do not move across regions. With greater granularity into **planning areas**, there is high commute flows observed across planning areas, indicating propulsive and attractive variables that push and pull commuters into such movement patterns.
+:::
+
+# 6. Assemble propulsive and attractive variables
+
+To determine variables that influence the commute pattern between TAZ, we explore how flow data is related to propulsive and attractive attributes of the origin and destination.
+
+**Propulsive attributes** refer to factors that push or drive movement from origin to destination.
+
+**Attractive attributes** are factors that pull or attract entities toward a specific destination.
+
+::: {.callout-note collapse="true"}
+## Load rds
 
 ```{r}
 hexagon_busstop <- read_rds("data/rds/hexagon_busstop.rds")
 ```
+:::
 
 ::: panel-tabset
 ## Business
 
+`business` is a **geospatial** dataset of industrial areas, business parks, trade hubs and corporations where most working population commute to work. The output indicates that the geospatial objects are **point** features. There are **6550 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
 Source: Prof Kam
 
-The output indicates that the geospatial objects are **point** features. There are **6550 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 business <- st_read(dsn = "data/geospatial", layer = "Business") %>%
   st_transform(crs = 3414)
 
-glimpse(business)
-```
-
-```{r}
 hexagon_busstop$BUSINESS_COUNT <- lengths(st_intersects(hexagon_busstop, business))
 summary(hexagon_busstop$BUSINESS_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -374,23 +421,23 @@ tm_shape(business) +
 
 ## Train
 
+`train` is a **geospatial** dataset of the Singapore Mass Rapid Transit system. Singaporeans often transit to destinations through a combination of train and bus to minimize commuting time. The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
 Source: LTA DataMall
 
-The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 train <- st_read(dsn = "data/geospatial", layer = "Train_Station_Exit_Layer") %>%
   st_transform(crs = 3414)
 
-glimpse(train)
-```
-
-```{r}
 hexagon_busstop$TRAIN_COUNT <- lengths(st_intersects(hexagon_busstop, train))
 summary(hexagon_busstop$TRAIN_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -411,23 +458,23 @@ tm_shape(train) +
 
 ## School
 
+`school` is a **geospatial** dataset of MOE-registered primary to tertiary institutions to consider the young population. The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
 Source: LTA DataMall
 
-The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 school <- st_read(dsn = "data/geospatial", layer = "SCHOOLZONE") %>%
   st_transform(crs = 3414)
 
-glimpse(school)
-```
-
-```{r}
 hexagon_busstop$SCHOOL_COUNT <- lengths(st_intersects(hexagon_busstop, school))
 summary(hexagon_busstop$SCHOOL_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -448,30 +495,30 @@ tm_shape(school) +
 
 ## HDB
 
+`HDB` is an **aspatial** dataset of the residential areas of Singapore. The output indicates that there are **10,181 observations** and 7 fields and will be converted into a simple feature object.
+
 Source: Prof Kam
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hdb <- read.csv("data/aspatial/hdb.csv") %>% 
   filter(residential == "Y") %>% 
   select(blk_no, street, building, postal, total_dwelling_units, lat, lng)
 
-str(hdb)
-```
-
-```{r}
 hdb_sf <- st_as_sf(hdb,
                    coords = c("lng","lat"),
                    crs = 4326,
                    remove = F) %>% 
   st_transform(crs = 3414)
-```
 
-```{r}
 hexagon_busstop$HDB_COUNT <- lengths(st_intersects(hexagon_busstop, hdb_sf))
 summary(hexagon_busstop$HDB_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -492,31 +539,29 @@ tm_shape(hdb_sf) +
 
 ## Hospital
 
-Source: Wan Kee
+`hospital` is an **aspatial** dataset of MOH-registered acute and community hospitals where commuters visit for health-related appointments and is also workplaces for healthcare professionals. The output indicates that there are **30 observations** and 3 fields and will be converted into a simple feature object.
+
+Source: Author
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hospital <- read.csv("data/aspatial/hospitals-location-updated.csv") %>%
   select(Hospitals, Lat, Lng)
 
-str(hospital)
-```
-
-```{r}
 hospital_sf <- st_as_sf(hospital,
                    coords = c("Lng","Lat"),
                    crs = 4326,
                    remove = F) %>% 
   st_transform(crs = 3414)
 
-glimpse(hospital_sf)
-```
-
-```{r}
 hexagon_busstop$HOSPITAL_COUNT <- lengths(st_intersects(hexagon_busstop, hospital_sf))
 summary(hexagon_busstop$HOSPITAL_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -537,29 +582,29 @@ tm_shape(hospital_sf) +
 
 ## Malls
 
+`malls` is an **aspatial** dataset of shopping malls that serves each planning area for various purposes. The output indicates that there are **184 observations** and 4 fields and will be converted into a simple feature object.
+
+Source: Author
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 mall <- read.csv("data/aspatial/mall_coordinates_updated.csv") %>%
   select(latitude, longitude, name)
 
-str(mall)
-```
-
-```{r}
 mall_sf <- st_as_sf(mall,
                    coords = c("longitude","latitude"),
                    crs = 4326,
                    remove = F) %>% 
   st_transform(crs = 3414)
 
-glimpse(mall_sf)
-```
-
-```{r}
 hexagon_busstop$MALL_COUNT <- lengths(st_intersects(hexagon_busstop, mall_sf))
 summary(hexagon_busstop$MALL_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -580,23 +625,23 @@ tm_shape(mall_sf) +
 
 ## Food
 
+`food` is a **geospatial** dataset of food and beverage outlets. The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
 Source: Prof Kam
 
-The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 food <- st_read(dsn = "data/geospatial", layer = "F&B") %>%
   st_transform(crs = 3414)
 
-glimpse(food)
-```
-
-```{r}
 hexagon_busstop$FOOD_COUNT <- lengths(st_intersects(hexagon_busstop, food))
 summary(hexagon_busstop$FOOD_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -617,23 +662,23 @@ tm_shape(food) +
 
 ## Retail
 
+`retails` is a **geospatial** dataset of retail stores widely distributed and available. The output indicates that the geospatial objects are **point** features. There are **37,635 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
 Source: Prof Kam
 
-The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 retails <- st_read(dsn = "data/geospatial", layer = "Retails") %>%
   st_transform(crs = 3414)
 
-glimpse(retails)
-```
-
-```{r}
 hexagon_busstop$RETAIL_COUNT <- lengths(st_intersects(hexagon_busstop, retails))
 summary(hexagon_busstop$RETAIL_COUNT)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 tm_shape(mpsz) +
   tm_polygons(col = "REGION_N", palette = "Set2") +
   
@@ -653,19 +698,23 @@ tm_shape(retails) +
 ```
 :::
 
-# 7. Compute flow
+# 7. Prepare Attribute Counts
+
+Here are the attribute counts of various functions extracted for spatial interaction model:
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 summary(hexagon_busstop)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hexagon_busstop_tidy <- hexagon_busstop %>% 
   st_drop_geometry() %>% 
   select(-c(BUS_STOP_N, BUS_ROOF_N, LOC_DESC))
-```
 
-```{r}
 flow_data <- suppressWarnings(
   od1_data %>% 
   left_join(hexagon_busstop_tidy,
@@ -676,7 +725,11 @@ flow_data <- suppressWarnings(
 summary(flow_data)
 ```
 
+Since Poisson Regression is log-based and log 0 is undefined, it is important for us to ensure that no 0 values in the explanatory variables. Hence, all zeros are replaced with 0.99. Duplicates are also removed.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 flow_data$BUSINESS_COUNT <- ifelse(
   flow_data$BUSINESS_COUNT == 0,
   0.99, flow_data$BUSINESS_COUNT)
@@ -708,38 +761,58 @@ flow_data$HOSPITAL_COUNT <- ifelse(
 flow_data$MALL_COUNT <- ifelse(
   flow_data$MALL_COUNT == 0,
   0.99, flow_data$MALL_COUNT)
-```
 
-```{r}
 duplicate <- flow_data %>%
   group_by_all() %>%
   filter(n()>1) %>%
   ungroup()
-```
 
-```{r}
 flow_data <- unique(flow_data)
 ```
+
+::: {.callout-note collapse="true"}
+## Save rds
 
 ```{r}
 write_rds(flow_data, "data/rds/flow_data.rds")
 ```
+:::
 
 # 8. Compute distance matrix
 
+In spatial interaction, a **distance matrix** is a table that shows the distance between pairs of locations. In this section, we prepare the **distance decay** component of the spatial interaction model.
+
+::: panel-tabset
+## Step 1: Convert to spatial polygon data frame
+
+The `hexagon_busstop` sf data table is converted to spatial polygons data frame
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hexagon_busstop_sp <- as(hexagon_busstop, "Spatial")
 hexagon_busstop_sp
 ```
 
+## Step 2: Compute euclidean distance between centroids
+
+`spDists()` of sp package will be used to compute the Euclidean distance between the centroids of the planning subzones. The output is a matrix object class where the column and row headers are not labeled with the planning subzone codes and the diagonals are zero.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 dist <- spDists(hexagon_busstop_sp, 
                 longlat = FALSE)
 head(dist, n=c(5, 5))
 ```
 
+## Step 3: Label the distance matrix
+
+`paste0` concatenates vectors after converting to characters and attach the hexagon index to the row and column headers of the distance matrix.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 index <- hexagon_busstop$index
 
 colnames(dist) <- paste0(index)
@@ -748,20 +821,36 @@ rownames(dist) <- paste0(index)
 kable(head(dist, n=c(8, 8)))
 ```
 
+## Step 4: Pivot the distance value
+
+We will pivot the distance matrix into a long table by using the row and column hexagon index.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 distPair <- melt(dist) %>%
   rename(dist = value)
 
 head(distPair, 10)
 ```
 
+## Step 5: Revise intra-zonal distances
+
+To estimate a pseudo value for intra-zonal distance, we will understand the minimumn, maximum, mean of the distance by using summary(). Filtering 0, the minimum distance between two different bus stops, in any case inter-zonal, is 750m. Therefore, the maximum intra-zonal distance is 375m.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 distPair %>%
   filter(dist > 0) %>%
   summary()
 ```
 
+Given the minimum value of `dist`, we will append a constant value of **375m** to replace the intra-zonal distance of 0 and rename the columns to origin and destination.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 distPair$dist <- ifelse(distPair$dist == 0,
                         375, 
                         distPair$dist)
@@ -775,21 +864,32 @@ distPair$DESTIN_INDEX <- as.character(distPair$DESTIN_INDEX)
 
 summary(distPair)
 ```
+:::
+
+::: {.callout-note collapse="true"}
+## Save rds
 
 ```{r}
 write_rds(distPair, "data/rds/distPair.rds")
 ```
-
+:::
 
 # 9. Prepare data for Spatial Interaction Model
+
+::: {.callout-note collapse="true"}
+## Load rds
 
 ```{r}
 flow_data <- read_rds("data/rds/flow_data.rds")
 ```
+:::
 
-Error : level sets of factors are different
+::: panel-tabset
+## Step 1: Calculate FlowNoIntra and offset
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 # Convert factors to characters for comparison
 flow_data$ORIGIN_INDEX <- as.character(flow_data$ORIGIN_INDEX)
 flow_data$DESTIN_INDEX <- as.character(flow_data$DESTIN_INDEX)
@@ -803,9 +903,14 @@ flow_data$FlowNoIntra <- ifelse(flow_data$ORIGIN_INDEX == flow_data$DESTIN_INDEX
 flow_data$offset <- ifelse(flow_data$ORIGIN_INDEX == flow_data$DESTIN_INDEX,
                            0.000001, 
                            1)
+glimpse(flow_data)
 ```
 
+## Step 2: Prepare inter-zonal flow
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 inter_zonal_flow <- flow_data %>% 
   filter(FlowNoIntra >0)
 
@@ -819,28 +924,35 @@ inter_zonal_flow <- unique(inter_zonal_flow)
 glimpse(inter_zonal_flow)
 ```
 
+## Step 3: Append dist to
+
+The distance between hexagons from `distPair` data frame is appended to `flow_data` data frame.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 SIM_data <- inter_zonal_flow %>%
   left_join (distPair,
              by = c("ORIGIN_INDEX" = "ORIGIN_INDEX",
                     "DESTIN_INDEX" = "DESTIN_INDEX"))
-```
 
-```{r}
 duplicate <- SIM_data %>%
   group_by_all() %>%
   filter(n()>1) %>%
   ungroup()
 
 SIM_data <- unique(SIM_data)
-```
 
-```{r}
 head(SIM_data) %>% 
   kable()
 ```
+:::
+
+To visualize the distribution of morning peak hour commute, the histogram shows a highly skewed distribution and does not resemble normal distribution. **Poisson regression** is used in the spatial interaction models.
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 ggplot(data = SIM_data, aes(x = MORNING_PEAK)) +
   geom_histogram(fill = "lightblue", color = "black",
                  binwidth = 2500) +
@@ -849,7 +961,11 @@ ggplot(data = SIM_data, aes(x = MORNING_PEAK)) +
   )
 ```
 
+To understand distance decay, we plot the dependent variable, `MORNING_PEAK`, with one of the independent variable `dist`. The plot shows **negative binomial distribution**.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 ggplot(data = SIM_data,
        aes(x = dist,
            y = MORNING_PEAK)) +
@@ -860,7 +976,11 @@ ggplot(data = SIM_data,
   )
 ```
 
+`MORNING_PEAK` and `dist` is log-transformed to visualize their relationship on log-scale.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 ggplot(data = SIM_data,
        aes(x = log(dist),
            y = log(MORNING_PEAK))) +
@@ -872,7 +992,23 @@ ggplot(data = SIM_data,
   )
 ```
 
+::: callout-tip
+## Insight
+
+Generally, the number of trips during morning peak hour decrease exponentially as the distance increases. This observation is applicable across all trips at any time of the day.
+
+The main island of Singapore is about 49km from east to west and 28km from north to south with a coastline of 228km.
+
+There are **outliers** observed where the distance is between 20 to 25km. This shows the presence of **strong propulsive or attractive variables** influence the commute flow in the morning peak hour.
+:::
+
+# 10. Correlation Analysis of Attributes
+
+**Multicollinearity** exists whenever an independent variable is highly correlated with one or more of the other independent variables in a multiple regression equation. Multicollinearity is a problem because it undermines the statistical significance of an independent variable.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 vars.cor = cor(SIM_data[,4:11])
 corrplot.mixed(vars.cor,
          lower = "ellipse", 
@@ -882,17 +1018,37 @@ corrplot.mixed(vars.cor,
                tl.col = "black")
 ```
 
+::: callout-tip
+## Insight
+
+Examining the correlation analysis,
+
+Strong correlation between `food`, `mall` and `retail`. As food options are widely available in malls and retail stores, it explains the collinearity. As such, `food` and `mall` will be removed from the spatial interaction model.
+
+Weak correlation between `train` and variables such as `food`, `mall` and `retail`. This is likely due to the urban planning of Singapore where the accessibility to amentities is optimized by the co-location of train stations.
+
+`HDB` has positive correlation with `schools` and negative correlation with other variables. This shows the residential areas are mostly clustered togther in a homogenous manner and often near schools to reduce distance travelled by the young population.
+:::
+
+::: {.callout-note collapse="true"}
+## Save rds
+
 ```{r}
 write_rds(SIM_data, "data/rds/SIM_data.rds")
 ```
+:::
 
 # 10. Spatial Interaction Model
+
+::: {.callout-note collapse="true"}
+## Load rds
 
 ```{r}
 SIM_data <- read_rds("data/rds/SIM_data.rds")
 ```
+:::
 
-::: panel-tabset 
+::: panel-tabset
 
 ## Unconstrained Spatial Interaction Model
 
@@ -914,29 +1070,22 @@ write_rds(uncSIM, "data/rds/uncSIM.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 uncSIM <- read_rds("data/rds/uncSIM.rds")
-summary(uncSIM)
+kable(tail(uncSIM$coefficients, n = 7))
 ```
 
-```{r}
-CalcRSquared <- function(observed,estimated){
-  r <- cor(observed,estimated)
-  R2 <- r^2
-  R2
-}
-```
+::: callout-tip
+### Insight
 
-```{r}
-CalcRSquared(uncSIM$data$MORNING_PEAK, uncSIM$fitted.values)
-```
-
-```{r}
-r2_mcfadden(uncSIM)
-```
+Key Coefficients: Notably, log(TRAIN_COUNT) and log(SCHOOL_COUNT) has a positive coefficient of 0.5599568 and 0.3936077 respectively, suggests that an increase in the corresponding variable is associated with a higher number of morning peak trips. log(MALL_COUNT) has a negative coefficient of -0.0930407 implies a negative influence, supported by the usual operation hours of 11am onwards. The highly significant p-values (\<2e-16) indicates the robustness and statistical significance of these associations.
+:::
 
 ## Origin (Production) Constrained SIM
 
 ```{r}
+#| eval: false
 orcSIM <- glm(formula = MORNING_PEAK ~ 
                 ORIGIN_INDEX +
                 log(BUSINESS_COUNT)+
@@ -951,18 +1100,18 @@ orcSIM <- glm(formula = MORNING_PEAK ~
 write_rds(orcSIM, "data/rds/orcSIM.rds")
 ```
 
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 orcSIM <- read_rds("data/rds/orcSIM.rds")
+kable(tail(orcSIM$coefficients, n = 5))
 ```
 
-```{r}
-CalcRSquared(orcSIM$data$MORNING_PEAK, orcSIM$fitted.values)
-```
+::: callout-tip
+### Insight
 
-```{r}
-r2_mcfadden(orcSIM)
-```
+Key Coefficients: log(TRAIN_COUNT) has a positive coefficient of 0.7167591 suggesting a positive influence on the number of morning peak trips. log(MALL_COUNT) and log(HOSPITAL_COUNT) has a negative coefficient of -0.03100878 and -0.06283137 implies a negative influence.
+:::
 
 ## Destination (Attraction) Constrained SIM
 
@@ -982,16 +1131,17 @@ write_rds(decSIM, "data/rds/decSIM.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 decSIM <- read_rds("data/rds/decSIM.rds")
+kable(tail(decSIM$coefficients, n = 4))
 ```
 
-```{r}
-CalcRSquared(decSIM$data$MORNING_PEAK, decSIM$fitted.values)
-```
+::: callout-tip
+### Insight
 
-```{r}
-r2_mcfadden(decSIM)
-```
+Key Coefficients: The variables does not have any reportable coefficients.
+:::
 
 ## Doubly Constrained SIM
 
@@ -1008,22 +1158,24 @@ dbcSIM <- glm(formula = MORNING_PEAK ~
 write_rds(dbcSIM, "data/rds/dbcSIM.rds")
 ```
 
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 dbcSIM <- read_rds("data/rds/dbcSIM.rds")
+kable(tail(dbcSIM$coefficients, n = 1))
 ```
 
-```{r}
-CalcRSquared(dbcSIM$data$MORNING_PEAK, dbcSIM$fitted.values)
-```
+::: callout-tip
+### Insight
 
-```{r}
-r2_mcfadden(dbcSIM)
-```
+Key Coefficients: The variables does not have any reportable coefficients.
+:::
 
 # 11. Model Comparison
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 model_list <- list(
   Unconstrained = uncSIM,
   Origin_Constrained = orcSIM,
@@ -1031,17 +1183,79 @@ model_list <- list(
   Doubly_Constrained = dbcSIM)
 ```
 
+::: panel-tabset
+## Goodness-of-fit
+
+The **R-squared** values calculated from various spatial interaction models, such as unconstrained, production-constrained, destination-constrained, and doubly-constrained models, reflect the proportion of variance for a dependent variable  explained by an independent variable or variables in a regression model. High R-squared values suggest that the model explains a large portion of the observed variation in the data, indicating a strong model fit. An R2 of 1 indicates that the regression predictions perfectly fit the data.
+
+**r2_mcfadden** calculates McFadden’s pseudo R2 where a value from 0.2 to 0.4 indicates very good model fit.
+
+::: {.callout-tip collapse="true"}
+### R^2 function
+
 ```{r}
-compare_performance(model_list,
-                    metrics = "RMSE")
+CalcRSquared <- function(observed,estimated){
+  r <- cor(observed,estimated)
+  R2 <- r^2
+  R2
+}
+```
+:::
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+CalcRSquared(uncSIM$data$MORNING_PEAK, uncSIM$fitted.values)
+CalcRSquared(orcSIM$data$MORNING_PEAK, orcSIM$fitted.values)
+CalcRSquared(decSIM$data$MORNING_PEAK, decSIM$fitted.values)
+CalcRSquared(dbcSIM$data$MORNING_PEAK, dbcSIM$fitted.values)
 ```
 
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+r2_mcfadden(uncSIM)
+r2_mcfadden(orcSIM)
+r2_mcfadden(decSIM)
+r2_mcfadden(dbcSIM)
+```
+
+| Model                   | RSquared  | adj. r2_mcfadden |
+|-------------------------|-----------|------------------|
+| Unconstrained           | 0.139712  | 0.376            |
+| Origin_Constrained      | 0.3021518 | 0.579            |
+| Destination_Constrained | 0.2434654 | 0.505            |
+| Doubly_Constrained      | 0.5112972 | 0.712            |
+
+## AIC and RMSE
+
+**Akaike Information Criterion (AIC)** is a measure of the relative quality of a statistical model for a given set of data. It provides a means for model selection by comparing models and choosing the one that minimizes information loss.
+
+**The Root Mean Square Error (RMSE)** is a frequently used measure of the differences between values predicted by a model and the values observed. It represents the square root of the second sample moment of the differences between predicted values and observed values or the quadratic mean of these differences.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+compare_performance(model_list,
+                    metrics = c("RMSE", "AIC")
+                    )
+```
+:::
+
+::: callout-tip
+### Insight
+
+Based on r^2, AIC and RMSE, **doubly unconstrained model** has the highest r^2 and the lowest AIC and RMSE, suggesting the model accounts for approximately 0.511 or 51% of the variability in the morning peak hour commute flows and a stronger predictive accuracy over the other three models. 
+
+:::
 
 # 12. Model Diagnostics
 
-Visualize fitted values
+To visualize fitted values from the models, the `fitted values` are plotted against `MORNING_PEAK`.
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 uncSIM_fitted <- as.data.frame(uncSIM$fitted.values) %>%
   round(digits = 0)
 
@@ -1056,21 +1270,81 @@ dbcSIM_fitted <- as.data.frame(dbcSIM$fitted.values) %>%
 ```
 
 ```{r}
-flow_attr <- SIM_data %>%
-  cbind(
-    uncSIM_fitted,
-    orcSIM_fitted,
-    decSIM_fitted,
-    dbcSIM_fitted
-  )
+#| code-fold: true
+#| code-summary: "Show the code"
+SIM_data_fitted <- SIM_data %>%
+  cbind(uncSIM_fitted,
+        orcSIM_fitted,
+        decSIM_fitted,
+        dbcSIM_fitted) %>%
+  rename(uncTRIPS = "uncSIM$fitted.values",
+         orcTRIPS = "orcSIM$fitted.values",
+         decTRIPS = "decSIM$fitted.values",
+         dbcTRIPS = "dbcSIM$fitted.values")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+unc_p <- ggplot(data = SIM_data_fitted,
+                aes(x = uncTRIPS,
+                    y = MORNING_PEAK)) +
+  geom_point(color = "darkseagreen", alpha = 0.5) +
+  geom_smooth(method = lm) +
+  labs(title = "Unconstrained") +
+  coord_cartesian(xlim=c(0,40000),
+                  ylim=c(0,50000)) +
+  theme(panel.background = element_blank())
 
+orc_p <- ggplot(data = SIM_data_fitted,
+                aes(x = orcTRIPS,
+                    y = MORNING_PEAK)) +
+  geom_point(color = "palevioletred", alpha = 0.5) +
+  geom_smooth(method = lm) +
+  labs(title = "Origin Constrained") +
+  coord_cartesian(xlim=c(0,40000),
+                  ylim=c(0,50000)) +
+  theme(panel.background = element_blank())
+
+dec_p <- ggplot(data = SIM_data_fitted,
+                aes(x = decTRIPS,
+                    y = MORNING_PEAK)) +
+  geom_point(color = "lightskyblue3", alpha = 0.5) +
+  geom_smooth(method = lm) +
+  labs(title = "Destination Constrained") +
+  coord_cartesian(xlim=c(0,40000),
+                  ylim=c(0,50000))+
+  theme(panel.background = element_blank())
+
+dbc_p <- ggplot(data = SIM_data_fitted,
+                aes(x = dbcTRIPS,
+                    y = MORNING_PEAK)) +
+  geom_point(color = "lightsalmon", alpha = 0.5) +
+  geom_smooth(method = lm) +
+  labs(title = "Doubly Constrained") +
+  coord_cartesian(xlim=c(0,40000),
+                  ylim=c(0,50000))+
+  theme(panel.background = element_blank())
+
+ggarrange(unc_p, orc_p, dec_p, dbc_p,
+          ncol = 2, 
+          nrow = 2)
 ```
-
 
 # 13. Discussion
 
+The **doubly constrained SIM** consistently outperformed unconstrained, origin-constrained and destination-constrained SIMs with highest RSquared value of 0.5112972 and lowest RMSE of 1097.688. The simplicity of the model based on the distance between origin and destination is the strongest driving force behind the commuting pattern. 
+
+Based on RSquared values, the unconstrained model has the lowest accountability of 0.139712 on variability, followed by the Destination_Constrained model. To note, the Destination_Constrained model is not well constructed with propulsive variables that pushed coummuters. With slightly improved RSquared value of 0.3021518 in the Origin_Constrained model, the attractive attributes have briefly accounted for a small amount of influence. Although the propulsive and attractive attributes have not contributed to selected model, it presents that commuting pattern may be complex and **further calibration** of the model is required. Nonetheless, the geovisualization of propulsive and attractive attributes displays urban planning and co-localization of certain attributes. 
+
+The possible improvements can be **stratification of age groups** due to the difference in activities and commitments of the different age groups. Aggregating the commuter flow has diluted the commute pattern and reflect general flows, which may not be easily explained by the propulsive and attractive attributes.  In addition, spatial interaction models assume independence among observations, and does not consider the relative attractiveness or propulsiveness of the neighbouring areas. Further **spatial econometrics modifications** could be made to the SIMs by adding weighted metrics to understand the relative influence of the neighborhood on the commuter flow.
 
 # 14. Conclusion
+
+**Spatial interaction models** are valuable tools for understanding and predicting the flow of people, goods, or information between different locations in geographic space. The models, which often incorporate the effects of distance and other factors, help urban planners, geographers, and policymakers to analyze and interpret the complexities of movement within urban and regional systems. The insights gained from these models can inform decisions related to infrastructure development, transportation planning, and service provision.
+
+In summary, spatial interaction models are indispensable in the realm of urban analytics, enabling the extrapolation of meaningful patterns and trends from the data, which can guide strategic planning and policy formulation for urban development and mobility. They bridge the gap between raw data and actionable insights, empowering decision-makers to craft evidence-based strategies that cater to the current and future needs of urban environments.
+
+# 15. Acknowledgement
+
+Thank you, Prof Kam, for preparing the wonderful teaching materials and sharing your analytical approach with us over the winter class. Appreciate your commitment to practical skills delivery and understand of our constraints. <3
