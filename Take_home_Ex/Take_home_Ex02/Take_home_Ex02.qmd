@@ -83,7 +83,7 @@ The analysis involves the following packages:
 pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2, performance, ggpubr, olsrr, corrplot, GWmodel, gtsummary, knitr)
 ```
 
-# 3. Import data
+# 4. Import data
 
 The analysis will leverage on real world data, broadly categorized as **geospatial** and **aspatial** data. For all geospatial data, we will use the same coordinate reference system, **SVY21**.
 
@@ -133,7 +133,7 @@ odbus = read_csv("data/aspatial/origin_destination_bus_202310.csv")
 ```
 :::
 
-# 4. Create Analytical Hexagons
+# 5. Create Analytical Hexagons
 
 ::: panel-tabset
 ## Create spatial grids
@@ -200,7 +200,7 @@ write_rds(od, "data/rds/od.rds")
 ```
 :::
 
-# 5. Prepare OD Matrix
+# 6. Prepare OD Matrix
 
 ::: panel-tabset
 ## Step 1: Extract selected commute flow
@@ -283,7 +283,7 @@ write_rds(od1_data, "data/rds/od1_data.rds")
 ```
 :::
 
-# 6. Create flowline
+# 7. Create flowline
 
 **Flow lines** represent movement between origins and destinations. To visualize major commute flows, the threshold for morning peak hour trips is set to 10,000.
 
@@ -365,7 +365,7 @@ tm_shape(mpsz) +
 The highest commute flow is at Lim Chu Kang. Visualizing the weekday morning peak commute flow by **region** shows that the major flows occur within the region and do not move across regions. With greater granularity into **planning areas**, there is high commute flows observed across planning areas, indicating propulsive and attractive variables that push and pull commuters into such movement patterns.
 :::
 
-# 6. Assemble propulsive and attractive variables
+# 8. Assemble propulsive and attractive variables
 
 To determine variables that influence the commute pattern between TAZ, we explore how flow data is related to propulsive and attractive attributes of the origin and destination.
 
@@ -698,15 +698,9 @@ tm_shape(retails) +
 ```
 :::
 
-# 7. Prepare Attribute Counts
+# 9. Prepare Attribute Counts
 
 Here are the attribute counts of various functions extracted for spatial interaction model:
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show the code"
-summary(hexagon_busstop)
-```
 
 ```{r}
 #| code-fold: true
@@ -778,7 +772,7 @@ write_rds(flow_data, "data/rds/flow_data.rds")
 ```
 :::
 
-# 8. Compute distance matrix
+# 10. Compute distance matrix
 
 In spatial interaction, a **distance matrix** is a table that shows the distance between pairs of locations. In this section, we prepare the **distance decay** component of the spatial interaction model.
 
@@ -874,7 +868,7 @@ write_rds(distPair, "data/rds/distPair.rds")
 ```
 :::
 
-# 9. Prepare data for Spatial Interaction Model
+# 11. Prepare data for Spatial Interaction Model
 
 ::: {.callout-note collapse="true"}
 ## Load rds
@@ -924,7 +918,7 @@ inter_zonal_flow <- unique(inter_zonal_flow)
 glimpse(inter_zonal_flow)
 ```
 
-## Step 3: Append dist to
+## Step 3: Append OD distance with flow 
 
 The distance between hexagons from `distPair` data frame is appended to `flow_data` data frame.
 
@@ -1002,7 +996,7 @@ The main island of Singapore is about 49km from east to west and 28km from north
 There are **outliers** observed where the distance is between 20 to 25km. This shows the presence of **strong propulsive or attractive variables** influence the commute flow in the morning peak hour.
 :::
 
-# 10. Correlation Analysis of Attributes
+# 12. Correlation Analysis of Attributes
 
 **Multicollinearity** exists whenever an independent variable is highly correlated with one or more of the other independent variables in a multiple regression equation. Multicollinearity is a problem because it undermines the statistical significance of an independent variable.
 
@@ -1038,7 +1032,7 @@ write_rds(SIM_data, "data/rds/SIM_data.rds")
 ```
 :::
 
-# 10. Spatial Interaction Model
+# 13. Spatial Interaction Models
 
 ::: {.callout-note collapse="true"}
 ## Load rds
@@ -1079,7 +1073,7 @@ kable(tail(uncSIM$coefficients, n = 7))
 ::: callout-tip
 ### Insight
 
-Key Coefficients: Notably, log(TRAIN_COUNT) and log(SCHOOL_COUNT) has a positive coefficient of 0.5599568 and 0.3936077 respectively, suggests that an increase in the corresponding variable is associated with a higher number of morning peak trips. log(MALL_COUNT) has a negative coefficient of -0.0930407 implies a negative influence, supported by the usual operation hours of 11am onwards. The highly significant p-values (\<2e-16) indicates the robustness and statistical significance of these associations.
+Notably, log(TRAIN_COUNT) and log(SCHOOL_COUNT) has a positive coefficient of 0.5599568 and 0.3936077 respectively, suggests that an increase in the corresponding variable is associated with a higher number of morning peak trips. log(MALL_COUNT) has a negative coefficient of -0.0930407 implies a negative influence, supported by the usual operation hours of 11am onwards. The highly significant p-values (\<2e-16) indicates the robustness and statistical significance of these associations.
 :::
 
 ## Origin (Production) Constrained SIM
@@ -1110,7 +1104,7 @@ kable(tail(orcSIM$coefficients, n = 5))
 ::: callout-tip
 ### Insight
 
-Key Coefficients: log(TRAIN_COUNT) has a positive coefficient of 0.7167591 suggesting a positive influence on the number of morning peak trips. log(MALL_COUNT) and log(HOSPITAL_COUNT) has a negative coefficient of -0.03100878 and -0.06283137 implies a negative influence.
+log(TRAIN_COUNT) has a positive coefficient of 0.7167591 suggesting a positive influence on the number of morning peak trips. log(MALL_COUNT) and log(HOSPITAL_COUNT) has a negative coefficient of -0.03100878 and -0.06283137 implies a negative influence.
 :::
 
 ## Destination (Attraction) Constrained SIM
@@ -1140,7 +1134,8 @@ kable(tail(decSIM$coefficients, n = 4))
 ::: callout-tip
 ### Insight
 
-Key Coefficients: The variables does not have any reportable coefficients.
+The variables does not have any reportable coefficients.
+
 :::
 
 ## Doubly Constrained SIM
@@ -1168,10 +1163,11 @@ kable(tail(dbcSIM$coefficients, n = 1))
 ::: callout-tip
 ### Insight
 
-Key Coefficients: The variables does not have any reportable coefficients.
+log(dist) has the highest negative coefficient of -1.509381 in doubly constrained model than previous models. Notably, log(dist) has remained a strong negative influence in the four models.
+
 :::
 
-# 11. Model Comparison
+# 14. Model Comparison
 
 ```{r}
 #| code-fold: true
@@ -1249,7 +1245,7 @@ Based on r^2, AIC and RMSE, **doubly unconstrained model** has the highest r^2 a
 
 :::
 
-# 12. Model Diagnostics
+# 15. Model Diagnostics
 
 To visualize fitted values from the models, the `fitted values` are plotted against `MORNING_PEAK`.
 
@@ -1331,7 +1327,7 @@ ggarrange(unc_p, orc_p, dec_p, dbc_p,
           nrow = 2)
 ```
 
-# 13. Discussion
+# 16. Discussion
 
 The **doubly constrained SIM** consistently outperformed unconstrained, origin-constrained and destination-constrained SIMs with highest RSquared value of 0.5112972 and lowest RMSE of 1097.688. The simplicity of the model based on the distance between origin and destination is the strongest driving force behind the commuting pattern. 
 
@@ -1339,12 +1335,14 @@ Based on RSquared values, the unconstrained model has the lowest accountability 
 
 The possible improvements can be **stratification of age groups** due to the difference in activities and commitments of the different age groups. Aggregating the commuter flow has diluted the commute pattern and reflect general flows, which may not be easily explained by the propulsive and attractive attributes.  In addition, spatial interaction models assume independence among observations, and does not consider the relative attractiveness or propulsiveness of the neighbouring areas. Further **spatial econometrics modifications** could be made to the SIMs by adding weighted metrics to understand the relative influence of the neighborhood on the commuter flow.
 
-# 14. Conclusion
+Relating the model results back to flowline, it is consistent with relatively **short flowlines** crossing neighbouring hexagons and the gravity model. To understand the basis of commute flow, the next step is the understand the characteristic of the hexagons and its neighbours.
+
+# 17. Conclusion
 
 **Spatial interaction models** are valuable tools for understanding and predicting the flow of people, goods, or information between different locations in geographic space. The models, which often incorporate the effects of distance and other factors, help urban planners, geographers, and policymakers to analyze and interpret the complexities of movement within urban and regional systems. The insights gained from these models can inform decisions related to infrastructure development, transportation planning, and service provision.
 
 In summary, spatial interaction models are indispensable in the realm of urban analytics, enabling the extrapolation of meaningful patterns and trends from the data, which can guide strategic planning and policy formulation for urban development and mobility. They bridge the gap between raw data and actionable insights, empowering decision-makers to craft evidence-based strategies that cater to the current and future needs of urban environments.
 
-# 15. Acknowledgement
+# 18. Acknowledgement
 
 Thank you, Prof Kam, for preparing the wonderful teaching materials and sharing your analytical approach with us over the winter class. Appreciate your commitment to practical skills delivery and understand of our constraints. <3
