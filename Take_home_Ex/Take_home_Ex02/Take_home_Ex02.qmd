@@ -357,7 +357,6 @@ tm_shape(mpsz) +
             frame = FALSE)
 ```
 
-:::
 
 ::: callout-tip
 ## Insight
@@ -1167,6 +1166,8 @@ log(dist) has the highest negative coefficient of -1.509381 in doubly constraine
 
 :::
 
+:::
+
 # 14. Model Comparison
 
 ```{r}
@@ -1333,7 +1334,7 @@ The **doubly constrained SIM** consistently outperformed unconstrained, origin-c
 
 Based on RSquared values, the unconstrained model has the lowest accountability of 0.139712 on variability, followed by the Destination_Constrained model. To note, the Destination_Constrained model is not well constructed with propulsive variables that pushed coummuters. With slightly improved RSquared value of 0.3021518 in the Origin_Constrained model, the attractive attributes have briefly accounted for a small amount of influence. Although the propulsive and attractive attributes have not contributed to selected model, it presents that commuting pattern may be complex and **further calibration** of the model is required. Nonetheless, the geovisualization of propulsive and attractive attributes displays urban planning and co-localization of certain attributes. 
 
-The possible improvements can be **stratification of age groups** due to the difference in activities and commitments of the different age groups. Aggregating the commuter flow has diluted the commute pattern and reflect general flows, which may not be easily explained by the propulsive and attractive attributes.  In addition, spatial interaction models assume independence among observations, and does not consider the relative attractiveness or propulsiveness of the neighbouring areas. Further **spatial econometrics modifications** could be made to the SIMs by adding weighted metrics to understand the relative influence of the neighborhood on the commuter flow.
+The possible improvements can be **stratification of age groups** due to the difference in activities and commitments of the different age groups. Aggregating the commuter flow has diluted the commute pattern and reflect general flows, which may not be easily explained by the propulsive and attractive attributes.  In addition, spatial interaction models assume independence among observations, and does not consider the relative attractiveness or propulsiveness of the neighbouring areas. Further **spatial econometrics interaction models** by adding weighted metrics may shed light on the relative influence of the neighbouring hexagon on the commuter flow.
 
 Relating the model results back to flowline, it is consistent with relatively **short flowlines** crossing neighbouring hexagons and the gravity model. To understand the basis of commute flow, the next step is the understand the characteristic of the hexagons and its neighbours.
 

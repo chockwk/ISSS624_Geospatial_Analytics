@@ -242,13 +242,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#compute-distance-matrix" id="toc-compute-distance-matrix" class="nav-link" data-scroll-target="#compute-distance-matrix">10. Compute distance matrix</a></li>
   <li><a href="#prepare-data-for-spatial-interaction-model" id="toc-prepare-data-for-spatial-interaction-model" class="nav-link" data-scroll-target="#prepare-data-for-spatial-interaction-model">11. Prepare data for Spatial Interaction Model</a></li>
   <li><a href="#correlation-analysis-of-attributes" id="toc-correlation-analysis-of-attributes" class="nav-link" data-scroll-target="#correlation-analysis-of-attributes">12. Correlation Analysis of Attributes</a></li>
-  <li><a href="#spatial-interaction-models" id="toc-spatial-interaction-models" class="nav-link" data-scroll-target="#spatial-interaction-models">13. Spatial Interaction Models</a>
-  <ul class="collapse">
-  <li><a href="#unconstrained-spatial-interaction-model" id="toc-unconstrained-spatial-interaction-model" class="nav-link" data-scroll-target="#unconstrained-spatial-interaction-model">Unconstrained Spatial Interaction Model</a></li>
-  <li><a href="#origin-production-constrained-sim" id="toc-origin-production-constrained-sim" class="nav-link" data-scroll-target="#origin-production-constrained-sim">Origin (Production) Constrained SIM</a></li>
-  <li><a href="#destination-attraction-constrained-sim" id="toc-destination-attraction-constrained-sim" class="nav-link" data-scroll-target="#destination-attraction-constrained-sim">Destination (Attraction) Constrained SIM</a></li>
-  <li><a href="#doubly-constrained-sim" id="toc-doubly-constrained-sim" class="nav-link" data-scroll-target="#doubly-constrained-sim">Doubly Constrained SIM</a></li>
-  </ul></li>
+  <li><a href="#spatial-interaction-models" id="toc-spatial-interaction-models" class="nav-link" data-scroll-target="#spatial-interaction-models">13. Spatial Interaction Models</a></li>
   <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison">14. Model Comparison</a></li>
   <li><a href="#model-diagnostics" id="toc-model-diagnostics" class="nav-link" data-scroll-target="#model-diagnostics">15. Model Diagnostics</a></li>
   <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">16. Discussion</a></li>
@@ -757,7 +751,6 @@ Load rds
 <p><img src="Take_home_Ex02_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>:::</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1990,9 +1983,10 @@ Load rds
 </div>
 </div>
 </div>
-<p>::: panel-tabset</p>
-<section id="unconstrained-spatial-interaction-model" class="level2">
-<h2 class="anchored" data-anchor-id="unconstrained-spatial-interaction-model">Unconstrained Spatial Interaction Model</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Unconstrained Spatial Interaction Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">Origin (Production) Constrained SIM</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-3" role="tab" aria-controls="tabset-8-3" aria-selected="false">Destination (Attraction) Constrained SIM</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-4" role="tab" aria-controls="tabset-8-4" aria-selected="false">Doubly Constrained SIM</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>uncSIM <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">formula =</span> MORNING_PEAK <span class="sc">~</span> </span>
 <span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>                <span class="fu">log</span>(BUSINESS_COUNT)<span class="sc">+</span></span>
@@ -2068,9 +2062,8 @@ Insight
 <p>Notably, log(TRAIN_COUNT) and log(SCHOOL_COUNT) has a positive coefficient of 0.5599568 and 0.3936077 respectively, suggests that an increase in the corresponding variable is associated with a higher number of morning peak trips. log(MALL_COUNT) has a negative coefficient of -0.0930407 implies a negative influence, supported by the usual operation hours of 11am onwards. The highly significant p-values (&lt;2e-16) indicates the robustness and statistical significance of these associations.</p>
 </div>
 </div>
-</section>
-<section id="origin-production-constrained-sim" class="level2">
-<h2 class="anchored" data-anchor-id="origin-production-constrained-sim">Origin (Production) Constrained SIM</h2>
+</div>
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>orcSIM <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">formula =</span> MORNING_PEAK <span class="sc">~</span> </span>
 <span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>                ORIGIN_INDEX <span class="sc">+</span></span>
@@ -2137,9 +2130,8 @@ Insight
 <p>log(TRAIN_COUNT) has a positive coefficient of 0.7167591 suggesting a positive influence on the number of morning peak trips. log(MALL_COUNT) and log(HOSPITAL_COUNT) has a negative coefficient of -0.03100878 and -0.06283137 implies a negative influence.</p>
 </div>
 </div>
-</section>
-<section id="destination-attraction-constrained-sim" class="level2">
-<h2 class="anchored" data-anchor-id="destination-attraction-constrained-sim">Destination (Attraction) Constrained SIM</h2>
+</div>
+<div id="tabset-8-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-3-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>decSIM <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">formula =</span> MORNING_PEAK <span class="sc">~</span> </span>
 <span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>                DESTIN_INDEX <span class="sc">+</span></span>
@@ -2201,9 +2193,8 @@ Insight
 <p>The variables does not have any reportable coefficients.</p>
 </div>
 </div>
-</section>
-<section id="doubly-constrained-sim" class="level2">
-<h2 class="anchored" data-anchor-id="doubly-constrained-sim">Doubly Constrained SIM</h2>
+</div>
+<div id="tabset-8-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-4-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>dbcSIM <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="at">formula =</span> MORNING_PEAK <span class="sc">~</span> </span>
 <span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>                ORIGIN_INDEX <span class="sc">+</span></span>
@@ -2251,7 +2242,9 @@ Insight
 <p>log(dist) has the highest negative coefficient of -1.509381 in doubly constrained model than previous models. Notably, log(dist) has remained a strong negative influence in the four models.</p>
 </div>
 </div>
-</section>
+</div>
+</div>
+</div>
 </section>
 <section id="model-comparison" class="level1">
 <h1>14. Model Comparison</h1>
@@ -2266,9 +2259,9 @@ Insight
 </details>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Goodness-of-fit</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false">AIC and RMSE</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">Goodness-of-fit</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-9-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-2" role="tab" aria-controls="tabset-9-2" aria-selected="false">AIC and RMSE</a></li></ul>
 <div class="tab-content">
-<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
 <p>The <strong>R-squared</strong> values calculated from various spatial interaction models, such as unconstrained, production-constrained, destination-constrained, and doubly-constrained models, reflect the proportion of variance for a dependent variable explained by an independent variable or variables in a regression model. High R-squared values suggest that the model explains a large portion of the observed variation in the data, indicating a strong model fit. An R2 of 1 indicates that the regression predictions perfectly fit the data.</p>
 <p><strong>r2_mcfadden</strong> calculates McFadden’s pseudo R2 where a value from 0.2 to 0.4 indicates very good model fit.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -2393,7 +2386,7 @@ R^2 function
 </tbody>
 </table>
 </div>
-<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
+<div id="tabset-9-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-9-2-tab">
 <p><strong>Akaike Information Criterion (AIC)</strong> is a measure of the relative quality of a statistical model for a given set of data. It provides a means for model selection by comparing models and choosing the one that minimizes information loss.</p>
 <p><strong>The Root Mean Square Error (RMSE)</strong> is a frequently used measure of the differences between values predicted by a model and the values observed. It represents the square root of the second sample moment of the differences between predicted values and observed values or the quadratic mean of these differences.</p>
 <div class="cell">
@@ -2520,7 +2513,7 @@ Insight
 <h1>16. Discussion</h1>
 <p>The <strong>doubly constrained SIM</strong> consistently outperformed unconstrained, origin-constrained and destination-constrained SIMs with highest RSquared value of 0.5112972 and lowest RMSE of 1097.688. The simplicity of the model based on the distance between origin and destination is the strongest driving force behind the commuting pattern.</p>
 <p>Based on RSquared values, the unconstrained model has the lowest accountability of 0.139712 on variability, followed by the Destination_Constrained model. To note, the Destination_Constrained model is not well constructed with propulsive variables that pushed coummuters. With slightly improved RSquared value of 0.3021518 in the Origin_Constrained model, the attractive attributes have briefly accounted for a small amount of influence. Although the propulsive and attractive attributes have not contributed to selected model, it presents that commuting pattern may be complex and <strong>further calibration</strong> of the model is required. Nonetheless, the geovisualization of propulsive and attractive attributes displays urban planning and co-localization of certain attributes.</p>
-<p>The possible improvements can be <strong>stratification of age groups</strong> due to the difference in activities and commitments of the different age groups. Aggregating the commuter flow has diluted the commute pattern and reflect general flows, which may not be easily explained by the propulsive and attractive attributes. In addition, spatial interaction models assume independence among observations, and does not consider the relative attractiveness or propulsiveness of the neighbouring areas. Further <strong>spatial econometrics modifications</strong> could be made to the SIMs by adding weighted metrics to understand the relative influence of the neighborhood on the commuter flow.</p>
+<p>The possible improvements can be <strong>stratification of age groups</strong> due to the difference in activities and commitments of the different age groups. Aggregating the commuter flow has diluted the commute pattern and reflect general flows, which may not be easily explained by the propulsive and attractive attributes. In addition, spatial interaction models assume independence among observations, and does not consider the relative attractiveness or propulsiveness of the neighbouring areas. Further <strong>spatial econometrics interaction models</strong> by adding weighted metrics may shed light on the relative influence of the neighbouring hexagon on the commuter flow.</p>
 <p>Relating the model results back to flowline, it is consistent with relatively <strong>short flowlines</strong> crossing neighbouring hexagons and the gravity model. To understand the basis of commute flow, the next step is the understand the characteristic of the hexagons and its neighbours.</p>
 </section>
 <section id="conclusion" class="level1">
