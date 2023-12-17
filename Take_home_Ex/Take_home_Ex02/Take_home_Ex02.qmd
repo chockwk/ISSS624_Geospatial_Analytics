@@ -19,48 +19,51 @@ Urban mobility and public transport service planning are critical challenges for
 
 In contrast, the digitization of urban infrastructure, such as public buses, trains, and roads, offers a wealth of data that can capture movement patterns over time and space. The advent of pervasive computing technologies like GPS and smart cards for transport has led to an explosion of geospatial data. However, the capability to effectively analyze this data and extract valuable information is not in the same pace, leading to suboptimal returns on investment in data collection and management.
 
-This exercise is propelled by two key motivators: the under utilization of the increasing volumes of open data for policy-making, and the scarcity of practical research demonstrating the use of geospatial data science and analysis (GDSA) in decision-making processes.
+This exercise is propelled by two key motivators: the utilization of open data for policy-making, and the scarcity of practical research demonstrating the use of geospatial data science and analysis (GDSA) in decision-making processes.
 
-# 2. Task
+# 2. Methods
 
 **Geospatial Data Science**
 
 1.  Derive an analytical hexagon data of 375m to represent the traffic analysis zone.
+
 2.  Construct an OD matrix of commuter flows for the following time intervals:
 
-    a.  Weekday morning peak from 6am to 9am
+    a.  Weekday morning peak from 6am to 9am (selected time interval)
     b.  Weekday evening peak from 5pm to 8pm
     c.  Weekend/holiday morning peak from 11am to 2pm
     d.  Weekend/holiday evening peak from 4pm to 7pm
-    
-3.  Display the O-D flows of the passenger trips by using appropriate geovisualisation methods.
+
+3.  Display the O-D flows of the passenger trips.
+
 4.  Describe the spatial patterns revealed by the geovisualisation.
-5.  Assemble at least three propulsive and three attractiveness variables by using aspatial and geospatial from publicly available sources.
+
+5.  Assemble propulsive and attractiveness variables by using aspatial and geospatial from publicly available sources.
+
 6.  Compute a distance matrix by using the analytical hexagon data.
 
 **Spatial Interaction Modelling**
 
-1.  Calibrate spatial interactive models to determine factors affecting urban commuting flows at the selected time interval.
+1.  Create four log-based Poisson spatial interactive models to determine propulsiveness and attractiveness factors affecting urban commuting flows at the selected time interval.
 
-2.  Present the modelling results by using appropriate geovisualisation and graphical visualisation methods.
+    a.  Unconstrained Model
+    b.  Origin (production) constrained model
+    c.  Destination (attraction) constrained model
+    d.  Doubly constrained model
 
-3.  With reference to the Spatial Interaction Model output tables, maps and data visualisation prepared, describe the modelling results.
+2.  Calibrate spatial interactive models using propulsiveness and attractiveness factors.
 
-# 2. Load packages
+3.  Compare the modelling results of the four spatial interactive models.
+
+# 3. Load packages
+
+::: {.callout-tip collapse="true"}
+## R package functions
 
 The analysis involves the following packages:
 
-`sf` handles spatial data.
-`tidyverse` handles attribute data.
-`DT` enables R data objects (matrices or data frames) to be displayed as tables on HTML pages.
-`stplanr` analyses OD matrix.
-`reshape2` restructures and aggregates data. 
-`performance` contains utilities for computing measures to assess model quality. 
-`ggpubr` arrange and annotate multiple plots.
-`olsrr` builds OLS and performing diagnostics tests.
-`GWmodel` calibrate geographical weighted family of models.
-`corrplot` enables multivariate data visualisation and analysis.
-`tmap` plots choropleth maps.
+`sf` handles spatial data. `tidyverse` handles attribute data. `DT` enables R data objects (matrices or data frames) to be displayed as tables on HTML pages. `stplanr` analyses OD matrix. `reshape2` restructures and aggregates data. `performance` contains utilities for computing measures to assess model quality. `ggpubr` arrange and annotate multiple plots. `olsrr` builds OLS and performing diagnostics tests. `GWmodel` calibrate geographical weighted family of models. `corrplot` enables multivariate data visualisation and analysis. `tmap` plots choropleth maps.
+:::
 
 ```{r}
 pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2, performance, ggpubr, olsrr, corrplot, GWmodel, gtsummary, knitr)
@@ -70,9 +73,7 @@ pacman::p_load(tmap, sf, sp, DT, stplanr, tidyverse, reshape2, performance, ggpu
 
 We will be using the following **geospatial** (`busstop`, `mpsz`) and **aspatial** (`odbus`) datasets.
 
-:::panel-tabset
-
-
+::: panel-tabset
 ## Bus Stop
 
 `busstop` is a **geospatial** dataset containing the detailed information for all bus stops currently serviced by buses, including bus stop code, road name, description, location coordinates.
@@ -82,6 +83,8 @@ The output indicates that the geospatial objects are **point** features. There a
 Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/BusStops))
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 busstop <- st_read(dsn = "data/geospatial", layer = "BusStop") %>%
   st_transform(crs = 3414)
 
@@ -90,109 +93,56 @@ glimpse(busstop)
 
 ## Subzone
 
-`mpsz` is is a **geospatial** dataset of the Master Plan 2019, a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years published in **2019**. 
+`mpsz` is is a **geospatial** dataset of the Master Plan 2019, a forward looking guiding plan for Singapore's development in the medium term over the next 10 to 15 years published in **2019**.
 
 The output indicates that the geospatial objects are **multipolygon** features. There are **332 features** and 6 fields. It is in **WGS84** projected coordinates system with **XY** dimension.
 
 Source: URA (Download [here](https://beta.data.gov.sg/collections/1749/view))
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 mpsz <- st_read(dsn = "data/geospatial", layer = "MPSZ-2019") %>% 
   st_transform(crs=3414)
 glimpse(mpsz)
 ```
 
-## Bus Stop in Subzones
-
-```{r}
-busstop_mpsz <- st_intersection(busstop, mpsz) %>%
-  select(BUS_STOP_N, SUBZONE_C) 
-
-glimpse(busstop_mpsz)
-```
-
 ## Passenger Volume
 
-`odbus` is an **aspatial** dataset containing the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used. 
+`odbus` is an **aspatial** dataset containing the number of trips by weekdays and weekends from origin to destination bus stops. It reflects the passenger trip traffic and the most recent dataset from **October 2023** will be used.
 
-The output indicates **5,694,297 records** and 7 fields. The bus stop codes are converted into factor for data handling.
+The output indicates **5,694,297 records** and 7 fields.
 
 Source: LTA DataMall ([Postman URL](http://datamall2.mytransport.sg/ltaodataservice/PV/ODBus))
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 odbus = read_csv("data/aspatial/origin_destination_bus_202310.csv")
 
 glimpse(odbus)
 ```
-
-## Passenger Volume by Bus Stop
-
-```{r}
-# odbusstop <- read_rds("data/rds/odbusstop.rds")
-# glimpse(odbusstop)
-```
-
 :::
 
-# 4. Extract Commuting Flow
+# 4. Create Analytical Hexagons
 
 ::: panel-tabset
 
-```{r}
-odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
-odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
-```
+## Create spatial grids
 
-## Weekday Morning Peak
+According to Statista, the average walking distance on a commute trip in Singapore is 396 meters.
+![](images/Screenshot%202023-12-17%20at%2012.02.23%E2%80%AFPM.png){fig-align="left" width="300"}
 
-```{r}
-odbus6_9 <- odbus %>%
-  filter(DAY_TYPE == "WEEKDAY") %>%
-  filter(TIME_PER_HOUR >= 6 & TIME_PER_HOUR <= 9) %>%
-  group_by(ORIGIN_PT_CODE, DESTINATION_PT_CODE) %>%
-  summarise(TRIPS = sum(TOTAL_TRIPS))
-
-glimpse(odbus6_9)
-```
-
-## Weekday Evening Peak
+As an estimation, the maximum walking distance is 792m and the `cellsize` of analytical hexagon grid is set to 750m.
 
 ```{r}
-odbus17_20 <- odbus %>%
-  filter(DAY_TYPE == "WEEKDAY") %>%
-  filter(TIME_PER_HOUR >= 17 & TIME_PER_HOUR <= 20) %>%
-  group_by(ORIGIN_PT_CODE, DESTINATION_PT_CODE) %>%
-  summarise(TRIPS = sum(TOTAL_TRIPS))
-```
+#| code-fold: true
+#| code-summary: "Show the code"
+busstop_mpsz <- st_intersection(busstop, mpsz) %>%
+  select(BUS_STOP_N, SUBZONE_C) 
 
-## Weekend Morning Peak
+glimpse(busstop_mpsz)
 
-```{r}
-odbus11_14 <- odbus %>%
-  filter(DAY_TYPE == "WEEKENDS/HOLIDAY") %>%
-  filter(TIME_PER_HOUR >= 11 & TIME_PER_HOUR <= 14) %>%
-  group_by(ORIGIN_PT_CODE, DESTINATION_PT_CODE) %>%
-  summarise(TRIPS = sum(TOTAL_TRIPS))
-```
-
-## Weekend Evening Peak
-
-```{r}
-odbus16_19 <- odbus %>%
-  filter(DAY_TYPE == "WEEKENDS/HOLIDAY") %>%
-  filter(TIME_PER_HOUR >= 16 & TIME_PER_HOUR <= 19) %>%
-  group_by(ORIGIN_PT_CODE, DESTINATION_PT_CODE) %>%
-  summarise(TRIPS = sum(TOTAL_TRIPS))
-```
-:::
-
-# 4. Create Spatial Grids
-
-::: panel-tabset
-
-## Step 1
-
-```{r}
 area_hexagon_grid <- st_make_grid(busstop_mpsz, 
                                   cellsize = 750, 
                                   crs = 3414,
@@ -201,9 +151,11 @@ area_hexagon_grid <- st_make_grid(busstop_mpsz,
 area_hexagon_grid
 ```
 
-## Step 2
+## Assign hexagon index
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hexagon_grid_sf = st_sf(area_hexagon_grid) %>% 
   mutate(INDEX = row_number()) %>% 
   rename(geometry = area_hexagon_grid,
@@ -212,24 +164,52 @@ hexagon_grid_sf = st_sf(area_hexagon_grid) %>%
 glimpse(hexagon_grid_sf)
 ```
 
-## Step 3
+## Create bus stop hexagon grids
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 hexagon_busstop <- st_join(hexagon_grid_sf, busstop, 
                            by = c("geometry" = "geometry")) %>% 
   drop_na()
+
 glimpse(hexagon_busstop)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 od <- st_join(hexagon_grid_sf, busstop_mpsz, 
             by = c("geometry" = "geometry"))
+
 glimpse(od)
 ```
 
+```{r}
+write_rds(hexagon_busstop, "data/rds/hexagon_busstop.rds")
+write_rds(od, "data/rds/od.rds")
+```
+
+:::
+
 # 5. Prepare OD Matrix
 
+## Weekday Morning
+
+The selected time interval is weekday morning peak from 6am to 9am.
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
+odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE)
+
+odbus6_9 <- odbus %>%
+  filter(DAY_TYPE == "WEEKDAY") %>%
+  filter(TIME_PER_HOUR >= 6 & TIME_PER_HOUR <= 9) %>%
+  group_by(ORIGIN_PT_CODE, DESTINATION_PT_CODE) %>%
+  summarise(TRIPS = sum(TOTAL_TRIPS))
+
 od1 <- left_join(odbus6_9, od,
                  by = c("ORIGIN_PT_CODE" = "BUS_STOP_N")) %>% 
   rename(ORIGIN_BS = ORIGIN_PT_CODE,
@@ -238,9 +218,6 @@ od1 <- left_join(odbus6_9, od,
 
 od1$ORIGIN_BS <- as.factor(od1$ORIGIN_BS)
 
-glimpse(od1)
-```
-```{r}
 duplicate <- od1 %>%
   group_by_all() %>%
   filter(n()>1) %>%
@@ -248,11 +225,6 @@ duplicate <- od1 %>%
 
 od1 <- unique(od1)
 
-glimpse(od1)
-```
-
-
-```{r}
 od1 <- left_join(od1, od,
                  by = c("DESTIN_BS" = "BUS_STOP_N")) %>%
   rename(DESTIN_SZ = SUBZONE_C,
@@ -265,10 +237,6 @@ od1 <- left_join(od1, od,
 
 od1$DESTIN_BS <- as.factor(od1$DESTIN_BS)
 
-glimpse(od1)
-```
-
-```{r}
 duplicate <- od1 %>%
   group_by_all() %>%
   filter(n()>1) %>%
@@ -279,21 +247,33 @@ od1 <- unique(od1)
 glimpse(od1)
 ```
 
+## Remove intra-zonal flow
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
 od1 <- od1[od1$ORIGIN_SZ!=od1$DESTIN_SZ,]
-head(od1)
-```
-```{r}
+
 od1_data <- od1 %>%
   drop_na() %>%
   group_by(ORIGIN_INDEX, DESTIN_INDEX) %>%
   summarise(MORNING_PEAK = sum(TRIPS))
 
-
 summary(od1_data)
 ```
 
+```{r}
+write_rds(od1, "data/rds/od1.rds")
+write_rds(od1_data, "data/rds/od1_data.rds")
+```
+
 :::
+
+# 6. Create flowline
+
+```{r}
+od1 <- readRDS("data/rds/od1_data.rds")
+```
 
 ```{r}
 flowLine <- od1_data %>% 
@@ -326,7 +306,6 @@ tm_shape(mpsz) +
 
 ```
 
-
 ```{r}
 tmap_mode("plot")
 
@@ -351,8 +330,11 @@ tm_shape(mpsz) +
 
 # 6. Assemble propulsive and attractiveness variables
 
-::: panel-tabset
+```{r}
+hexagon_busstop <- read_rds("data/rds/hexagon_busstop.rds")
+```
 
+::: panel-tabset
 ## Business
 
 Source: Prof Kam
@@ -365,6 +347,7 @@ business <- st_read(dsn = "data/geospatial", layer = "Business") %>%
 
 glimpse(business)
 ```
+
 ```{r}
 hexagon_busstop$BUSINESS_COUNT <- lengths(st_intersects(hexagon_busstop, business))
 summary(hexagon_busstop$BUSINESS_COUNT)
@@ -389,78 +372,6 @@ tm_shape(business) +
             frame = FALSE)
 ```
 
-## Food
-
-Source: Prof Kam
-
-The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
-```{r}
-food <- st_read(dsn = "data/geospatial", layer = "F&B") %>%
-  st_transform(crs = 3414)
-
-glimpse(food)
-```
-```{r}
-hexagon_busstop$FOOD_COUNT <- lengths(st_intersects(hexagon_busstop, food))
-summary(hexagon_busstop$FOOD_COUNT)
-```
-
-```{r}
-tm_shape(mpsz) +
-  tm_polygons(col = "REGION_N", palette = "Set2") +
-  
-tm_shape(hexagon_busstop) +
-  tm_polygons(col = "white", alpha = 0.1) +
-  
-tm_shape(food) +
-  tm_dots(col = "black") +
-  
-  tm_layout(main.title = "Food in Regions",
-            main.title.position = "center",
-            main.title.size = 1,
-            legend.position = c("right", "bottom"),
-            legend.outside = FALSE,
-            legend.text.size = 0.6,
-            frame = FALSE)
-```
-
-## Retail
-
-Source: Prof Kam
-
-The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
-
-```{r}
-retails <- st_read(dsn = "data/geospatial", layer = "Retails") %>%
-  st_transform(crs = 3414)
-
-glimpse(retails)
-```
-
-```{r}
-hexagon_busstop$RETAIL_COUNT <- lengths(st_intersects(hexagon_busstop, retails))
-summary(hexagon_busstop$RETAIL_COUNT)
-```
-
-```{r}
-tm_shape(mpsz) +
-  tm_polygons(col = "REGION_N", palette = "Set2") +
-  
-tm_shape(hexagon_busstop) +
-  tm_polygons(col = "white", alpha = 0.1) +
-  
-tm_shape(retails) +
-  tm_dots(col = "black") +
-  
-  tm_layout(main.title = "Distribution of Retails",
-            main.title.position = "center",
-            main.title.size = 1,
-            legend.position = c("right", "bottom"),
-            legend.outside = FALSE,
-            legend.text.size = 0.6,
-            frame = FALSE)
-```
 ## Train
 
 Source: LTA DataMall
@@ -534,7 +445,10 @@ tm_shape(school) +
             legend.text.size = 0.6,
             frame = FALSE)
 ```
+
 ## HDB
+
+Source: Prof Kam
 
 ```{r}
 hdb <- read.csv("data/aspatial/hdb.csv") %>% 
@@ -575,16 +489,180 @@ tm_shape(hdb_sf) +
             legend.text.size = 0.6,
             frame = FALSE)
 ```
+
+## Hospital
+
+Source: Wan Kee
+
+```{r}
+hospital <- read.csv("data/aspatial/hospitals-location-updated.csv") %>%
+  select(Hospitals, Lat, Lng)
+
+str(hospital)
+```
+
+```{r}
+hospital_sf <- st_as_sf(hospital,
+                   coords = c("Lng","Lat"),
+                   crs = 4326,
+                   remove = F) %>% 
+  st_transform(crs = 3414)
+
+glimpse(hospital_sf)
+```
+
+```{r}
+hexagon_busstop$HOSPITAL_COUNT <- lengths(st_intersects(hexagon_busstop, hospital_sf))
+summary(hexagon_busstop$HOSPITAL_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(hospital_sf) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Distribution of Hospitals",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+
+## Malls
+
+```{r}
+mall <- read.csv("data/aspatial/mall_coordinates_updated.csv") %>%
+  select(latitude, longitude, name)
+
+str(mall)
+```
+
+```{r}
+mall_sf <- st_as_sf(mall,
+                   coords = c("longitude","latitude"),
+                   crs = 4326,
+                   remove = F) %>% 
+  st_transform(crs = 3414)
+
+glimpse(mall_sf)
+```
+
+```{r}
+hexagon_busstop$MALL_COUNT <- lengths(st_intersects(hexagon_busstop, mall_sf))
+summary(hexagon_busstop$MALL_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(mall_sf) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Distribution of Shopping Malls",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+
+## Food
+
+Source: Prof Kam
+
+The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+```{r}
+food <- st_read(dsn = "data/geospatial", layer = "F&B") %>%
+  st_transform(crs = 3414)
+
+glimpse(food)
+```
+
+```{r}
+hexagon_busstop$FOOD_COUNT <- lengths(st_intersects(hexagon_busstop, food))
+summary(hexagon_busstop$FOOD_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(food) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Food in Regions",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
+
+## Retail
+
+Source: Prof Kam
+
+The output indicates that the geospatial objects are **point** features. There are **1919 features** and 3 fields. It is in **SVY21** projected coordinates system with **XY** dimension.
+
+```{r}
+retails <- st_read(dsn = "data/geospatial", layer = "Retails") %>%
+  st_transform(crs = 3414)
+
+glimpse(retails)
+```
+
+```{r}
+hexagon_busstop$RETAIL_COUNT <- lengths(st_intersects(hexagon_busstop, retails))
+summary(hexagon_busstop$RETAIL_COUNT)
+```
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons(col = "REGION_N", palette = "Set2") +
+  
+tm_shape(hexagon_busstop) +
+  tm_polygons(col = "white", alpha = 0.1) +
+  
+tm_shape(retails) +
+  tm_dots(col = "black") +
+  
+  tm_layout(main.title = "Distribution of Retails",
+            main.title.position = "center",
+            main.title.size = 1,
+            legend.position = c("right", "bottom"),
+            legend.outside = FALSE,
+            legend.text.size = 0.6,
+            frame = FALSE)
+```
 :::
+
 # 7. Compute flow
 
 ```{r}
 summary(hexagon_busstop)
 ```
+
 ```{r}
 hexagon_busstop_tidy <- hexagon_busstop %>% 
   st_drop_geometry() %>% 
-  select(index, BUS_STOP_N, BUSINESS_COUNT, FOOD_COUNT, RETAIL_COUNT, TRAIN_COUNT, HDB_COUNT, SCHOOL_COUNT)
+  select(-c(BUS_STOP_N, BUS_ROOF_N, LOC_DESC))
 ```
 
 ```{r}
@@ -622,9 +700,16 @@ flow_data$HDB_COUNT <- ifelse(
 flow_data$SCHOOL_COUNT <- ifelse(
   flow_data$SCHOOL_COUNT == 0,
   0.99, flow_data$SCHOOL_COUNT)
+
+flow_data$HOSPITAL_COUNT <- ifelse(
+  flow_data$HOSPITAL_COUNT == 0,
+  0.99, flow_data$HOSPITAL_COUNT)
+
+flow_data$MALL_COUNT <- ifelse(
+  flow_data$MALL_COUNT == 0,
+  0.99, flow_data$MALL_COUNT)
 ```
 
-The output indicates 2484 observations
 ```{r}
 duplicate <- flow_data %>%
   group_by_all() %>%
@@ -632,17 +717,16 @@ duplicate <- flow_data %>%
   ungroup()
 ```
 
-flow data 500205 to 498963
 ```{r}
 flow_data <- unique(flow_data)
 ```
-
 
 ```{r}
 write_rds(flow_data, "data/rds/flow_data.rds")
 ```
 
-# 8. Compute distance matrix 
+# 8. Compute distance matrix
+
 
 ```{r}
 hexagon_busstop_sp <- as(hexagon_busstop, "Spatial")
@@ -654,13 +738,15 @@ dist <- spDists(hexagon_busstop_sp,
                 longlat = FALSE)
 head(dist, n=c(5, 5))
 ```
+
 ```{r}
 index <- hexagon_busstop$index
 
 colnames(dist) <- paste0(index)
 rownames(dist) <- paste0(index)
-```
 
+kable(head(dist, n=c(8, 8)))
+```
 
 ```{r}
 distPair <- melt(dist) %>%
@@ -668,6 +754,7 @@ distPair <- melt(dist) %>%
 
 head(distPair, 10)
 ```
+
 ```{r}
 distPair %>%
   filter(dist > 0) %>%
@@ -683,18 +770,25 @@ distPair <- distPair %>%
   rename(ORIGIN_INDEX = Var1,
          DESTIN_INDEX = Var2)
 
-summary(distPair)
-```
-```{r}
 distPair$ORIGIN_INDEX <- as.character(distPair$ORIGIN_INDEX)
 distPair$DESTIN_INDEX <- as.character(distPair$DESTIN_INDEX)
-glimpse(distPair)
+
+summary(distPair)
 ```
 
-# 9. Create Spatial Interaction Model
+```{r}
+write_rds(distPair, "data/rds/distPair.rds")
+```
+
+
+# 9. Prepare data for Spatial Interaction Model
+
+```{r}
+flow_data <- read_rds("data/rds/flow_data.rds")
+```
 
 Error : level sets of factors are different
-  
+
 ```{r}
 # Convert factors to characters for comparison
 flow_data$ORIGIN_INDEX <- as.character(flow_data$ORIGIN_INDEX)
@@ -711,11 +805,9 @@ flow_data$offset <- ifelse(flow_data$ORIGIN_INDEX == flow_data$DESTIN_INDEX,
                            1)
 ```
 
-
 ```{r}
 inter_zonal_flow <- flow_data %>% 
-  filter(FlowNoIntra >0) %>% 
-  select(-BUS_STOP_N)
+  filter(FlowNoIntra >0)
 
 duplicate <- inter_zonal_flow %>%
   group_by_all() %>%
@@ -746,9 +838,6 @@ SIM_data <- unique(SIM_data)
 ```{r}
 head(SIM_data) %>% 
   kable()
-```
-```{r}
-write_rds(SIM_data, "data/rds/SIM_data.rds")
 ```
 
 ```{r}
@@ -784,14 +873,7 @@ ggplot(data = SIM_data,
 ```
 
 ```{r}
-summary(SIM_data)
-```
-```{r}
-glimpse(SIM_data)
-```
-
-```{r}
-vars.cor = cor(SIM_data[,4:9])
+vars.cor = cor(SIM_data[,4:11])
 corrplot.mixed(vars.cor,
          lower = "ellipse", 
                upper = "number",
@@ -799,19 +881,40 @@ corrplot.mixed(vars.cor,
                diag = "l",
                tl.col = "black")
 ```
-# 10. Unconstrained Spatial Interaction Model
 
 ```{r}
+write_rds(SIM_data, "data/rds/SIM_data.rds")
+```
+
+# 10. Spatial Interaction Model
+
+```{r}
+SIM_data <- read_rds("data/rds/SIM_data.rds")
+```
+
+::: panel-tabset 
+
+## Unconstrained Spatial Interaction Model
+
+```{r}
+#| eval: false
 uncSIM <- glm(formula = MORNING_PEAK ~ 
                 log(BUSINESS_COUNT)+
-                log(RETAIL_COUNT)+
+                log(MALL_COUNT)+
                 log(TRAIN_COUNT)+
                 log(HDB_COUNT)+
                 log(SCHOOL_COUNT)+
+                log(HOSPITAL_COUNT)+
                 log(dist),
               family = poisson(link = "log"),
               data = SIM_data,
               na.action = na.exclude)
+
+write_rds(uncSIM, "data/rds/uncSIM.rds")
+```
+
+```{r}
+uncSIM <- read_rds("data/rds/uncSIM.rds")
 summary(uncSIM)
 ```
 
@@ -831,23 +934,27 @@ CalcRSquared(uncSIM$data$MORNING_PEAK, uncSIM$fitted.values)
 r2_mcfadden(uncSIM)
 ```
 
-# 11. Origin (Production) Constrained SIM 
+## Origin (Production) Constrained SIM
 
 ```{r}
 orcSIM <- glm(formula = MORNING_PEAK ~ 
                 ORIGIN_INDEX +
                 log(BUSINESS_COUNT)+
-                log(RETAIL_COUNT)+
+                log(MALL_COUNT)+
                 log(TRAIN_COUNT)+
-                log(HDB_COUNT)+
-                log(SCHOOL_COUNT)+
+                log(HOSPITAL_COUNT)+
                 log(dist) - 1,
               family = poisson(link = "log"),
               data = SIM_data,
               na.action = na.exclude)
-summary(orcSIM)
+
+write_rds(orcSIM, "data/rds/orcSIM.rds")
 ```
 
+
+```{r}
+orcSIM <- read_rds("data/rds/orcSIM.rds")
+```
 
 ```{r}
 CalcRSquared(orcSIM$data$MORNING_PEAK, orcSIM$fitted.values)
@@ -857,14 +964,12 @@ CalcRSquared(orcSIM$data$MORNING_PEAK, orcSIM$fitted.values)
 r2_mcfadden(orcSIM)
 ```
 
-
-# 12. Destination (Attraction) Constrained SIM
+## Destination (Attraction) Constrained SIM
 
 ```{r}
+#| eval: false
 decSIM <- glm(formula = MORNING_PEAK ~ 
                 DESTIN_INDEX +
-                log(BUSINESS_COUNT)+
-                log(RETAIL_COUNT)+
                 log(TRAIN_COUNT)+
                 log(HDB_COUNT)+
                 log(SCHOOL_COUNT)+
@@ -872,9 +977,13 @@ decSIM <- glm(formula = MORNING_PEAK ~
               family = poisson(link = "log"),
               data = SIM_data,
               na.action = na.exclude)
-summary(decSIM)
+
+write_rds(decSIM, "data/rds/decSIM.rds")
 ```
 
+```{r}
+decSIM <- read_rds("data/rds/decSIM.rds")
+```
 
 ```{r}
 CalcRSquared(decSIM$data$MORNING_PEAK, decSIM$fitted.values)
@@ -884,25 +993,25 @@ CalcRSquared(decSIM$data$MORNING_PEAK, decSIM$fitted.values)
 r2_mcfadden(decSIM)
 ```
 
-
-# 13. Doubly Constrained SIM
+## Doubly Constrained SIM
 
 ```{r}
+#| eval: false
 dbcSIM <- glm(formula = MORNING_PEAK ~ 
                 ORIGIN_INDEX +
                 DESTIN_INDEX +
-                log(BUSINESS_COUNT)+
-                log(RETAIL_COUNT)+
-                log(TRAIN_COUNT)+
-                log(HDB_COUNT)+
-                log(SCHOOL_COUNT)+
                 log(dist),
               family = poisson(link = "log"),
               data = SIM_data,
               na.action = na.exclude)
-summary(dbcSIM)
+
+write_rds(dbcSIM, "data/rds/dbcSIM.rds")
 ```
 
+
+```{r}
+dbcSIM <- read_rds("data/rds/dbcSIM.rds")
+```
 
 ```{r}
 CalcRSquared(dbcSIM$data$MORNING_PEAK, dbcSIM$fitted.values)
@@ -912,4 +1021,56 @@ CalcRSquared(dbcSIM$data$MORNING_PEAK, dbcSIM$fitted.values)
 r2_mcfadden(dbcSIM)
 ```
 
+# 11. Model Comparison
 
+```{r}
+model_list <- list(
+  Unconstrained = uncSIM,
+  Origin_Constrained = orcSIM,
+  Destination_Constrained = decSIM,
+  Doubly_Constrained = dbcSIM)
+```
+
+```{r}
+compare_performance(model_list,
+                    metrics = "RMSE")
+```
+
+
+# 12. Model Diagnostics
+
+Visualize fitted values
+
+```{r}
+uncSIM_fitted <- as.data.frame(uncSIM$fitted.values) %>%
+  round(digits = 0)
+
+orcSIM_fitted <- as.data.frame(orcSIM$fitted.values) %>%
+  round(digits = 0)
+
+decSIM_fitted <- as.data.frame(decSIM$fitted.values) %>%
+  round(digits = 0)
+
+dbcSIM_fitted <- as.data.frame(dbcSIM$fitted.values) %>%
+  round(digits = 0)
+```
+
+```{r}
+flow_attr <- SIM_data %>%
+  cbind(
+    uncSIM_fitted,
+    orcSIM_fitted,
+    decSIM_fitted,
+    dbcSIM_fitted
+  )
+```
+
+```{r}
+
+```
+
+
+# 13. Discussion
+
+
+# 14. Conclusion
