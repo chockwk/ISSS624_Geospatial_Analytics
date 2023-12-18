@@ -54,7 +54,7 @@ The analysis involves the following packages:
 -   `mapview` and `tmap` supports data visualisation
 
 ```{r}
-pacman::p_load(sf, sp, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse)
+pacman::p_load(sf, sp, DT, gridExtra, knitr, mapview, spdep, sfdep, tmap, tidyverse, Kendall)
 ```
 
 # 3. Import data
